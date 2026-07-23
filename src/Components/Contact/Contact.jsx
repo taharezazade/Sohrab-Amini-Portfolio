@@ -21,8 +21,7 @@ function Contact() {
       className='
         relative
         overflow-hidden
-        py-24
-        lg:py-36
+        pt-28
       '>
       {/* Background Glow */}
 
