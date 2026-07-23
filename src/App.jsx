@@ -6,17 +6,20 @@ import Hero from "./Components/hero/Hero";
 import About from "./Components/About/About";
 import Services from "./components/services/Services";
 import Portfolio from "./Components/Portfolio/Portfolio";
+import Contact from "./Components/Contact";
 
 function App() {
   return (
     <>
+      <Header />
       <main className='relative z-10'>
-        <Header />
         <Hero />
         <About />
         <Services />
         <Portfolio />
+        <Contact />
       </main>
+      {/* <Footer /> */}
     </>
   );
 }

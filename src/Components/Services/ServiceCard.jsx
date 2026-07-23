@@ -3,8 +3,6 @@ import { TickCircle } from "iconsax-reactjs";
 
 function ServiceCard({ service, onOpenDrawer }) {
   const Icon = service.icon;
-  console.log(service);
-  console.log(service.length);
   return (
     <article className='group h-full'>
       <div
