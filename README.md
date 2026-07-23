@@ -98,15 +98,15 @@ Project screenshots will be added soon.
 - [x] Hero Section
 - [x] Header
 - [x] About Section
-- [ ] Services
-- [ ] Skills
+- [x] Services
+- [x] Skills
 - [ ] Projects
 - [ ] Experience
 - [ ] Testimonials
 - [ ] Contact
 - [ ] Footer
-- [ ] Dark / Light Theme
-- [ ] Performance Optimization
+- [x] Dark / Light Theme
+- [x] Performance Optimization
 - [ ] SEO Improvements
 
 ---
@@ -127,7 +127,7 @@ This project is licensed under the MIT License.
 
 ## 👤 Author
 
-**Sohrab Amini**
+**Taha Rezazade**
 
 Frontend Developer • UI/UX Designer
 
