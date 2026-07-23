@@ -1,3 +1,5 @@
+/** @format */
+
 import {
   Buildings2,
   BagHappy,
@@ -7,13 +9,13 @@ import {
   Building,
 } from "iconsax-reactjs";
 
-import NedayeMehrOmid from "../../assets/images/portfolio/nedayemehromid.png";
-import IranTobacco from "../../assets/images/portfolio/irantobaccoex.png";
-import BlackClothes from "../../assets/images/portfolio/blackclothes.png";
-import SahandBoresh from "../../assets/images/portfolio/sahandboresh.png";
-import JahanCharm from "../../assets/images/portfolio/jahancharm.png";
-import Ahangari from "../../assets/images/portfolio/ahangarimontazeri.png";
-import Kimia from "../../assets/images/portfolio/kimiapajoohan.png";
+import NedayeMehrOmid from "../../assets/images/portfolio/nedayemehromid.webp";
+import IranTobacco from "../../assets/images/portfolio/irantobaccoex.webp";
+import BlackClothes from "../../assets/images/portfolio/blackclothes.webp";
+import SahandBoresh from "../../assets/images/portfolio/sahandboresh.webp";
+import JahanCharm from "../../assets/images/portfolio/jahancharm.webp";
+import Ahangari from "../../assets/images/portfolio/ahangarimontazeri.webp";
+import Kimia from "../../assets/images/portfolio/kimiapajoohan.webp";
 
 export const portfolioItems = [
   {

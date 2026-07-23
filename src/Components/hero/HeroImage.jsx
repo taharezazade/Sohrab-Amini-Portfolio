@@ -1,22 +1,23 @@
+/** @format */
+
 import { motion } from "framer-motion";
 
 import HeroFloatingCards from "./HeroFloatingCards";
-import Hero from "../../assets/images/Hero.png";
+import Hero from "../../assets/images/hero/Hero.webp";
 
 import { floatingImage } from "./hero.animations";
 
 function HeroImage() {
   return (
     <div
-      className="
+      className='
         relative
         mx-auto
         flex
         items-center
         justify-center
         w-fit
-      "
-    >
+      '>
       {/* Primary Glow */}
       <motion.div
         animate={{
@@ -28,14 +29,14 @@ function HeroImage() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="
+        className='
           absolute
           h-96
           w-96
           rounded-full
           bg-primary/30
           blur-[120px]
-        "
+        '
       />
 
       {/* Secondary Glow */}
@@ -49,14 +50,14 @@ function HeroImage() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="
+        className='
           absolute
           h-[26rem]
           w-[26rem]
           rounded-full
           bg-secondary/20
           blur-[150px]
-        "
+        '
       />
 
       {/* Glass Halo */}
@@ -69,7 +70,7 @@ function HeroImage() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="
+        className='
           absolute
           h-[26rem]
           w-[26rem]
@@ -78,7 +79,7 @@ function HeroImage() {
           border-base-content/10
           bg-base-100/5
           backdrop-blur-xl
-        "
+        '
       />
 
       {/* Floating Cards */}
@@ -87,12 +88,12 @@ function HeroImage() {
       {/* Hero Image */}
       <motion.img
         src={Hero}
-        alt="Sohrab Amini"
+        alt='Sohrab Amini'
         draggable={false}
         variants={floatingImage}
-        initial="hidden"
+        initial='hidden'
         animate={["show", "animate"]}
-        className="
+        className='
           relative
           z-20
           select-none
@@ -104,7 +105,7 @@ function HeroImage() {
           md:w-[26rem]
           lg:w-[30rem]
           xl:w-[34rem]
-        "
+        '
       />
     </div>
   );

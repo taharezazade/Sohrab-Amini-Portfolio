@@ -32,7 +32,7 @@ function HeroFloatingCards() {
   return (
     <>
       {cards.map(
-        ({ id, icon: Icon, title, value, top, bottom, left, right }) => (
+        ({ id, icon: Icon, title, value, top, left, right }) => (
           <motion.div
             key={id}
             initial={{
