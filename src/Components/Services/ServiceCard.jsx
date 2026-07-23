@@ -1,27 +1,12 @@
 /** @format */
-
-import { motion } from "framer-motion";
 import { TickCircle } from "iconsax-reactjs";
-import { serviceCardVariants } from "./services.animations";
 
-function ServiceCard({ service, index, onOpenDrawer }) {
+function ServiceCard({ service, onOpenDrawer }) {
   const Icon = service.icon;
-
+  console.log(service);
+  console.log(service.length);
   return (
-    <motion.article
-      variants={serviceCardVariants}
-      initial={{ opacity: 0, y: 70 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{
-        duration: 0.6,
-        delay: index * 0.08,
-      }}
-      whileHover={{
-        y: -8,
-        scale: 1.01,
-      }}
-      className='group h-full'>
+    <article className='group h-full'>
       <div
         className='
           relative
@@ -305,7 +290,7 @@ function ServiceCard({ service, index, onOpenDrawer }) {
           />
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
 

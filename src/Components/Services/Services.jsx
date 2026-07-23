@@ -87,7 +87,8 @@ function Services() {
             whileInView={{ opacity: 1 }}
             viewport={{
               once: true,
-              amount: 0.15,
+              amount: 0.05,
+              margin: "-100px",
             }}
             transition={{
               duration: 0.6,
