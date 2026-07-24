@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+////////////////////////////////////////////////////////////
+// ENUMS
+////////////////////////////////////////////////////////////
+
+enum Role {
+  ADMIN
+}
+
+enum ProjectStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+////////////////////////////////////////////////////////////
+// ADMIN
+////////////////////////////////////////////////////////////
+
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+
+  role      Role     @default(ADMIN)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+////////////////////////////////////////////////////////////
+// HERO
+////////////////////////////////////////////////////////////
+
+model Hero {
+  id          String   @id @default(cuid())
+
+  title       String
+  subtitle    String
+  description String
+
+  image       String
+  resume      String?
+
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  primaryButtonText String?
+  primaryButtonLink String?
+
+  secondaryButtonText String?
+  secondaryButtonLink String?
+
+  seoTitle String?
+  seoDescription String?
+}
+
+////////////////////////////////////////////////////////////
+// ABOUT
+////////////////////////////////////////////////////////////
+
+model About {
+  id          String   @id @default(cuid())
+
+  title       String
+  description String
+
+  birthYear   Int?
+  location    String?
+
+  experience  Int?
+
+  image       String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+////////////////////////////////////////////////////////////
+// SERVICE
+////////////////////////////////////////////////////////////
+
+model Service {
+  id            String   @id @default(cuid())
+
+  title         String
+  slug          String   @unique
+
+  description   String
+
+  category      String
+
+  technologies  String[]
+  features      String[]
+
+  order         Int      @default(0)
+
+  isActive      Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+////////////////////////////////////////////////////////////
+// PORTFOLIO
+////////////////////////////////////////////////////////////
+
+model Portfolio {
+  id            String          @id @default(cuid())
+
+  title         String
+  slug          String          @unique
+
+  description   String
+
+  thumbnail     String
+
+  projectUrl    String?
+  githubUrl     String?
+
+  category      String
+
+  technologies  String[]
+
+  featured      Boolean         @default(false)
+
+  order         Int             @default(0)
+
+  status        ProjectStatus   @default(PUBLISHED)
+
+  images        PortfolioImage[]
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+////////////////////////////////////////////////////////////
+// PORTFOLIO IMAGES
+////////////////////////////////////////////////////////////
+
+model PortfolioImage {
+  id            String      @id @default(cuid())
+
+  image         String
+  alt           String?
+
+  order         Int         @default(0)
+
+  portfolioId   String
+  portfolio     Portfolio   @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime    @default(now())
+}
+
+////////////////////////////////////////////////////////////
+// CONTACT
+////////////////////////////////////////////////////////////
+
+model Contact {
+  id            String   @id @default(cuid())
+
+  phone         String
+  whatsapp      String
+
+  email         String?
+
+  address       String?
+
+  workingHours  String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+////////////////////////////////////////////////////////////
+// SETTINGS
+////////////////////////////////////////////////////////////
+
+model Setting {
+  id              String   @id @default(cuid())
+
+  siteTitle       String
+  siteDescription String
+
+  logo            String?
+  favicon         String?
+
+  resume          String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
