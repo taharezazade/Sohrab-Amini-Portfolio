@@ -84,11 +84,6 @@ Preview production build:
 npm run preview
 ```
 
----
-
-## 📸 Screenshots
-
-Project screenshots will be added soon.
 
 ---
 
