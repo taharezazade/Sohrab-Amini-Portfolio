@@ -100,14 +100,14 @@ Project screenshots will be added soon.
 - [x] About Section
 - [x] Services
 - [x] Skills
-- [ ] Projects
-- [ ] Experience
-- [ ] Testimonials
-- [ ] Contact
-- [ ] Footer
+- [x] Projects
+- [x] Experience
+- [x] Testimonials
+- [x] Contact
+- [x] Footer
 - [x] Dark / Light Theme
 - [x] Performance Optimization
-- [ ] SEO Improvements
+- [x] SEO Improvements
 
 ---
 
