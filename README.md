@@ -122,7 +122,7 @@ This project is licensed under the MIT License.
 
 **Taha Rezazade**
 
-Frontend Developer • UI/UX Designer
+Frontend Developer - UI/UX Designer
 
 GitHub:
 https://github.com/taharezazade
