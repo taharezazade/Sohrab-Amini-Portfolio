@@ -177,4 +177,4 @@ class ContactRepository {
   }
 }
 
-export default new ContactRepository();
+export default ContactRepository;

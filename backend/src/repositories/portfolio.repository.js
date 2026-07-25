@@ -300,4 +300,4 @@ class PortfolioRepository {
   }
 }
 
-export default new PortfolioRepository();
+export default PortfolioRepository;

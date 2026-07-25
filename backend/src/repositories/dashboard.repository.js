@@ -95,4 +95,4 @@ class DashboardRepository {
   }
 }
 
-export default new DashboardRepository();
+export default DashboardRepository;

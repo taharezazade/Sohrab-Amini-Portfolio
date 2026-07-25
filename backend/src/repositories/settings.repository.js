@@ -102,4 +102,4 @@ class SettingRepository {
   }
 }
 
-export default new SettingRepository();
+export default SettingRepository;

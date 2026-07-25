@@ -119,3 +119,41 @@ export const toggleFeaturedSchema = z.object({
 export const changePortfolioStatusSchema = z.object({
   status,
 });
+
+/* ============================
+    Portfolio Featured Validation
+============================ */
+
+export const portfolioFeaturedSchema = z.object({
+  isFeatured: z.boolean({
+    required_error: "Featured status is required",
+  }),
+});
+
+/* ============================
+    Portfolio Order Validation
+============================ */
+
+export const portfolioOrderSchema = z.object({
+  order: z
+    .array(
+      z.object({
+        id: z.string().min(1, "Portfolio id is required"),
+
+        position: z
+          .number()
+          .int()
+          .nonnegative("Position must be a positive number"),
+      }),
+    )
+    .min(1, "Order list cannot be empty"),
+});
+
+/* ============================
+    Portfolio Status Validation
+============================ */
+export const portfolioStatusSchema = z.object({
+  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"], {
+    required_error: "Portfolio status is required",
+  }),
+});

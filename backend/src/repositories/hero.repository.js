@@ -129,4 +129,4 @@ class HeroRepository {
   }
 }
 
-export default new HeroRepository();
+export default HeroRepository;
