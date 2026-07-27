@@ -2,70 +2,103 @@
 
 import { z } from "zod";
 
-/* ============================
-    Register Validation
-============================ */
+/* ==========================================================
+   Common Fields
+========================================================== */
+
+const id = z
+  .string({
+    required_error: "Administrator ID is required.",
+  })
+  .cuid("Invalid administrator ID.");
+
+const username = z
+  .string({
+    required_error: "Username is required.",
+  })
+  .trim()
+  .min(3, "Username must be at least 3 characters.")
+  .max(30, "Username must be less than 30 characters.")
+  .regex(
+    /^[a-zA-Z0-9_]+$/,
+    "Username can only contain letters, numbers and underscores.",
+  );
+
+const email = z
+  .string({
+    required_error: "Email is required.",
+  })
+  .trim()
+  .email("Invalid email address.");
+
+const password = z
+  .string({
+    required_error: "Password is required.",
+  })
+  .min(8, "Password must be at least 8 characters.")
+  .max(100, "Password must be less than 100 characters.");
+
+const refreshToken = z
+  .string({
+    required_error: "Refresh token is required.",
+  })
+  .min(10, "Refresh token is invalid.");
+
+////////////////////////////////////////////////////////////
+// Register
+////////////////////////////////////////////////////////////
 
 export const registerSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name is too long"),
-
-  email: z.string().email("Invalid email format"),
-
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  username,
+  email,
+  password,
 });
 
-/* ============================
-    Login Validation
-============================ */
+////////////////////////////////////////////////////////////
+// Login
+////////////////////////////////////////////////////////////
 
 export const loginSchema = z.object({
-  email: z.string().email("Invalid email format"),
-
-  password: z.string().min(6, "Password is required"),
+  email,
+  password,
 });
 
-/* ============================
-    Change Password Validation
-============================ */
-
-export const changePasswordSchema = z.object({
-  oldPassword: z.string().min(6, "Old password is required"),
-
-  newPassword: z.string().min(6, "New password must be at least 6 characters"),
-});
-
-/* ============================
-    Refresh Token Validation
-============================ */
-
-export const refreshTokenSchema = z.object({
-  refreshToken: z.string().min(10, "Refresh token is required"),
-});
-
-/* ============================
-    Update Profile Validation
-============================ */
+////////////////////////////////////////////////////////////
+// Update Profile
+////////////////////////////////////////////////////////////
 
 export const updateProfileSchema = z.object({
+  username: username.optional(),
+  email: email.optional(),
+});
 
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name is too long")
-    .optional(),
+////////////////////////////////////////////////////////////
+// Change Password
+////////////////////////////////////////////////////////////
 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: password,
 
-  email: z
-    .string()
-    .email("Invalid email format")
-    .optional(),
+    newPassword: password,
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "New password must be different from the current password.",
+    path: ["newPassword"],
+  });
 
+////////////////////////////////////////////////////////////
+// Refresh Token
+////////////////////////////////////////////////////////////
 
-  avatar: z
-    .string()
-    .optional(),
+export const refreshTokenSchema = z.object({
+  refreshToken,
+});
 
+////////////////////////////////////////////////////////////
+// Params
+////////////////////////////////////////////////////////////
+
+export const authParamsSchema = z.object({
+  id,
 });

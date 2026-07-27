@@ -3,120 +3,138 @@
 import authService from "../services/auth.service.js";
 
 class AuthController {
-  /* ============================
-      Register Admin
-  ============================ */
+  /* =======================================================
+      Register
+  ======================================================= */
 
   async register(req, res, next) {
     try {
-      const user = await authService.register(req.body);
+      const response = await authService.register(req.body);
 
-      return res.status(201).json({
-        success: true,
-
-        message: "User registered successfully",
-
-        data: user,
-      });
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
+  /* =======================================================
       Login
-  ============================ */
+  ======================================================= */
 
   async login(req, res, next) {
     try {
-      const result = await authService.login(req.body);
+      const response = await authService.login(req.body);
 
-      const { accessToken, refreshToken, user } = result;
-
-      // Refresh Token Cookie
-
-      res.cookie("refreshToken", refreshToken, {
+      res.cookie("refreshToken", response.data.refreshToken, {
         httpOnly: true,
-
         secure: process.env.NODE_ENV === "production",
-
         sameSite: "strict",
-
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
-      return res.status(200).json({
-        success: true,
-
-        message: "Login successful",
-
+      return res.status(response.statusCode).json({
+        success: response.success,
+        statusCode: response.statusCode,
+        message: response.message,
         data: {
-          user,
-
-          accessToken,
+          accessToken: response.data.accessToken,
+          admin: response.data.admin,
         },
+        timestamp: response.timestamp,
       });
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
+  /* =======================================================
       Logout
-  ============================ */
+  ======================================================= */
 
   async logout(req, res, next) {
     try {
-      const refreshToken = req.cookies.refreshToken;
-
-      await authService.logout(refreshToken);
-
-      res.clearCookie("refreshToken");
-
-      return res.status(200).json({
-        success: true,
-
-        message: "Logout successful",
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
       });
+      const response = await authService.logout();
+
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Get Current User
-  ============================ */
+  /* =======================================================
+      Get Profile
+  ======================================================= */
 
   async me(req, res, next) {
     try {
-      const user = await authService.getCurrentUser(req.user.id);
+      const response = await authService.getProfile(req.user.id);
 
-      return res.status(200).json({
-        success: true,
-
-        data: user,
-      });
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
+  /* =======================================================
+      Update Profile
+  ======================================================= */
+
+  async updateProfile(req, res, next) {
+    try {
+      const response = await authService.updateProfile(req.user.id, req.body);
+
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =======================================================
+      Change Password
+  ======================================================= */
+
+  async changePassword(req, res, next) {
+    try {
+      const response = await authService.changePassword(req.user.id, req.body);
+
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =======================================================
       Refresh Token
-  ============================ */
+  ======================================================= */
 
   async refreshToken(req, res, next) {
     try {
-      const refreshToken = req.cookies.refreshToken;
+      const token = req.cookies.refreshToken;
 
-      const result = await authService.refreshToken(refreshToken);
+      const response = await authService.refreshToken(token);
 
-      return res.status(200).json({
-        success: true,
+      res.cookie("refreshToken", response.data.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      });
 
-        message: "Token refreshed successfully",
-
-        data: result,
+      return res.status(response.statusCode).json({
+        success: response.success,
+        statusCode: response.statusCode,
+        message: response.message,
+        data: {
+          accessToken: response.data.accessToken,
+        },
+        timestamp: response.timestamp,
       });
     } catch (error) {
       next(error);

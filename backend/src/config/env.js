@@ -16,6 +16,9 @@ const env = {
   JWT: {
     SECRET: process.env.JWT_SECRET,
     EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+    REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN,
+    ISSUER: process.env.JWT_ISSUER,
+    AUDIENCE: process.env.JWT_AUDIENCE,
   },
 
   UPLOAD: {

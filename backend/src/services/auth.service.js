@@ -6,20 +6,20 @@ import jwt from "jsonwebtoken";
 import authRepository from "../repositories/auth.repository.js";
 
 import {
-  loginSchema,
   registerSchema,
+  loginSchema,
   updateProfileSchema,
   changePasswordSchema,
 } from "../validations/auth.validation.js";
 
+import jwtConfig from "../config/jwt.js";
+
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
-import env from "../config/env.js";
-
 class AuthService {
   /* =======================================================
-      Register Admin
+      Register
   ======================================================= */
 
   async register(payload) {
@@ -28,13 +28,19 @@ class AuthService {
     const emailExists = await authRepository.existsByEmail(data.email);
 
     if (emailExists) {
-      throw new ApiError(409, "Email already exists.");
+      throw new ApiError({
+        statusCode: 409,
+        message: "Email already exists.",
+      });
     }
 
     const usernameExists = await authRepository.existsByUsername(data.username);
 
     if (usernameExists) {
-      throw new ApiError(409, "Username already exists.");
+      throw new ApiError({
+        statusCode: 409,
+        message: "Username already exists.",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(data.password, 12);
@@ -45,16 +51,16 @@ class AuthService {
       password: hashedPassword,
     });
 
-    return new ApiResponse(
-      201,
-      {
+    return new ApiResponse({
+      statusCode: 201,
+      message: "Administrator registered successfully.",
+      data: {
         id: admin.id,
         username: admin.username,
         email: admin.email,
         role: admin.role,
       },
-      "Admin account created successfully.",
-    );
+    });
   }
 
   /* =======================================================
@@ -67,22 +73,30 @@ class AuthService {
     const admin = await authRepository.findByEmail(data.email);
 
     if (!admin) {
-      throw new ApiError(401, "Invalid email or password.");
+      throw new ApiError({
+        statusCode: 401,
+        message: "Invalid email or password.",
+      });
     }
 
-    const isPasswordValid = await bcrypt.compare(data.password, admin.password);
+    const passwordMatched = await bcrypt.compare(data.password, admin.password);
 
-    if (!isPasswordValid) {
-      throw new ApiError(401, "Invalid email or password.");
+    if (!passwordMatched) {
+      throw new ApiError({
+        statusCode: 401,
+        message: "Invalid email or password.",
+      });
     }
 
-    const token = this.generateAccessToken(admin);
+    const accessToken = this.generateAccessToken(admin);
+    const refreshToken = this.generateRefreshToken(admin);
 
-    return new ApiResponse(
-      200,
-      {
-        token,
-
+    return new ApiResponse({
+      statusCode: 200,
+      message: "Login successful.",
+      data: {
+        accessToken,
+        refreshToken,
         admin: {
           id: admin.id,
           username: admin.username,
@@ -90,25 +104,7 @@ class AuthService {
           role: admin.role,
         },
       },
-      "Login successful.",
-    );
-  }
-
-  /* =======================================================
-      Generate JWT
-  ======================================================= */
-
-  generateAccessToken(admin) {
-    return jwt.sign(
-      {
-        id: admin.id,
-        role: admin.role,
-      },
-      env.JWT.SECRET,
-      {
-        expiresIn: env.JWT.EXPIRES_IN,
-      },
-    );
+    });
   }
 
   /* =======================================================
@@ -119,12 +115,15 @@ class AuthService {
     const admin = await authRepository.findById(adminId);
 
     if (!admin) {
-      throw new ApiError(404, "Administrator not found.");
+      throw new ApiError({
+        statusCode: 404,
+        message: "Administrator not found.",
+      });
     }
 
-    return new ApiResponse(
-      200,
-      {
+    return new ApiResponse({
+      message: "Profile fetched successfully.",
+      data: {
         id: admin.id,
         username: admin.username,
         email: admin.email,
@@ -132,8 +131,7 @@ class AuthService {
         createdAt: admin.createdAt,
         updatedAt: admin.updatedAt,
       },
-      "Profile fetched successfully.",
-    );
+    });
   }
 
   /* =======================================================
@@ -146,40 +144,45 @@ class AuthService {
     const admin = await authRepository.findById(adminId);
 
     if (!admin) {
-      throw new ApiError(404, "Administrator not found.");
+      throw new ApiError({
+        statusCode: 404,
+        message: "Administrator not found.",
+      });
     }
 
-    if (data.email !== admin.email) {
+    if (data.email && data.email !== admin.email) {
       const exists = await authRepository.existsByEmail(data.email);
 
       if (exists) {
-        throw new ApiError(409, "Email already exists.");
+        throw new ApiError({
+          statusCode: 409,
+          message: "Email already exists.",
+        });
       }
     }
 
-    if (data.username !== admin.username) {
+    if (data.username && data.username !== admin.username) {
       const exists = await authRepository.existsByUsername(data.username);
 
       if (exists) {
-        throw new ApiError(409, "Username already exists.");
+        throw new ApiError({
+          statusCode: 409,
+          message: "Username already exists.",
+        });
       }
     }
 
-    const updatedAdmin = await authRepository.update(adminId, {
-      username: data.username,
-      email: data.email,
-    });
+    const updatedAdmin = await authRepository.update(adminId, data);
 
-    return new ApiResponse(
-      200,
-      {
+    return new ApiResponse({
+      message: "Profile updated successfully.",
+      data: {
         id: updatedAdmin.id,
         username: updatedAdmin.username,
         email: updatedAdmin.email,
         role: updatedAdmin.role,
       },
-      "Profile updated successfully.",
-    );
+    });
   }
 
   /* =======================================================
@@ -192,23 +195,75 @@ class AuthService {
     const admin = await authRepository.findById(adminId);
 
     if (!admin) {
-      throw new ApiError(404, "Administrator not found.");
+      throw new ApiError({
+        statusCode: 404,
+        message: "Administrator not found.",
+      });
     }
 
-    const isCurrentPasswordCorrect = await this.comparePassword(
+    const isMatched = await bcrypt.compare(
       data.currentPassword,
       admin.password,
     );
 
-    if (!isCurrentPasswordCorrect) {
-      throw new ApiError(401, "Current password is incorrect.");
+    if (!isMatched) {
+      throw new ApiError({
+        statusCode: 401,
+        message: "Current password is incorrect.",
+      });
     }
 
-    const hashedPassword = await this.hashPassword(data.newPassword);
+    const hashedPassword = await bcrypt.hash(data.newPassword, 12);
 
     await authRepository.updatePassword(adminId, hashedPassword);
 
-    return new ApiResponse(200, null, "Password changed successfully.");
+    return new ApiResponse({
+      message: "Password changed successfully.",
+    });
+  }
+
+  /* =======================================================
+      Refresh Token
+  ======================================================= */
+
+  async refreshToken(token) {
+    if (!token) {
+      throw new ApiError({
+        statusCode: 401,
+        message: "Refresh token is required.",
+      });
+    }
+
+    let decoded;
+
+    try {
+      decoded = jwt.verify(token, jwtConfig.secret);
+    } catch {
+      throw new ApiError({
+        statusCode: 401,
+        message: "Invalid refresh token.",
+      });
+    }
+
+    const admin = await authRepository.findById(decoded.id);
+
+    if (!admin) {
+      throw new ApiError({
+        statusCode: 404,
+        message: "Administrator not found.",
+      });
+    }
+
+    const accessToken = this.generateAccessToken(admin);
+    const refreshToken = this.generateRefreshToken(admin);
+
+    return new ApiResponse({
+      message: "Token refreshed successfully.",
+      data: {
+        accessToken,
+        refreshToken,
+      },
+    });
   }
 
   /* =======================================================
@@ -216,41 +271,32 @@ class AuthService {
   ======================================================= */
 
   async logout() {
-    return new ApiResponse(200, null, "Logout successful.");
+    return new ApiResponse({
+      message: "Logout successful.",
+    });
   }
 
   /* =======================================================
-      Hash Password
+      Generate Access Token
   ======================================================= */
 
-  async hashPassword(password) {
-    return await bcrypt.hash(password, 12);
+  generateAccessToken(admin) {
+    return jwt.sign(
+      {
+        id: admin.id,
+        role: admin.role,
+      },
+      jwtConfig.secret,
+      {
+        expiresIn: jwtConfig.expiresIn,
+        issuer: jwtConfig.issuer,
+        audience: jwtConfig.audience,
+      },
+    );
   }
 
   /* =======================================================
-      Compare Password
-  ======================================================= */
-
-  async comparePassword(password, hashedPassword) {
-    return await bcrypt.compare(password, hashedPassword);
-  }
-
-  /* =======================================================
-      Verify Password
-  ======================================================= */
-
-  async verifyPassword(adminId, password) {
-    const admin = await authRepository.findById(adminId);
-
-    if (!admin) {
-      throw new ApiError(404, "Administrator not found.");
-    }
-
-    return await this.comparePassword(password, admin.password);
-  }
-
-  /* =======================================================
-      Generate Refresh Token (Future Ready)
+      Generate Refresh Token
   ======================================================= */
 
   generateRefreshToken(admin) {
@@ -259,9 +305,11 @@ class AuthService {
         id: admin.id,
         role: admin.role,
       },
-      env.JWT.SECRET,
+      jwtConfig.secret,
       {
-        expiresIn: "30d",
+        expiresIn: jwtConfig.refreshExpiresIn,
+        issuer: jwtConfig.issuer,
+        audience: jwtConfig.audience,
       },
     );
   }

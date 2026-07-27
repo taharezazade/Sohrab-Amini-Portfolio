@@ -3,9 +3,9 @@
 import prisma from "../config/prisma.js";
 
 class AuthRepository {
-  /* ============================
-      Get Admin By ID
-  ============================ */
+  /* =======================================================
+      Find By ID
+  ======================================================= */
 
   async findById(id) {
     return await prisma.admin.findUnique({
@@ -15,9 +15,9 @@ class AuthRepository {
     });
   }
 
-  /* ============================
-      Get Admin By Email
-  ============================ */
+  /* =======================================================
+      Find By Email
+  ======================================================= */
 
   async findByEmail(email) {
     return await prisma.admin.findUnique({
@@ -27,9 +27,9 @@ class AuthRepository {
     });
   }
 
-  /* ============================
-      Get Admin By Username
-  ============================ */
+  /* =======================================================
+      Find By Username
+  ======================================================= */
 
   async findByUsername(username) {
     return await prisma.admin.findUnique({
@@ -39,9 +39,9 @@ class AuthRepository {
     });
   }
 
-  /* ============================
-      Create Admin
-  ============================ */
+  /* =======================================================
+      Create
+  ======================================================= */
 
   async create(data) {
     return await prisma.admin.create({
@@ -49,9 +49,9 @@ class AuthRepository {
     });
   }
 
-  /* ============================
-      Update Admin
-  ============================ */
+  /* =======================================================
+      Update
+  ======================================================= */
 
   async update(id, data) {
     return await prisma.admin.update({
@@ -62,9 +62,9 @@ class AuthRepository {
     });
   }
 
-  /* ============================
-      Change Password
-  ============================ */
+  /* =======================================================
+      Update Password
+  ======================================================= */
 
   async updatePassword(id, password) {
     return await prisma.admin.update({
@@ -77,9 +77,9 @@ class AuthRepository {
     });
   }
 
-  /* ============================
-      Delete Admin
-  ============================ */
+  /* =======================================================
+      Delete
+  ======================================================= */
 
   async delete(id) {
     return await prisma.admin.delete({
@@ -89,9 +89,9 @@ class AuthRepository {
     });
   }
 
-  /* ============================
+  /* =======================================================
       Exists By Email
-  ============================ */
+  ======================================================= */
 
   async existsByEmail(email) {
     const admin = await prisma.admin.findUnique({
@@ -103,12 +103,12 @@ class AuthRepository {
       },
     });
 
-    return !!admin;
+    return Boolean(admin);
   }
 
-  /* ============================
+  /* =======================================================
       Exists By Username
-  ============================ */
+  ======================================================= */
 
   async existsByUsername(username) {
     const admin = await prisma.admin.findUnique({
@@ -120,16 +120,16 @@ class AuthRepository {
       },
     });
 
-    return !!admin;
+    return Boolean(admin);
   }
 
-  /* ============================
+  /* =======================================================
       Count
-  ============================ */
+  ======================================================= */
 
   async count() {
     return await prisma.admin.count();
   }
 }
 
-export default AuthRepository;
+export default new AuthRepository();

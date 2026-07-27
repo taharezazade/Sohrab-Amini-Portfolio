@@ -7,23 +7,55 @@ import ApiError from "../utils/ApiError.js";
 
 const authMiddleware = (req, res, next) => {
   try {
-    const header = req.headers.authorization;
+    const authorization = req.headers.authorization;
 
-    if (!header || !header.startsWith("Bearer ")) {
+    if (!authorization) {
       throw new ApiError({
         statusCode: 401,
-        message: "Authentication required.",
+        message: "Authorization header is required.",
       });
     }
 
-    const token = header.split(" ")[1];
+    if (!authorization.startsWith("Bearer ")) {
+      throw new ApiError({
+        statusCode: 401,
+        message: "Invalid authorization format.",
+      });
+    }
 
-    const decoded = jwt.verify(token, jwtConfig.secret);
+    const token = authorization.split(" ")[1];
 
-    req.user = decoded;
+    if (!token) {
+      throw new ApiError({
+        statusCode: 401,
+        message: "Access token is required.",
+      });
+    }
+
+    const decoded = jwt.verify(token, jwtConfig.secret, {
+      issuer: jwtConfig.issuer,
+      audience: jwtConfig.audience,
+    });
+
+    req.user = {
+      id: decoded.id,
+      role: decoded.role,
+    };
 
     next();
   } catch (error) {
+    if (
+      error.name === "JsonWebTokenError" ||
+      error.name === "TokenExpiredError"
+    ) {
+      return next(
+        new ApiError({
+          statusCode: 401,
+          message: "Invalid or expired access token.",
+        }),
+      );
+    }
+
     next(error);
   }
 };

@@ -4,37 +4,51 @@ import { Router } from "express";
 
 import authController from "../controllers/auth.controller.js";
 
+import authMiddleware from "../middlewares/auth.middleware.js";
+
 const router = Router();
 
-/* ============================
-    Authentication Routes
-============================ */
+/* =======================================================
+    Public Routes
+======================================================= */
 
 /*
-    Register User
+    Register Administrator
 */
 router.post("/register", authController.register);
 
 /*
-    Login User
+    Login
 */
 router.post("/login", authController.login);
-
-/*
-    Logout User
-*/
-router.post("/logout", authController.logout);
 
 /*
     Refresh Access Token
 */
 router.post("/refresh-token", authController.refreshToken);
 
-/*
-    Get Current User
+/* =======================================================
+    Protected Routes
+======================================================= */
 
-    نیازمند auth.middleware.js
+/*
+    Get Current Administrator
 */
-router.get("/me", authController.me);
+router.get("/me", authMiddleware, authController.me);
+
+/*
+    Update Profile
+*/
+router.put("/profile", authMiddleware, authController.updateProfile);
+
+/*
+    Change Password
+*/
+router.patch("/change-password", authMiddleware, authController.changePassword);
+
+/*
+    Logout
+*/
+router.post("/logout", authMiddleware, authController.logout);
 
 export default router;
