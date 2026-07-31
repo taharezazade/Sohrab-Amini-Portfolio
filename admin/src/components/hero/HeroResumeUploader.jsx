@@ -13,22 +13,68 @@ import { useDropzone } from "react-dropzone";
 
 const HeroResumeUploader = () => {
   const [resume, setResume] = useState({
-    name: "Sohrab-Amini-Resume.pdf",
-    size: "1.82 MB",
-    updatedAt: "امروز",
+    name: "",
+    size: "",
+    updatedAt: "",
+    url: "",
+    file: null,
   });
 
-  const onDrop = useCallback((acceptedFiles) => {
-    if (!acceptedFiles.length) return;
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      if (!acceptedFiles.length) return;
 
-    const file = acceptedFiles[0];
+      const file = acceptedFiles[0];
+
+      if (resume.url?.startsWith("blob:")) {
+        URL.revokeObjectURL(resume.url);
+      }
+
+      setResume({
+        name: file.name,
+        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+        updatedAt: "همین الان",
+        url: URL.createObjectURL(file),
+        file,
+      });
+    },
+    [resume.url],
+  );
+
+  const handlePreview = () => {
+    if (!resume.url) return;
+
+    window.open(resume.url, "_blank");
+  };
+
+  const handleDownload = () => {
+    if (!resume.url) return;
+
+    const link = document.createElement("a");
+
+    link.href = resume.url;
+    link.download = resume.name;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+  };
+
+  const handleDelete = () => {
+    if (resume.url?.startsWith("blob:")) {
+      URL.revokeObjectURL(resume.url);
+    }
 
     setResume({
-      name: file.name,
-      size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-      updatedAt: "همین الان",
+      name: "",
+      size: "",
+      updatedAt: "",
+      url: "",
+      file: null,
     });
-  }, []);
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     multiple: false,
@@ -103,20 +149,42 @@ const HeroResumeUploader = () => {
         ======================================================= */}
 
         <div className='mt-5 rounded-2xl border border-base-300 bg-base-200 p-4'>
-          <div className='flex items-center gap-4'>
-            <div className='flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary'>
-              <DocumentText size={28} variant='Bulk' />
-            </div>
+          <div>
+            {resume.url ?
+              <>
+                <div className='flex items-center gap-4'>
+                  <div className='flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary'>
+                    <DocumentText size={28} variant='Bulk' />
+                  </div>
 
-            <div className='min-w-0 flex-1'>
-              <h4 className='truncate font-semibold'>{resume.name}</h4>
+                  <div className='min-w-0 flex-1'>
+                    <h4 className='truncate font-semibold'>{resume.name}</h4>
 
-              <div className='mt-2 flex flex-wrap gap-2'>
-                <div className='badge badge-neutral'>{resume.size}</div>
+                    <div className='mt-2 flex flex-wrap gap-2'>
+                      <div className='badge badge-neutral'>{resume.size}</div>
+                      <div className='badge badge-success'>
+                        {resume.updatedAt}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            : <div className='flex flex-col items-center justify-center py-8 text-center'>
+                <DocumentText
+                  size={54}
+                  variant='Bulk'
+                  className='text-base-content/30'
+                />
 
-                <div className='badge badge-success'>{resume.updatedAt}</div>
+                <h3 className='mt-4 font-semibold'>
+                  هنوز رزومه‌ای انتخاب نشده است
+                </h3>
+
+                <p className='mt-1 text-sm text-base-content/60'>
+                  یک فایل PDF انتخاب کنید.
+                </p>
               </div>
-            </div>
+            }
           </div>
 
           {/* =======================================================
@@ -129,15 +197,24 @@ const HeroResumeUploader = () => {
               انتخاب فایل
             </button>
 
-            <button className='btn btn-outline btn-primary rounded-xl'>
+            <button
+              onClick={handlePreview}
+              disabled={!resume.url}
+              className='btn btn-outline btn-primary rounded-xl'>
               <Eye size={18} />
             </button>
 
-            <button className='btn btn-outline btn-primary rounded-xl'>
+            <button
+              onClick={handleDownload}
+              disabled={!resume.url}
+              className='btn btn-outline btn-primary rounded-xl'>
               <DocumentDownload size={18} />
             </button>
 
-            <button className='btn btn-outline btn-error rounded-xl'>
+            <button
+              onClick={handleDelete}
+              disabled={!resume.url}
+              className='btn btn-outline btn-error rounded-xl'>
               <Trash size={18} />
             </button>
           </div>

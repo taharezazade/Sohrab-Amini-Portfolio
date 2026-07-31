@@ -21,7 +21,7 @@ const LoginPage = () => {
     <>
       <LoginBackground />
 
-      <div className='relative z-10 top-5 lg:top-14 flex items-center justify-center'>
+      <div className='relative z-10 lg:top-14 flex items-center justify-center'>
         <LoginCard />
       </div>
     </>

@@ -11,6 +11,7 @@ const HeroImageUploader = () => {
     size: "842 KB",
     dimensions: "1920 × 1080",
     preview: "https://placehold.co/600x340",
+    file: null,
   });
 
   const onDrop = useCallback((acceptedFiles) => {
@@ -23,8 +24,25 @@ const HeroImageUploader = () => {
       size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
       dimensions: "-",
       preview: URL.createObjectURL(file),
+      file,
     });
   }, []);
+
+  const handleRemoveImage = () => {
+    if (image?.preview?.startsWith("blob:")) {
+      URL.revokeObjectURL(image.preview);
+    }
+
+    setPreviewOpen(false);
+
+    setImage({
+      name: "",
+      size: "",
+      dimensions: "",
+      preview: "",
+      file: null,
+    });
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     multiple: false,
@@ -35,6 +53,8 @@ const HeroImageUploader = () => {
     },
     onDrop,
   });
+
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   return (
     <motion.section
@@ -71,11 +91,17 @@ const HeroImageUploader = () => {
 
       <div className='p-5'>
         <div className='overflow-hidden rounded-xl border border-base-300'>
-          <img
-            src={image.preview}
-            alt={image.name}
-            className='aspect-video w-full object-cover'
-          />
+          {image.preview ?
+            <img
+              src={image.preview}
+              alt={image.name}
+              className='aspect-video w-full object-cover'
+            />
+          : <div className='aspect-video flex flex-col items-center justify-center bg-base-200 text-base-content/40'>
+              <Image size={52} variant='Bulk' />
+              <p className='mt-3 text-sm'>تصویری انتخاب نشده است.</p>
+            </div>
+          }
         </div>
 
         {/* =======================================================
@@ -132,15 +158,85 @@ const HeroImageUploader = () => {
             انتخاب تصویر
           </button>
 
-          <button className='btn btn-outline btn-primary rounded-xl'>
+          <button
+            type='button'
+            onClick={() => setPreviewOpen(true)}
+            disabled={!image?.preview}
+            className='btn btn-outline btn-primary rounded-xl'>
             <Eye size={18} />
           </button>
 
-          <button className='btn btn-outline btn-error rounded-xl'>
+          <button
+            type='button'
+            onClick={handleRemoveImage}
+            disabled={!image.preview}
+            className='btn btn-outline btn-error rounded-xl'>
             <Trash size={18} />
           </button>
         </div>
       </div>
+      {/* =======================================================
+            Preview Modal
+      ======================================================= */}
+
+      {previewOpen && (
+        <dialog className='modal modal-open'>
+          <div className='modal-box max-w-5xl rounded-3xl p-0 overflow-hidden bg-base-100'>
+            {/* Header */}
+
+            <div className='flex items-center justify-between border-b border-base-300 px-6 py-4'>
+              <div>
+                <h3 className='font-bold text-lg'>پیش نمایش تصویر Hero</h3>
+
+                <p className='text-sm text-base-content/60 mt-1'>
+                  {image.name}
+                </p>
+              </div>
+
+              <button
+                className='btn btn-circle btn-ghost'
+                onClick={() => setPreviewOpen(false)}>
+                ✕
+              </button>
+            </div>
+
+            {/* Image */}
+
+            <div className='bg-base-200'>
+              <img
+                src={image.preview}
+                alt={image.name}
+                className='w-full max-h-[75vh] object-contain'
+              />
+            </div>
+
+            {/* Footer */}
+
+            <div className='flex flex-wrap items-center justify-between gap-3 border-t border-base-300 px-6 py-4'>
+              <div className='flex flex-wrap gap-2'>
+                <div className='badge badge-primary badge-outline'>
+                  {image.name}
+                </div>
+
+                <div className='badge badge-neutral'>{image.size}</div>
+
+                <div className='badge badge-neutral'>{image.dimensions}</div>
+              </div>
+
+              <button
+                className='btn btn-primary rounded-xl'
+                onClick={() => setPreviewOpen(false)}>
+                بستن
+              </button>
+            </div>
+          </div>
+
+          <div
+            className='modal-backdrop'
+            onClick={() => setPreviewOpen(false)}
+          />
+        </dialog>
+      )}
     </motion.section>
   );
 };

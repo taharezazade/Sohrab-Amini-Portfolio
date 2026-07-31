@@ -14,7 +14,7 @@ const LoginCard = () => {
         duration: 0.6,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className='w-11/12 max-w-5xl'>
+      className='w-11/12 max-w-5xl mt-[5rem]'>
       <div className='relative overflow-hidden rounded-[28px] border border-primary/15 bg-base-100/70 backdrop-blur-2xl'>
         <div className='pointer-events-none absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl' />
 

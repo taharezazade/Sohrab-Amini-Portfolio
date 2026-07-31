@@ -1,16 +1,15 @@
 /** @format */
 
-import { ArrowLeft2 } from "iconsax-reactjs";
 import { Link, useLocation } from "react-router-dom";
 
 const routeTitles = {
   "/dashboard": "داشبورد",
-  "/dashboard/hero": "بخش هیرو",
-  "/dashboard/about": "درباره من",
-  "/dashboard/services": "خدمات",
-  "/dashboard/portfolio": "نمونه‌کارها",
-  "/dashboard/contact": "اطلاعات تماس",
-  "/dashboard/settings": "تنظیمات سایت",
+  "/hero": "بخش هیرو",
+  "/about": "درباره من",
+  "/services": "خدمات",
+  "/portfolio": "نمونه‌کارها",
+  "/contact": "اطلاعات تماس",
+  "/settings": "تنظیمات سایت",
 };
 
 const Breadcrumb = () => {
