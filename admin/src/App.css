@@ -1,3 +1,4 @@
+@import "./assets/fonts/fontiran.css";
 @import "tailwindcss";
 @plugin "daisyui" {
   themes:
@@ -36,4 +37,16 @@ canvas {
   100% {
     transform: translateX(100%);
   }
+}
+
+html {
+  font-family: var(--font-sans);
+  direction: rtl;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background: hsl(var(--b1));
+  color: hsl(var(--bc));
 }

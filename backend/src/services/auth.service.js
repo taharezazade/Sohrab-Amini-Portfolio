@@ -30,7 +30,7 @@ class AuthService {
     if (emailExists) {
       throw new ApiError({
         statusCode: 409,
-        message: "Email already exists.",
+        message: "این ایمیل از قبل وجود دارد.",
       });
     }
 
@@ -39,7 +39,7 @@ class AuthService {
     if (usernameExists) {
       throw new ApiError({
         statusCode: 409,
-        message: "Username already exists.",
+        message: "این ایمیل از قبل وجود دارد.",
       });
     }
 
@@ -53,7 +53,7 @@ class AuthService {
 
     return new ApiResponse({
       statusCode: 201,
-      message: "Administrator registered successfully.",
+      message: "مدیر با موفقیت ثبت‌نام شد.",
       data: {
         id: admin.id,
         username: admin.username,
@@ -75,7 +75,7 @@ class AuthService {
     if (!admin) {
       throw new ApiError({
         statusCode: 401,
-        message: "Invalid email or password.",
+        message: "ایمیل یا رمز عبور نامعتبر است.",
       });
     }
 
@@ -84,7 +84,7 @@ class AuthService {
     if (!passwordMatched) {
       throw new ApiError({
         statusCode: 401,
-        message: "Invalid email or password.",
+        message: "ایمیل یا رمز عبور نامعتبر است.",
       });
     }
 
@@ -93,7 +93,7 @@ class AuthService {
 
     return new ApiResponse({
       statusCode: 200,
-      message: "Login successful.",
+      message: "ورود با موفقیت انجام شد.",
       data: {
         accessToken,
         refreshToken,
@@ -117,12 +117,12 @@ class AuthService {
     if (!admin) {
       throw new ApiError({
         statusCode: 404,
-        message: "Administrator not found.",
+        message: "مدیر یافت نشد.",
       });
     }
 
     return new ApiResponse({
-      message: "Profile fetched successfully.",
+      message: "پروفایل با موفقیت دریافت شد.",
       data: {
         id: admin.id,
         username: admin.username,
@@ -146,7 +146,7 @@ class AuthService {
     if (!admin) {
       throw new ApiError({
         statusCode: 404,
-        message: "Administrator not found.",
+        message: "مدیر یافت نشد.",
       });
     }
 
@@ -156,7 +156,7 @@ class AuthService {
       if (exists) {
         throw new ApiError({
           statusCode: 409,
-          message: "Email already exists.",
+          message: "این ایمیل از قبل وجود دارد.",
         });
       }
     }
@@ -167,7 +167,7 @@ class AuthService {
       if (exists) {
         throw new ApiError({
           statusCode: 409,
-          message: "Username already exists.",
+          message: "نام کاربری از قبل وجود دارد.",
         });
       }
     }
@@ -175,7 +175,7 @@ class AuthService {
     const updatedAdmin = await authRepository.update(adminId, data);
 
     return new ApiResponse({
-      message: "Profile updated successfully.",
+      message: "پروفایل با موفقیت به‌روزرسانی شد.",
       data: {
         id: updatedAdmin.id,
         username: updatedAdmin.username,
@@ -197,7 +197,7 @@ class AuthService {
     if (!admin) {
       throw new ApiError({
         statusCode: 404,
-        message: "Administrator not found.",
+        message: "مدیر یافت نشد.",
       });
     }
 
@@ -209,7 +209,7 @@ class AuthService {
     if (!isMatched) {
       throw new ApiError({
         statusCode: 401,
-        message: "Current password is incorrect.",
+        message: "رمز عبور فعلی نادرست است.",
       });
     }
 
@@ -218,7 +218,7 @@ class AuthService {
     await authRepository.updatePassword(adminId, hashedPassword);
 
     return new ApiResponse({
-      message: "Password changed successfully.",
+      message: "رمز عبور با موفقیت تغییر کرد.",
     });
   }
 
@@ -230,7 +230,7 @@ class AuthService {
     if (!token) {
       throw new ApiError({
         statusCode: 401,
-        message: "Refresh token is required.",
+        message: "ارائه توکن به‌روزرسانی الزامی است.",
       });
     }
 
@@ -241,7 +241,7 @@ class AuthService {
     } catch {
       throw new ApiError({
         statusCode: 401,
-        message: "Invalid refresh token.",
+        message: "توکن به‌روزرسانی نامعتبر است.",
       });
     }
 
@@ -250,7 +250,7 @@ class AuthService {
     if (!admin) {
       throw new ApiError({
         statusCode: 404,
-        message: "Administrator not found.",
+        message: "مدیر یافت نشد.",
       });
     }
 
@@ -258,7 +258,7 @@ class AuthService {
     const refreshToken = this.generateRefreshToken(admin);
 
     return new ApiResponse({
-      message: "Token refreshed successfully.",
+      message: "توکن با موفقیت به‌روزرسانی شد.",
       data: {
         accessToken,
         refreshToken,
@@ -272,7 +272,7 @@ class AuthService {
 
   async logout() {
     return new ApiResponse({
-      message: "Logout successful.",
+      message: "خروج با موفقیت انجام شد.",
     });
   }
 
