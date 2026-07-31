@@ -1,128 +1,339 @@
-# 🚀 Sohrab Amini Portfolio
+# 🚀 Sohrab Amini Portfolio & CMS
 
-A modern, responsive, and high-performance personal portfolio built with **React**, **Vite**, **Tailwind CSS v4**, **DaisyUI**, and **Framer Motion**.
+A full-stack portfolio website and content management system (CMS) built with modern web technologies.
 
-The project is designed with a strong focus on performance, maintainability, accessibility, reusable components, and clean architecture.
+The project consists of three separate applications:
 
----
+- 🌐 Portfolio Website (Frontend)
+- ⚙️ Admin Dashboard (CMS)
+- 🔥 RESTful Backend API
 
-## ✨ Features
-
-- 🎨 Modern and responsive UI
-- ⚡ Built with React + Vite
-- 💨 Tailwind CSS v4
-- 🌼 DaisyUI components
-- 🎬 Smooth animations with Framer Motion
-- 🧩 Reusable component architecture
-- 📱 Mobile-first responsive design
-- 🌙 Clean and scalable project structure
-- 🚀 Optimized for future expansion
+The entire project is designed around scalability, maintainability, clean architecture, reusable components, performance optimization, and modern UI/UX principles.
 
 ---
 
-## 🛠️ Tech Stack
+# ✨ Features
 
-- React
+## 🌐 Portfolio Website
+
+- Modern responsive design
+- Mobile-first layout
+- Dark / Light theme
+- Smooth page animations
+- SEO-friendly architecture
+- Optimized images
+- Responsive navigation
+- Hero section
+- About section
+- Services
+- Portfolio
+- Contact
+- Footer
+- Custom reusable UI components
+
+---
+
+## ⚙️ Admin Dashboard
+
+- Secure authentication
+- Protected routes
+- Responsive dashboard
+- Theme switch
+- Breadcrumb navigation
+- Sidebar navigation
+- Dashboard overview
+- Hero management page
+- File upload components
+- Image uploader
+- Resume uploader
+- Status cards
+- Statistics widgets
+- Quick actions
+- Timeline
+- Responsive admin layout
+
+---
+
+## 🔥 Backend API
+
+- RESTful API
+- JWT Authentication
+- Refresh Token Authentication
+- Cookie-based Authentication
+- Prisma ORM
+- PostgreSQL
+- Layered Architecture
+- Repository Pattern
+- Service Pattern
+- Request Validation
+- Global Error Handling
+- API Response Standardization
+- File Upload Structure
+- Database Seed
+- CRUD APIs
+
+---
+
+# 🛠️ Tech Stack
+
+## Frontend
+
+- React 19
 - Vite
-- JavaScript (ES6+)
+- React Router DOM
+- Axios
+- React Hook Form
+- Zod
+- Framer Motion
 - Tailwind CSS v4
 - DaisyUI
-- Framer Motion
 - Iconsax React
+- Tailwind Merge
 
 ---
 
-## 📂 Project Structure
+## Backend
+
+- Node.js
+- Express.js
+- Prisma ORM
+- PostgreSQL
+- JWT
+- bcrypt
+- Cookie Parser
+- Helmet
+- Morgan
+- CORS
+- Compression
+- Multer
+- Cloudinary
+- Zod
+
+---
+
+## Development
+
+- ESLint
+- Nodemon
+- Prisma Studio
+- Prisma Migrate
+
+---
+
+# 📁 Project Structure
 
 ```
-src/
-│
-├── assets/
-├── components/
-│   ├── Header/
-│   ├── Hero/
-│   ├── About/
+SohrabAmini/
+
+├── admin/
+│   ├── src/
+│   ├── public/
 │   └── ...
-├── data/
-├── hooks/
-├── layouts/
-├── utils/
-└── App.jsx
+│
+├── backend/
+│   ├── prisma/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middlewares/
+│   │   ├── repositories/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   ├── utils/
+│   │   ├── validations/
+│   │   └── server.js
+│   └── ...
+│
+└── portfolio/
+    ├── src/
+    ├── public/
+    └── ...
 ```
 
 ---
 
-## 🚀 Getting Started
+# ⚡ Backend Architecture
 
-Clone the repository:
+The backend follows a clean layered architecture.
+
+```
+Request
+
+↓
+
+Route
+
+↓
+
+Controller
+
+↓
+
+Service
+
+↓
+
+Repository
+
+↓
+
+Prisma ORM
+
+↓
+
+PostgreSQL
+```
+
+---
+
+# 🚀 Getting Started
+
+## Clone Repository
 
 ```bash
 git clone https://github.com/taharezazade/Sohrab-Amini-Portfolio.git
 ```
 
-Install dependencies:
+---
+
+## Portfolio
 
 ```bash
+cd portfolio
+
 npm install
-```
 
-Run the development server:
-
-```bash
 npm run dev
 ```
 
-Build for production:
+---
+
+## Admin Dashboard
 
 ```bash
-npm run build
+cd admin
+
+npm install
+
+npm run dev
 ```
 
-Preview production build:
+---
+
+## Backend
 
 ```bash
-npm run preview
+cd backend
+
+npm install
+
+npm run dev
 ```
----
-
-## 📌 Roadmap
-
-- [x] Project setup
-- [x] Hero Section
-- [x] Header
-- [x] About Section
-- [x] Services
-- [x] Skills
-- [x] Projects
-- [x] Experience
-- [x] Testimonials
-- [x] Contact
-- [x] Footer
-- [x] Dark / Light Theme
-- [x] Performance Optimization
-- [x] SEO Improvements
 
 ---
 
-## 📄 Notes
+# 📦 Backend Features
 
-Some premium assets (such as licensed fonts) are intentionally excluded from this repository.
-
-Please replace them with your own licensed fonts before running the project.
+- Authentication
+- Authorization
+- JWT Access Token
+- Refresh Token
+- Role System
+- Validation
+- Error Handling
+- Prisma ORM
+- PostgreSQL
+- File Upload
+- Image Upload
+- Resume Upload
+- CRUD APIs
+- Seed Database
 
 ---
 
-## 📜 License
+# 📌 Current Progress
+
+## Portfolio
+
+- ✅ Hero
+- ✅ About
+- ✅ Services
+- ✅ Portfolio
+- ✅ Contact
+- ✅ Footer
+- ✅ Responsive Layout
+- ✅ Theme Switch
+- ✅ Animations
+- ✅ SEO Improvements
+
+---
+
+## Backend
+
+- ✅ Authentication System
+- ✅ Hero API
+- ✅ About API
+- ✅ Services API
+- ✅ Portfolio API
+- ✅ Upload System
+- ✅ Validation
+- ✅ Database Seed
+- ✅ Prisma Models
+- ✅ Repository Pattern
+- ✅ Service Layer
+
+---
+
+## Admin Dashboard
+
+- ✅ Authentication
+- ✅ Dashboard
+- ✅ Responsive Layout
+- ✅ Sidebar
+- ✅ Header
+- ✅ Theme Switch
+- ✅ Dashboard Widgets
+- 🚧 Hero Management
+- ⏳ About Management
+- ⏳ Services Management
+- ⏳ Portfolio Management
+- ⏳ Contact Management
+- ⏳ Settings
+
+---
+
+# 🎯 Project Goals
+
+- Clean Architecture
+- Reusable Components
+- High Performance
+- Modern UI/UX
+- Scalable Backend
+- Secure Authentication
+- Maintainable Codebase
+
+---
+
+# 📄 Notes
+
+Some licensed assets (fonts, premium graphics and media) are intentionally excluded from the repository.
+
+Please replace them with your own licensed assets before running the project.
+
+---
+
+# 📜 License
 
 This project is licensed under the MIT License.
 
 ---
 
-## 👤 Author
+# 👨‍💻 Author
 
 **Taha Rezazade**
 
-Frontend Developer - UI/UX Designer
+Frontend Developer • UI/UX Designer • Full Stack Web Developer
 
-GitHub:
+GitHub
+
 https://github.com/taharezazade
