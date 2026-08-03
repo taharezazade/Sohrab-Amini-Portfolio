@@ -15,7 +15,7 @@ const Card = ({
   return (
     <div
       className={twMerge(
-        "card border border-base-300 bg-base-100 shadow-sm",
+        "card border border-base-300 bg-base-100 rounded-3xl shadow-sm",
         className,
       )}>
       {(title || subtitle || action) && (

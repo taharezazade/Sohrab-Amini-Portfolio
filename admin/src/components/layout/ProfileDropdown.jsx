@@ -51,7 +51,9 @@ const ProfileDropdown = () => {
         {/* Profile */}
 
         <li>
-          <Link to='/dashboard/settings' className='rounded-xl hover:text-primary hover:bg-primary/10'>
+          <Link
+            to='/profile'
+            className='rounded-xl hover:text-primary hover:bg-primary/10'>
             <ProfileCircle size={20} variant='Bulk' />
             پروفایل
           </Link>
@@ -60,7 +62,9 @@ const ProfileDropdown = () => {
         {/* Settings */}
 
         <li>
-          <Link to='/dashboard/settings' className='rounded-xl hover:text-primary hover:bg-primary/10'>
+          <Link
+            to='/settings'
+            className='rounded-xl hover:text-primary hover:bg-primary/10'>
             <Setting2 size={20} variant='Bulk' />
             تنظیمات
           </Link>
@@ -71,7 +75,10 @@ const ProfileDropdown = () => {
         {/* Logout */}
 
         <li>
-          <button type='button' onClick={logout} className='text-error rounded-xl hover:bg-error/10'>
+          <button
+            type='button'
+            onClick={logout}
+            className='text-error rounded-xl hover:bg-error/10'>
             <Logout size={20} variant='Bulk' />
             خروج از حساب کاربری
           </button>

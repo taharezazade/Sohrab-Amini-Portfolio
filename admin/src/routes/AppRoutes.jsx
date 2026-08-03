@@ -15,6 +15,7 @@ import PortfolioPage from "../pages/portfolio/Portfolio";
 import ContactPage from "../pages/contact/Contact";
 import SettingsPage from "../pages/settings/Settings";
 import NotFoundPage from "../pages/NotFound";
+import Profile from "../pages/profile/profile";
 
 const AppRoutes = () => {
   return (
@@ -36,6 +37,7 @@ const AppRoutes = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path='/dashboard' element={<DashboardPage />} />
+          <Route path='/Profile' element={<Profile />} />
           <Route path='/hero' element={<HeroPage />} />
           <Route path='/about' element={<AboutPage />} />
           <Route path='/services' element={<ServicesPage />} />

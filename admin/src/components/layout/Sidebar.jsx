@@ -99,7 +99,7 @@ const Sidebar = () => {
           z-50
           flex
           h-screen
-          w-72
+          w-56
           flex-col
           border-l
           border-base-300

@@ -39,7 +39,27 @@ const Header = () => {
   };
 
   return (
-    <header className='relative top-0 z-30 border-b border-base-300 bg-base-100/75 backdrop-blur-xl'>
+    <header
+      className='
+        fixed
+        top-0
+        right-0
+
+        z-50
+
+        h-20
+
+        w-full
+
+        bg-base-100/80
+        backdrop-blur-xl
+
+        border-b
+        border-base-300
+
+        lg:right-56
+        lg:w-[calc(100%-14rem)]
+      '>
       <div className='flex h-20 items-center justify-between px-5 lg:px-8'>
         {/* ========================================= */}
         {/* Right */}

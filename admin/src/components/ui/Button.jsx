@@ -20,12 +20,12 @@ const Button = ({
       type={type}
       disabled={disabled || loading}
       className={twMerge(
-        "relative inline-flex h-14 items-center justify-center gap-2 overflow-hidden rounded-2xl",
+        "relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl",
         "bg-primary text-primary-content",
-        "px-6 font-semibold",
-        "shadow-lg shadow-primary/20",
+        "p-3 font-semibold",
+        "shadow-md shadow-primary/20",
         "transition-all duration-300",
-        "hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30",
+        "hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30",
         "active:translate-y-0",
         "focus:outline-none focus:ring-4 focus:ring-primary/20",
         "disabled:pointer-events-none disabled:opacity-60",

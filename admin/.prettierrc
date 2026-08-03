@@ -5,13 +5,13 @@
   "htmlWhitespaceSensitivity": "css",
   "insertPragma": true,
   "singleAttributePerLine": false,
-  "bracketSameLine": false,
+  "bracketSameLine": true,
   "jsxBracketSameLine": true,
   "jsxSingleQuote": true,
   "printWidth": 80,
   "proseWrap": "preserve",
   "quoteProps": "as-needed",
-  "requirePragma": false,
+  "requirePragma": true,
   "semi": true,
   "singleQuote": false,
   "tabWidth": 2,
@@ -22,6 +22,6 @@
   "experimentalTernaries": true,
   "objectWrap": "preserve",
   "experimentalOperatorPosition": "end",
-  "filepath": "c:\\Users\\technic\\Desktop\\Sohrab Amini\\SohrabAmini\\src\\Components\\Portfolio\\PortfolioDrawer.jsx",
+  "filepath": "c:\\Users\\technic\\Desktop\\SohrabAmini\\admin",
   "parser": "babel"
 }

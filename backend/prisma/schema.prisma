@@ -26,12 +26,26 @@ enum ProjectStatus {
 ////////////////////////////////////////////////////////////
 
 model Admin {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  email     String   @unique
-  password  String
+  id String @id @default(cuid())
 
-  role      Role     @default(ADMIN)
+  firstName String?
+  lastName String?
+
+  displayName String?
+
+  username String @unique
+  email String @unique
+  phone String?
+
+  bio String?
+
+  image String?
+
+  password String
+
+  role Role @default(ADMIN)
+
+  lastLogin DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -168,19 +182,15 @@ model PortfolioImage {
 ////////////////////////////////////////////////////////////
 
 model Contact {
-  id            String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  phone         String
-  whatsapp      String
+  phone String
+  whatsapp String
 
-  email         String?
+  image String?
 
-  address       String?
-
-  workingHours  String?
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 ////////////////////////////////////////////////////////////
@@ -188,16 +198,68 @@ model Contact {
 ////////////////////////////////////////////////////////////
 
 model Setting {
-  id              String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  siteTitle       String
-  siteDescription String
 
-  logo            String?
-  favicon         String?
+  // General
 
-  resume          String?
+  siteName String
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  siteTitle String
+
+  description String
+
+
+  // Contact
+
+  phone String?
+
+  email String?
+
+
+  // Branding
+
+  logo String?
+
+  favicon String?
+
+
+  // SEO
+
+  metaTitle String?
+
+  metaDescription String?
+
+  keywords String?
+
+  canonicalUrl String?
+
+
+  // Social
+
+  instagram String?
+
+  linkedin String?
+
+  github String?
+
+  telegram String?
+
+  twitter String?
+
+  whatsapp String?
+
+
+  // Security
+
+  maintenanceMode Boolean @default(false)
+
+  twoFactor Boolean @default(false)
+
+  allowRegistration Boolean @default(false)
+
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 }
