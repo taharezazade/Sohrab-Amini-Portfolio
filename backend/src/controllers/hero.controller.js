@@ -1,87 +1,81 @@
 /** @format */
 
 import heroService from "../services/hero.service.js";
+import ApiResponse from "../utils/ApiResponse.js";
+import asyncHandler from "../utils/asyncHandler.js";
 
-class HeroController {
-  /* ============================
-      Get Hero
-  ============================ */
+/* =========================================
+    Get Hero
+========================================= */
 
-  async getHero(req, res, next) {
-    try {
-      const hero = await heroService.getHero();
+export const getHero = asyncHandler(async (req, res) => {
+  const hero = await heroService.getHero();
 
-      return res.status(200).json({
-        success: true,
+  console.log("HERO DATA:", hero);
 
-        message: "Hero information fetched successfully",
+  return res
+    .status(200)
+    .json(ApiResponse.ok(hero, "Hero section fetched successfully."));
+});
 
-        data: hero,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
+/* =========================================
+    Get Hero By ID
+========================================= */
 
-  /* ============================
-      Create Hero
-  ============================ */
+export const getHeroById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
 
-  async createHero(req, res, next) {
-    try {
-      const hero = await heroService.createHero(req.body);
+  const hero = await heroService.getHeroById(id);
 
-      return res.status(201).json({
-        success: true,
+  return res
+    .status(200)
+    .json(ApiResponse.ok(hero, "Hero section fetched successfully."));
+});
 
-        message: "Hero information created successfully",
+/* =========================================
+    Create Hero
+========================================= */
 
-        data: hero,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
+export const createHero = asyncHandler(async (req, res) => {
+  const hero = await heroService.createHero(req.body);
 
-  /* ============================
-      Update Hero
-  ============================ */
+  return res
+    .status(201)
+    .json(ApiResponse.created(hero, "Hero section created successfully."));
+});
 
-  async updateHero(req, res, next) {
-    try {
-      const hero = await heroService.updateHero(req.body);
+/* =========================================
+    Update Hero
+========================================= */
 
-      return res.status(200).json({
-        success: true,
+export const updateHero = asyncHandler(async (req, res) => {
+  const hero = await heroService.updateHero(req.body);
 
-        message: "Hero information updated successfully",
+  return res
+    .status(200)
+    .json(ApiResponse.updated(hero, "Hero section updated successfully."));
+});
 
-        data: hero,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
+/* =========================================
+    Upsert Hero
+========================================= */
 
-  /* ============================
-      Delete Hero
-  ============================ */
+export const upsertHero = asyncHandler(async (req, res) => {
+  const hero = await heroService.upsertHero(req.body);
 
-  async deleteHero(req, res, next) {
-    try {
-      const hero = await heroService.deleteHero();
+  return res
+    .status(200)
+    .json(ApiResponse.updated(hero, "Hero section saved successfully."));
+});
 
-      return res.status(200).json({
-        success: true,
+/* =========================================
+    Delete Hero
+========================================= */
 
-        message: "Hero information deleted successfully",
+export const deleteHero = asyncHandler(async (req, res) => {
+  await heroService.deleteHero();
 
-        data: hero,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-}
-
-export default new HeroController();
+  return res
+    .status(200)
+    .json(ApiResponse.deleted("Hero section deleted successfully."));
+});

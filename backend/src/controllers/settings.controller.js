@@ -3,121 +3,169 @@
 import settingsService from "../services/settings.service.js";
 
 class SettingsController {
-  /* ============================
-      Create Settings
-  ============================ */
-
-  async createSettings(req, res, next) {
-    try {
-      const settings = await settingsService.createSettings(req.body);
-
-      return res.status(201).json({
-        success: true,
-
-        message: "Settings created successfully",
-
-        data: settings,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* ============================
-      Get Settings
-  ============================ */
+  /* =========================================================
+     GET SETTINGS
+  ========================================================= */
 
   async getSettings(req, res, next) {
     try {
-      const settings = await settingsService.getSettings();
+      const result = await settingsService.getSettings();
 
-      return res.status(200).json({
-        success: true,
-
-        message: "Settings fetched successfully",
-
-        data: settings,
-      });
+      return res.status(result.statusCode).json(result);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Update Settings
-  ============================ */
+  /* =========================================================
+     GET SETTINGS BY ID
+  ========================================================= */
+
+  async getSettingsById(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const result = await settingsService.getSettingsById(id);
+
+      return res.status(result.statusCode).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     GET EXISTS
+  ========================================================= */
+
+  async exists(req, res, next) {
+    try {
+      const result = await settingsService.exists();
+
+      return res.status(result.statusCode).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     GET COUNT
+  ========================================================= */
+
+  async count(req, res, next) {
+    try {
+      const result = await settingsService.count();
+
+      return res.status(result.statusCode).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     POST CREATE SETTINGS
+  ========================================================= */
+
+  async createSettings(req, res, next) {
+    try {
+      const result = await settingsService.createSettings(req.body);
+
+      return res.status(result.statusCode).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     PUT UPDATE SETTINGS
+  ========================================================= */
 
   async updateSettings(req, res, next) {
     try {
-      const settings = await settingsService.updateSettings(req.body);
+      const { id } = req.params;
 
-      return res.status(200).json({
-        success: true,
+      const result = await settingsService.updateSettings(id, req.body);
 
-        message: "Settings updated successfully",
-
-        data: settings,
-      });
+      return res.status(result.statusCode).json(result);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Update SEO Settings
-  ============================ */
+  /* =========================================================
+     PUT UPDATE BRANDING
+  ========================================================= */
+
+  async updateBranding(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const result = await settingsService.updateBranding(id, req.body);
+
+      return res.status(result.statusCode).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     PUT UPDATE SEO
+  ========================================================= */
 
   async updateSEO(req, res, next) {
     try {
-      const settings = await settingsService.updateSEO(req.body);
+      const { id } = req.params;
 
-      return res.status(200).json({
-        success: true,
+      const result = await settingsService.updateSEO(id, req.body);
 
-        message: "SEO settings updated successfully",
-
-        data: settings,
-      });
+      return res.status(result.statusCode).json(result);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Update Social Links
-  ============================ */
+  /* =========================================================
+     PUT UPDATE SOCIAL
+  ========================================================= */
 
-  async updateSocialLinks(req, res, next) {
+  async updateSocial(req, res, next) {
     try {
-      const settings = await settingsService.updateSocialLinks(req.body);
+      const { id } = req.params;
 
-      return res.status(200).json({
-        success: true,
+      const result = await settingsService.updateSocial(id, req.body);
 
-        message: "Social links updated successfully",
-
-        data: settings,
-      });
+      return res.status(result.statusCode).json(result);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Delete Settings
-  ============================ */
+  /* =========================================================
+     PUT UPDATE SECURITY
+  ========================================================= */
+
+  async updateSecurity(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const result = await settingsService.updateSecurity(id, req.body);
+
+      return res.status(result.statusCode).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     DELETE SETTINGS
+  ========================================================= */
 
   async deleteSettings(req, res, next) {
     try {
-      const result = await settingsService.deleteSettings();
+      const { id } = req.params;
 
-      return res.status(200).json({
-        success: true,
+      const result = await settingsService.deleteSettings(id);
 
-        message: "Settings deleted successfully",
-
-        data: result,
-      });
+      return res.status(result.statusCode).json(result);
     } catch (error) {
       next(error);
     }

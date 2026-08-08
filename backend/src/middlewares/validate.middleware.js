@@ -1,19 +1,31 @@
 /** @format */
 
-const validate = (schema) => {
+import { ZodError } from "zod";
+
+const validateMiddleware = (schema) => {
   return async (req, res, next) => {
     try {
-      req.validatedData = await schema.parseAsync({
+      const validatedData = await schema.parseAsync({
         body: req.body,
         params: req.params,
         query: req.query,
       });
 
+      req.validatedData = validatedData;
+
       next();
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(422).json({
+          success: false,
+          message: "اطلاعات ارسال شده معتبر نیست.",
+          errors: error.errors,
+        });
+      }
+
       next(error);
     }
   };
 };
 
-export default validate;
+export default validateMiddleware;

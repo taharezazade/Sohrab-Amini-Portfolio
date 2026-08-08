@@ -6,47 +6,81 @@ import settingsController from "../controllers/settings.controller.js";
 
 const router = Router();
 
-/* ============================
-    Public Routes
-============================ */
+/* =========================================================
+   GET SETTINGS
+========================================================= */
 
-/*
-    Get Website Settings
-*/
+// Get main website settings
 router.get("/", settingsController.getSettings);
 
-/* ============================
-    Admin Routes
-============================ */
+/* =========================================================
+   GET EXISTS
+========================================================= */
 
-/*
-    Create Initial Settings
-*/
+// Check whether settings exist
+router.get("/exists", settingsController.exists);
+
+/* =========================================================
+   GET COUNT
+========================================================= */
+
+// Get settings count
+router.get("/count", settingsController.count);
+
+/* =========================================================
+   POST CREATE SETTINGS
+========================================================= */
+
+// Create initial settings
 router.post("/", settingsController.createSettings);
 
-/*
-    Update General Settings
+/* =========================================================
+   GET SETTINGS BY ID
+========================================================= */
 
-    تغییر:
-    - Site Name
-    - Description
-    - Contact Info
-*/
-router.put("/", settingsController.updateSettings);
+// Get settings by ID
+router.get("/:id", settingsController.getSettingsById);
 
-/*
-    Update SEO Settings
-*/
-router.patch("/seo", settingsController.updateSEO);
+/* =========================================================
+   PUT UPDATE SETTINGS
+========================================================= */
 
-/*
-    Update Social Links
-*/
-router.patch("/social", settingsController.updateSocialLinks);
+// Update general settings
+router.put("/:id", settingsController.updateSettings);
 
-/*
-    Delete Settings
-*/
-router.delete("/", settingsController.deleteSettings);
+/* =========================================================
+   PUT UPDATE BRANDING
+========================================================= */
+
+// Update logo and favicon
+router.put("/:id/branding", settingsController.updateBranding);
+
+/* =========================================================
+   PUT UPDATE SEO
+========================================================= */
+
+// Update SEO settings
+router.put("/:id/seo", settingsController.updateSEO);
+
+/* =========================================================
+   PUT UPDATE SOCIAL
+========================================================= */
+
+// Update social links
+router.put("/:id/social", settingsController.updateSocial);
+
+/* =========================================================
+   PUT UPDATE SECURITY
+========================================================= */
+
+// Update security settings
+router.put("/:id/security", settingsController.updateSecurity);
+
+/* =========================================================
+   DELETE SETTINGS
+========================================================= */
+
+// Delete settings
+router.delete("/:id", settingsController.deleteSettings);
 
 export default router;

@@ -1,39 +1,28 @@
 /** @format */
 
-import api from "./axios.js";
+import api from "./axios";
+
+import { SETTINGS_ENDPOINTS } from "../constants/endpoints";
+
+const getSettings = async () => {
+  const { data } = await api.get(SETTINGS_ENDPOINTS.GET);
+
+  return data;
+};
+
+const updateSettings = async (formData) => {
+  const { data } = await api.put(SETTINGS_ENDPOINTS.UPDATE, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return data;
+};
 
 const settingsApi = {
-  /* =======================================================
-      Get Settings
-  ======================================================= */
-
-  getSettings() {
-    return api.get("/settings");
-  },
-
-  /* =======================================================
-      Create Settings
-  ======================================================= */
-
-  createSettings(data) {
-    return api.post("/settings", data);
-  },
-
-  /* =======================================================
-      Update Settings
-  ======================================================= */
-
-  updateSettings(data) {
-    return api.put("/settings", data);
-  },
-
-  /* =======================================================
-      Delete Settings
-  ======================================================= */
-
-  deleteSettings() {
-    return api.delete("/settings");
-  },
+  getSettings,
+  updateSettings,
 };
 
 export default settingsApi;

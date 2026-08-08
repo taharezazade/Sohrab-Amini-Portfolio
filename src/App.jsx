@@ -1,27 +1,42 @@
 /** @format */
 
-import "./App.css";
-import Header from "./Components/layout/Header";
-import Hero from "./Components/hero/Hero";
-import About from "./Components/About/About";
-import Services from "./components/services/Services";
-import Portfolio from "./Components/Portfolio/Portfolio";
-import Contact from "./Components/Contact";
-import Footer from "./Components/layout/Footer";
+import { Routes, Route } from "react-router-dom";
+
+import Home from "./pages/Home/Home";
+
+import Dashboard from "./pages/Admin/Dashboard";
+
+import HeroSettings from "./pages/Admin/HeroSettings";
 
 function App() {
   return (
-    <>
-      <Header />
-      <main className='relative z-10'>
-        <Hero />
-        <About />
-        <Services />
-        <Portfolio />
-        <Contact />
-      </main>
-      <Footer />
-    </>
+    <Routes>
+      {/* =====================
+    Public Website
+===================== */}
+
+      <Route
+        path='/'
+
+        element={<Home />}
+      />
+
+      {/* =====================
+    Admin Panel
+===================== */}
+
+      <Route
+        path='/admin'
+
+        element={<Dashboard />}
+      />
+
+      <Route
+        path='/admin/hero'
+
+        element={<HeroSettings />}
+      />
+    </Routes>
   );
 }
 

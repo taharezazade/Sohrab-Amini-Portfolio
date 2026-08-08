@@ -24,7 +24,6 @@ router.get("/active", servicesController.getActiveServices);
     Get Single Service
 */
 router.get("/:id", servicesController.getServiceById);
-
 /* ============================
     Admin Routes
 ============================ */
@@ -47,8 +46,7 @@ router.delete("/:id", servicesController.deleteService);
 /*
     Toggle Active Status
 */
-router.patch("/:id/toggle", servicesController.toggleServiceStatus);
-
+router.patch("/reorder", servicesController.reorderServices);
 /*
     Reorder Services
 */

@@ -6,9 +6,13 @@ import {
   createPortfolioSchema,
   updatePortfolioSchema,
   portfolioParamsSchema,
+  portfolioSlugSchema,
   portfolioStatusSchema,
   portfolioFeaturedSchema,
   portfolioOrderSchema,
+  portfolioImageSchema,
+  portfolioImageOrderSchema,
+  portfolioImagesSchema,
 } from "../validations/portfolio.validation.js";
 
 import ApiError from "../utils/ApiError.js";
@@ -62,7 +66,9 @@ class PortfolioService {
   ========================================= */
 
   async getById(id) {
-    portfolioParamsSchema.parse({ id });
+    portfolioParamsSchema.parse({
+      id,
+    });
 
     const portfolio = await portfolioRepository.findById(id);
 
@@ -78,6 +84,10 @@ class PortfolioService {
   ========================================= */
 
   async getBySlug(slug) {
+    portfolioSlugSchema.parse({
+      slug,
+    });
+
     const portfolio = await portfolioRepository.findBySlug(slug);
 
     if (!portfolio) {
@@ -86,7 +96,6 @@ class PortfolioService {
 
     return new ApiResponse(200, portfolio, "Portfolio fetched successfully.");
   }
-
   /* =========================================
       Create Portfolio
   ========================================= */
@@ -102,13 +111,16 @@ class PortfolioService {
 
     const portfolio = await portfolioRepository.create({
       title: data.title,
+
       slug: data.slug,
+
       description: data.description,
 
-      thumbnail: data.thumbnail,
+      thumbnail: data.thumbnail ?? null,
 
-      projectUrl: data.projectUrl,
-      githubUrl: data.githubUrl,
+      projectUrl: data.projectUrl ?? null,
+
+      githubUrl: data.githubUrl ?? null,
 
       category: data.category,
 
@@ -129,7 +141,9 @@ class PortfolioService {
   ========================================= */
 
   async update(id, payload) {
-    portfolioParamsSchema.parse({ id });
+    portfolioParamsSchema.parse({
+      id,
+    });
 
     const data = updatePortfolioSchema.parse(payload);
 
@@ -148,24 +162,49 @@ class PortfolioService {
     }
 
     const updatedPortfolio = await portfolioRepository.update(id, {
-      title: data.title,
-      slug: data.slug,
-      description: data.description,
+      ...(data.title !== undefined && {
+        title: data.title,
+      }),
 
-      thumbnail: data.thumbnail,
+      ...(data.slug !== undefined && {
+        slug: data.slug,
+      }),
 
-      projectUrl: data.projectUrl,
-      githubUrl: data.githubUrl,
+      ...(data.description !== undefined && {
+        description: data.description,
+      }),
 
-      category: data.category,
+      ...(data.thumbnail !== undefined && {
+        thumbnail: data.thumbnail,
+      }),
 
-      technologies: data.technologies,
+      ...(data.projectUrl !== undefined && {
+        projectUrl: data.projectUrl,
+      }),
 
-      featured: data.featured,
+      ...(data.githubUrl !== undefined && {
+        githubUrl: data.githubUrl,
+      }),
 
-      order: data.order,
+      ...(data.category !== undefined && {
+        category: data.category,
+      }),
 
-      status: data.status,
+      ...(data.technologies !== undefined && {
+        technologies: data.technologies,
+      }),
+
+      ...(data.featured !== undefined && {
+        featured: data.featured,
+      }),
+
+      ...(data.order !== undefined && {
+        order: data.order,
+      }),
+
+      ...(data.status !== undefined && {
+        status: data.status,
+      }),
     });
 
     return new ApiResponse(
@@ -174,12 +213,15 @@ class PortfolioService {
       "Portfolio updated successfully.",
     );
   }
+
   /* =========================================
       Delete Portfolio
   ========================================= */
 
   async delete(id) {
-    portfolioParamsSchema.parse({ id });
+    portfolioParamsSchema.parse({
+      id,
+    });
 
     const portfolio = await portfolioRepository.findById(id);
 
@@ -191,13 +233,14 @@ class PortfolioService {
 
     return new ApiResponse(200, null, "Portfolio deleted successfully.");
   }
-
   /* =========================================
       Update Portfolio Status
   ========================================= */
 
   async updateStatus(id, payload) {
-    portfolioParamsSchema.parse({ id });
+    portfolioParamsSchema.parse({
+      id,
+    });
 
     const data = portfolioStatusSchema.parse(payload);
 
@@ -224,7 +267,9 @@ class PortfolioService {
   ========================================= */
 
   async toggleFeatured(id, payload) {
-    portfolioParamsSchema.parse({ id });
+    portfolioParamsSchema.parse({
+      id,
+    });
 
     const data = portfolioFeaturedSchema.parse(payload);
 
@@ -253,7 +298,9 @@ class PortfolioService {
   ========================================= */
 
   async updateOrder(id, payload) {
-    portfolioParamsSchema.parse({ id });
+    portfolioParamsSchema.parse({
+      id,
+    });
 
     const data = portfolioOrderSchema.parse(payload);
 
@@ -292,11 +339,13 @@ class PortfolioService {
   }
 
   /* =========================================
-      Check Portfolio Exists
+      Check Exists By ID
   ========================================= */
 
   async existsById(id) {
-    portfolioParamsSchema.parse({ id });
+    portfolioParamsSchema.parse({
+      id,
+    });
 
     const exists = await portfolioRepository.existsById(id);
 
@@ -310,10 +359,14 @@ class PortfolioService {
   }
 
   /* =========================================
-      Check Slug Exists
+      Check Exists By Slug
   ========================================= */
 
   async existsBySlug(slug) {
+    portfolioSlugSchema.parse({
+      slug,
+    });
+
     const exists = await portfolioRepository.existsBySlug(slug);
 
     return new ApiResponse(
@@ -324,7 +377,6 @@ class PortfolioService {
       "Portfolio slug checked successfully.",
     );
   }
-
   /* =========================================
       Add Portfolio Image
   ========================================= */
@@ -334,17 +386,15 @@ class PortfolioService {
       id: portfolioId,
     });
 
+    const data = portfolioImageSchema.parse(payload);
+
     const portfolio = await portfolioRepository.findById(portfolioId);
 
     if (!portfolio) {
       throw new ApiError(404, "Portfolio not found.");
     }
 
-    const image = await portfolioRepository.addImage(portfolioId, {
-      image: payload.image,
-      alt: payload.alt,
-      order: payload.order ?? 0,
-    });
+    const image = await portfolioRepository.addImage(portfolioId, data);
 
     return new ApiResponse(201, image, "Portfolio image added successfully.");
   }
@@ -378,11 +428,9 @@ class PortfolioService {
   ========================================= */
 
   async updateImage(imageId, payload) {
-    const image = await portfolioRepository.updateImage(imageId, {
-      image: payload.image,
-      alt: payload.alt,
-      order: payload.order,
-    });
+    const data = portfolioImageSchema.partial().parse(payload);
+
+    const image = await portfolioRepository.updateImage(imageId, data);
 
     if (!image) {
       throw new ApiError(404, "Portfolio image not found.");
@@ -410,9 +458,11 @@ class PortfolioService {
   ========================================= */
 
   async updateImageOrder(imageId, payload) {
+    const data = portfolioImageOrderSchema.parse(payload);
+
     const image = await portfolioRepository.updateImageOrder(
       imageId,
-      payload.order,
+      data.order,
     );
 
     if (!image) {
@@ -427,13 +477,15 @@ class PortfolioService {
   }
 
   /* =========================================
-      Bulk Add Images
+      Add Multiple Images
   ========================================= */
 
   async addMultipleImages(portfolioId, images) {
     portfolioParamsSchema.parse({
       id: portfolioId,
     });
+
+    const validatedImages = portfolioImagesSchema.parse(images);
 
     const portfolio = await portfolioRepository.findById(portfolioId);
 
@@ -443,12 +495,8 @@ class PortfolioService {
 
     const createdImages = [];
 
-    for (const image of images) {
-      const created = await portfolioRepository.addImage(portfolioId, {
-        image: image.image,
-        alt: image.alt,
-        order: image.order ?? 0,
-      });
+    for (const image of validatedImages) {
+      const created = await portfolioRepository.addImage(portfolioId, image);
 
       createdImages.push(created);
     }

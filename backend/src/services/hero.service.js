@@ -6,16 +6,14 @@ import {
   createHeroSchema,
   updateHeroSchema,
   heroParamsSchema,
-  toggleHeroStatusSchema,
 } from "../validations/hero.validation.js";
 
 import ApiError from "../utils/ApiError.js";
-import ApiResponse from "../utils/ApiResponse.js";
 
 class HeroService {
   /* =========================================
-        Get Hero
-    ========================================= */
+      Get Hero
+  ========================================= */
 
   async getHero() {
     const hero = await heroRepository.find();
@@ -24,28 +22,33 @@ class HeroService {
       throw new ApiError(404, "Hero section not found.");
     }
 
-    return new ApiResponse(200, hero, "Hero section fetched successfully.");
+    return hero;
   }
 
   /* =========================================
-        Get Hero By ID
-    ========================================= */
+      Get Hero By ID
+  ========================================= */
 
   async getHeroById(id) {
-    heroParamsSchema.parse({ id });
+    const params = heroParamsSchema.parse({
+      id,
+    });
 
-    const hero = await heroRepository.findById(id);
+    const hero = await heroRepository.findById(params.id);
 
     if (!hero) {
-      throw new ApiError(404, "Hero section not found.");
+      throw new ApiError({
+        statusCode: 404,
+        message: "Hero section not found.",
+      });
     }
 
-    return new ApiResponse(200, hero, "Hero section fetched successfully.");
+    return hero;
   }
 
   /* =========================================
-        Create Hero
-    ========================================= */
+      Create Hero
+  ========================================= */
 
   async createHero(payload) {
     const data = createHeroSchema.parse(payload);
@@ -53,7 +56,12 @@ class HeroService {
     const exists = await heroRepository.exists();
 
     if (exists) {
-      throw new ApiError(409, "Hero section already exists.");
+      if (exists) {
+        throw new ApiError({
+          statusCode: 409,
+          message: "Hero section already exists.",
+        });
+      }
     }
 
     const hero = await heroRepository.create({
@@ -61,186 +69,79 @@ class HeroService {
       subtitle: data.subtitle,
       description: data.description,
       image: data.image,
-      resume: data.resume,
-    });
-
-    return new ApiResponse(201, hero, "Hero section created successfully.");
-  }
-
-  /* =========================================
-        Update Hero
-    ========================================= */
-
-  async updateHero(id, payload) {
-    heroParamsSchema.parse({ id });
-
-    const data = updateHeroSchema.parse(payload);
-
-    const hero = await heroRepository.findById(id);
-
-    if (!hero) {
-      throw new ApiError(404, "Hero section not found.");
-    }
-
-    const updatedHero = await heroRepository.update(id, {
-      title: data.title,
-      subtitle: data.subtitle,
-      description: data.description,
-      image: data.image,
-      resume: data.resume,
-      isActive: data.isActive,
-    });
-
-    return new ApiResponse(
-      200,
-      updatedHero,
-      "Hero section updated successfully.",
-    );
-  }
-
-  /* =========================================
-    Toggle Hero Status
-========================================= */
-
-  async toggleStatus(id, payload) {
-    heroParamsSchema.parse({ id });
-
-    const data = toggleHeroStatusSchema.parse(payload);
-
-    const hero = await heroRepository.findById(id);
-
-    if (!hero) {
-      throw new ApiError(404, "Hero section not found.");
-    }
-
-    const updatedHero = await heroRepository.update(id, {
-      isActive: data.isActive,
-    });
-
-    return new ApiResponse(
-      200,
-      updatedHero,
-      `Hero section ${
-        data.isActive ? "activated" : "deactivated"
-      } successfully.`,
-    );
-  }
-
-  /* =========================================
-        Activate Hero
-    ========================================= */
-
-  async activateHero(id) {
-    heroParamsSchema.parse({ id });
-
-    const hero = await heroRepository.findById(id);
-
-    if (!hero) {
-      throw new ApiError(404, "Hero section not found.");
-    }
-
-    const updatedHero = await heroRepository.update(id, {
+      resume: data.resume ?? null,
       isActive: true,
     });
 
-    return new ApiResponse(
-      200,
-      updatedHero,
-      "Hero section activated successfully.",
-    );
+    return hero;
   }
 
   /* =========================================
-        Deactivate Hero
-    ========================================= */
+      Update Hero
+  ========================================= */
 
-  async deactivateHero(id) {
-    heroParamsSchema.parse({ id });
-
-    const hero = await heroRepository.findById(id);
-
-    if (!hero) {
-      throw new ApiError(404, "Hero section not found.");
-    }
-
-    const updatedHero = await heroRepository.update(id, {
-      isActive: false,
-    });
-
-    return new ApiResponse(
-      200,
-      updatedHero,
-      "Hero section deactivated successfully.",
-    );
-  }
-
-  /* =========================================
-        Upsert Hero
-    ========================================= */
-
-  async upsertHero(payload) {
+  async updateHero(payload) {
     const data = updateHeroSchema.parse(payload);
 
-    const hero = await heroRepository.upsert({
+    const hero = await heroRepository.find();
+
+    console.log("FOUND HERO:", hero);
+
+    if (!hero) {
+      if (!hero) {
+        throw new ApiError({
+          statusCode: 404,
+          message: "Hero section not found.",
+        });
+      }
+    }
+
+    const updatedHero = await heroRepository.update({
       title: data.title,
       subtitle: data.subtitle,
       description: data.description,
       image: data.image,
-      resume: data.resume,
-      isActive: data.isActive ?? true,
+      resume: data.resume ?? null,
+      isActive: data.isActive ?? hero.isActive,
     });
 
-    return new ApiResponse(200, hero, "Hero section saved successfully.");
+    return updatedHero;
   }
 
   /* =========================================
-        Delete Hero
-    ========================================= */
+      Upsert Hero
+  ========================================= */
 
-  async deleteHero(id) {
-    heroParamsSchema.parse({ id });
+  async upsertHero(payload) {
+    const hero = await heroRepository.find();
 
-    const hero = await heroRepository.findById(id);
-
-    if (!hero) {
-      throw new ApiError(404, "Hero section not found.");
+    if (hero) {
+      return await this.updateHero(payload);
     }
 
-    await heroRepository.delete(id);
-
-    return new ApiResponse(200, null, "Hero section deleted successfully.");
+    return await this.createHero(payload);
   }
 
   /* =========================================
-        Hero Exists
-    ========================================= */
+      Delete Hero
+  ========================================= */
 
-  async exists() {
-    const exists = await heroRepository.exists();
+  async deleteHero() {
+    const hero = await heroRepository.find();
 
-    return new ApiResponse(
-      200,
-      {
-        exists,
-      },
-      "Hero existence checked successfully.",
-    );
-  }
+    if (!hero) {
+      if (!hero) {
+        throw new ApiError({
+          statusCode: 404,
+          message: "Hero section not found.",
+        });
+      }
+    }
 
-  /* =========================================
-        Hero Count
-    ========================================= */
+    await heroRepository.delete();
 
-  async count() {
-    const total = await heroRepository.count();
-
-    return new ApiResponse(
-      200,
-      {
-        total,
-      },
-      "Hero count fetched successfully.",
-    );
+    return null;
   }
 }
+
 export default new HeroService();

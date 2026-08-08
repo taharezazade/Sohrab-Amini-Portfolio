@@ -1,153 +1,263 @@
 /** @format */
 
-import SettingsRepository from "../repositories/settings.repository.js";
+import settingsRepository from "../repositories/settings.repository.js";
+
+import {
+  createSettingsSchema,
+  updateSettingsSchema,
+  settingsParamsSchema,
+  updateSecuritySettingsSchema,
+  updateBrandingSchema,
+  updateSeoSchema,
+  updateSocialSchema,
+} from "../validations/settings.validation.js";
+
+import ApiError from "../utils/ApiError.js";
+import ApiResponse from "../utils/ApiResponse.js";
 
 class SettingsService {
-  constructor() {
-    this.settingsRepository = new SettingsRepository();
-  }
-
-  /* ============================
-      Create Settings
-  ============================ */
-
-  async createSettings(data) {
-    const { siteName, description, email, phone, address, socialLinks, seo } =
-      data;
-
-    if (!siteName) {
-      throw new Error("Site name is required");
-    }
-
-    const settingsData = {
-      siteName,
-      description: description || null,
-      email: email || null,
-      phone: phone || null,
-      address: address || null,
-
-      socialLinks: socialLinks || {},
-
-      seo: seo || {},
-    };
-
-    const existingSettings = await this.settingsRepository.findOne();
-
-    if (existingSettings) {
-      throw new Error("Settings already exist");
-    }
-
-    return await this.settingsRepository.create(settingsData);
-  }
-
-  /* ============================
-      Get Settings
-  ============================ */
+  /* =========================================================
+     Get Settings
+  ========================================================= */
 
   async getSettings() {
-    const settings = await this.settingsRepository.findOne();
+    const settings = await settingsRepository.find();
 
     if (!settings) {
-      throw new Error("Settings not found");
+      throw new ApiError(404, "Settings not found.");
     }
 
-    return settings;
+    return new ApiResponse(200, settings, "Settings fetched successfully.");
   }
 
-  /* ============================
-      Update Settings
-  ============================ */
+  /* =========================================================
+     Get Settings By ID
+  ========================================================= */
 
-  async updateSettings(data) {
-    const settings = await this.settingsRepository.findOne();
-
-    if (!settings) {
-      throw new Error("Settings not found");
-    }
-
-    const updateData = {
-      ...(data.siteName && {
-        siteName: data.siteName,
-      }),
-
-      ...(data.description !== undefined && {
-        description: data.description,
-      }),
-
-      ...(data.email !== undefined && {
-        email: data.email,
-      }),
-
-      ...(data.phone !== undefined && {
-        phone: data.phone,
-      }),
-
-      ...(data.address !== undefined && {
-        address: data.address,
-      }),
-
-      ...(data.socialLinks && {
-        socialLinks: data.socialLinks,
-      }),
-
-      ...(data.seo && {
-        seo: data.seo,
-      }),
-    };
-
-    return await this.settingsRepository.update(settings.id, updateData);
-  }
-
-  /* ============================
-      Update SEO Settings
-  ============================ */
-
-  async updateSEO(data) {
-    const settings = await this.settingsRepository.findOne();
-
-    if (!settings) {
-      throw new Error("Settings not found");
-    }
-
-    return await this.settingsRepository.update(settings.id, {
-      seo: {
-        ...(settings.seo || {}),
-        ...data,
-      },
+  async getSettingsById(id) {
+    settingsParamsSchema.parse({
+      id,
     });
-  }
 
-  /* ============================
-      Update Social Links
-  ============================ */
-
-  async updateSocialLinks(data) {
-    const settings = await this.settingsRepository.findOne();
+    const settings = await settingsRepository.findById(id);
 
     if (!settings) {
-      throw new Error("Settings not found");
+      throw new ApiError(404, "Settings not found.");
     }
 
-    return await this.settingsRepository.update(settings.id, {
-      socialLinks: {
-        ...(settings.socialLinks || {}),
-        ...data,
-      },
+    return new ApiResponse(200, settings, "Settings fetched successfully.");
+  }
+
+  /* =========================================================
+     Create Settings
+  ========================================================= */
+
+  async createSettings(payload) {
+    const data = createSettingsSchema.parse(payload);
+
+    const exists = await settingsRepository.exists();
+
+    if (exists) {
+      throw new ApiError(409, "Settings already exist.");
+    }
+
+    const settings = await settingsRepository.create(data);
+
+    return new ApiResponse(201, settings, "Settings created successfully.");
+  }
+
+  /* =========================================================
+     Update Settings
+  ========================================================= */
+
+  async updateSettings(id, payload) {
+    settingsParamsSchema.parse({
+      id,
     });
-  }
 
-  /* ============================
-      Delete Settings
-  ============================ */
+    const data = updateSettingsSchema.parse(payload);
 
-  async deleteSettings() {
-    const settings = await this.settingsRepository.findOne();
+    const settings = await settingsRepository.findById(id);
 
     if (!settings) {
-      throw new Error("Settings not found");
+      throw new ApiError(404, "Settings not found.");
     }
 
-    return await this.settingsRepository.delete(settings.id);
+    const updatedSettings = await settingsRepository.update(id, data);
+
+    return new ApiResponse(
+      200,
+      updatedSettings,
+      "Settings updated successfully.",
+    );
+  }
+
+  /* =========================================================
+     Upsert Settings
+  ========================================================= */
+
+  async upsertSettings(payload) {
+    const data = createSettingsSchema.parse(payload);
+
+    const settings = await settingsRepository.upsert(data);
+
+    return new ApiResponse(200, settings, "Settings saved successfully.");
+  }
+
+  /* =========================================================
+     Update Branding
+  ========================================================= */
+
+  async updateBranding(id, payload) {
+    settingsParamsSchema.parse({
+      id,
+    });
+
+    const data = updateBrandingSchema.parse(payload);
+
+    const settings = await settingsRepository.findById(id);
+
+    if (!settings) {
+      throw new ApiError(404, "Settings not found.");
+    }
+
+    const updatedSettings = await settingsRepository.updateBranding(id, data);
+
+    return new ApiResponse(
+      200,
+      updatedSettings,
+      "Branding settings updated successfully.",
+    );
+  }
+
+  /* =========================================================
+     Update SEO
+  ========================================================= */
+
+  async updateSEO(id, payload) {
+    settingsParamsSchema.parse({
+      id,
+    });
+
+    const data = updateSeoSchema.parse(payload);
+
+    const settings = await settingsRepository.findById(id);
+
+    if (!settings) {
+      throw new ApiError(404, "Settings not found.");
+    }
+
+    const updatedSettings = await settingsRepository.updateSEO(id, data);
+
+    return new ApiResponse(
+      200,
+      updatedSettings,
+      "SEO settings updated successfully.",
+    );
+  }
+
+  /* =========================================================
+     Update Social
+  ========================================================= */
+
+  async updateSocial(id, payload) {
+    settingsParamsSchema.parse({
+      id,
+    });
+
+    const data = updateSocialSchema.parse(payload);
+
+    const settings = await settingsRepository.findById(id);
+
+    if (!settings) {
+      throw new ApiError(404, "Settings not found.");
+    }
+
+    const updatedSettings = await settingsRepository.updateSocial(id, data);
+
+    return new ApiResponse(
+      200,
+      updatedSettings,
+      "Social settings updated successfully.",
+    );
+  }
+
+  /* =========================================================
+     Update Security
+  ========================================================= */
+
+  async updateSecurity(id, payload) {
+    settingsParamsSchema.parse({
+      id,
+    });
+
+    const data = updateSecuritySettingsSchema.parse(payload);
+
+    const settings = await settingsRepository.findById(id);
+
+    if (!settings) {
+      throw new ApiError(404, "Settings not found.");
+    }
+
+    const updatedSettings = await settingsRepository.updateSecurity(id, data);
+
+    return new ApiResponse(
+      200,
+      updatedSettings,
+      "Security settings updated successfully.",
+    );
+  }
+
+  /* =========================================================
+     Delete Settings
+  ========================================================= */
+
+  async deleteSettings(id) {
+    settingsParamsSchema.parse({
+      id,
+    });
+
+    const settings = await settingsRepository.findById(id);
+
+    if (!settings) {
+      throw new ApiError(404, "Settings not found.");
+    }
+
+    await settingsRepository.delete(id);
+
+    return new ApiResponse(200, null, "Settings deleted successfully.");
+  }
+
+  /* =========================================================
+     Exists
+  ========================================================= */
+
+  async exists() {
+    const exists = await settingsRepository.exists();
+
+    return new ApiResponse(
+      200,
+      {
+        exists,
+      },
+      "Settings existence checked successfully.",
+    );
+  }
+
+  /* =========================================================
+     Count
+  ========================================================= */
+
+  async count() {
+    const total = await settingsRepository.count();
+
+    return new ApiResponse(
+      200,
+      {
+        total,
+      },
+      "Settings count fetched successfully.",
+    );
   }
 }
 

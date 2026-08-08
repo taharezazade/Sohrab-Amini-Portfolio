@@ -6,37 +6,66 @@ import contactController from "../controllers/contact.controller.js";
 
 const router = Router();
 
-/* ============================
-    Public Routes
-============================ */
+/* =========================================================
+   Public / General
+========================================================= */
 
 /*
-    Send Contact Message
+   Get Contact
+   GET /api/contact
 */
-router.post("/", contactController.createMessage);
-
-/* ============================
-    Admin Routes
-============================ */
+router.get("/", contactController.getContact);
 
 /*
-    Get All Contact Messages
+   Check Contact Exists
+   GET /api/contact/exists
 */
-router.get("/", contactController.getAllMessages);
+router.get("/exists", contactController.exists);
 
 /*
-    Get Single Message
+   Get Contact Count
+   GET /api/contact/count
 */
-router.get("/:id", contactController.getMessageById);
+router.get("/count", contactController.count);
+
+/* =========================================================
+   Admin
+========================================================= */
 
 /*
-    Mark Message As Read
+   Create Contact
+   POST /api/contact
 */
-router.patch("/:id/read", contactController.markAsRead);
+router.post("/", contactController.create);
 
 /*
-    Delete Message
+   Upsert Contact
+   PUT /api/contact
 */
-router.delete("/:id", contactController.deleteMessage);
+router.put("/", contactController.upsert);
+
+/*
+   Get Contact By ID
+   GET /api/contact/:id
+*/
+router.get("/:id", contactController.getById);
+
+/*
+   Update Contact By ID
+   PUT /api/contact/:id
+*/
+router.put("/:id", contactController.update);
+
+/*
+   Update Contact Image
+   PATCH /api/contact/:id/image
+*/
+router.patch("/:id/image", contactController.updateImage);
+
+/*
+   Delete Contact
+   DELETE /api/contact/:id
+*/
+router.delete("/:id", contactController.delete);
 
 export default router;

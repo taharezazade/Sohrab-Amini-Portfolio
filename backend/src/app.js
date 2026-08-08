@@ -14,8 +14,10 @@ import rateLimiter from "./middlewares/rateLimiter.middleware.js";
 import notFoundMiddleware from "./middlewares/notFound.middleware.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 
-const app = express();
+import portfolioRoutes from "./routes/portfolio.routes.js";
+import portfolioImageRoutes from "./routes/portfolio-image.routes.js";
 
+const app = express();
 /* ================================= Security ================================= */
 
 app.use(helmet());
@@ -36,6 +38,7 @@ app.use(
   }),
 );
 
+app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
@@ -66,6 +69,10 @@ app.get("/api", (req, res) => {
 /* ================================= API Routes ================================= */
 
 app.use("/api", routes);
+
+app.use("/api/portfolio", portfolioRoutes);
+
+app.use("/api/portfolio", portfolioImageRoutes);
 
 /* ================================= 404 ================================= */
 

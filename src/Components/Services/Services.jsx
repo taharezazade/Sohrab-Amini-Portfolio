@@ -2,28 +2,34 @@
 
 import { Element } from "react-scroll";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 import ServicesHeader from "./ServicesHeader";
 import ServicesGrid from "./ServicesGrid";
 import ServiceCTA from "./ServiceCTA";
-
-import { services } from "./services.data";
-import { useState } from "react";
 import ServicesDrawer from "./ServicesDrawer";
 
+import { useServices } from "@/hooks/useServices";
+
 function Services() {
+  const { services, loading } = useServices();
+
   const [selectedService, setSelectedService] = useState(null);
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const handleOpenDrawer = (service) => {
     setSelectedService(service);
+
     setIsDrawerOpen(true);
   };
 
   const handleCloseDrawer = () => {
-    setIsDrawerOpen(false);
     setSelectedService(null);
+
+    setIsDrawerOpen(false);
   };
+
   return (
     <Element name='services'>
       <section
@@ -33,14 +39,13 @@ function Services() {
           py-24
           md:py-32
         '>
-        {/* Background Decoration */}
+        {/* Background */}
 
         <div
           className='
             absolute
             inset-0
             -z-10
-            overflow-hidden
           '>
           <div
             className='
@@ -76,33 +81,65 @@ function Services() {
             px-5
             lg:px-8
           '>
-          {/* Header */}
-
           <ServicesHeader />
 
-          {/* Grid */}
-
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{
+              opacity: 0,
+            }}
+
+            whileInView={{
+              opacity: 1,
+            }}
+
             viewport={{
               once: true,
-              amount: 0.05,
-              margin: "-100px",
+              amount: 0.1,
             }}
+
             transition={{
               duration: 0.6,
             }}
+
             className='mt-20'>
-            <ServicesGrid services={services} onOpenDrawer={handleOpenDrawer} />
+            {loading ?
+              <div
+                className='
+                    grid
+                    grid-cols-1
+                    sm:grid-cols-2
+                    xl:grid-cols-4
+                    gap-6
+                  '>
+                {Array.from({
+                  length: 8,
+                }).map((_, index) => (
+                  <div
+                    key={index}
+                    className='
+                        h-[520px]
+                        rounded-3xl
+                        bg-base-300/40
+                        animate-pulse
+                      '
+                  />
+                ))}
+              </div>
+            : <ServicesGrid
+                services={services}
+
+                onOpenDrawer={handleOpenDrawer}
+              />
+            }
+
             <ServicesDrawer
               service={selectedService}
+
               isOpen={isDrawerOpen}
+
               onClose={handleCloseDrawer}
             />
           </motion.div>
-
-          {/* CTA */}
 
           <div className='mt-24'>
             <ServiceCTA />

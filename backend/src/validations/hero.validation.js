@@ -37,7 +37,7 @@ const image = z
   .trim()
   .min(1, "Image is required.");
 
-const resume = z.string().trim().optional().or(z.literal(""));
+const resume = z.string().trim().optional().or(z.literal("")).nullable();
 
 const isActive = z.boolean().optional();
 

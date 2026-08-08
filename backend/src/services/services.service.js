@@ -1,10 +1,10 @@
 /** @format */
 
-import ServiceRepository from "../repositories/services.repository.js";
+import servicesRepository from "../repositories/services.repository.js";
 
 class ServicesService {
   constructor() {
-    this.servicesRepository = new ServiceRepository();
+    this.servicesRepository = servicesRepository;
   }
 
   /* ============================

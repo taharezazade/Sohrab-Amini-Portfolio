@@ -1,51 +1,36 @@
 /** @format */
 
 import multer from "multer";
-import path from "path";
-import fs from "fs";
-import crypto from "crypto";
 
-import { PROFILE_IMAGE_TYPES } from "../types/profile.js";
+/* ============================
+   Storage
+============================ */
 
-const uploadPath = path.join(process.cwd(), "uploads");
+const storage = multer.memoryStorage();
 
-const ensureDirectory = (folder) => {
-  const directory = path.join(uploadPath, folder);
+/* ============================
+   Allowed File Types
+============================ */
 
-  if (!fs.existsSync(directory)) {
-    fs.mkdirSync(directory, {
-      recursive: true,
-    });
-  }
+const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/svg+xml"];
 
-  return directory;
-};
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const folder = req.uploadFolder || "temp";
-
-    const directory = ensureDirectory(folder);
-
-    cb(null, directory);
-  },
-
-  filename: (req, file, cb) => {
-    const extension = path.extname(file.originalname);
-
-    const filename = `${crypto.randomUUID()}${extension}`;
-
-    cb(null, filename);
-  },
-});
+/* ============================
+   File Filter
+============================ */
 
 const fileFilter = (req, file, cb) => {
-  if (PROFILE_IMAGE_TYPES.includes(file.mimetype)) {
+  if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
-  } else {
-    cb(new Error("فرمت فایل مجاز نیست."), false);
+
+    return;
   }
+
+  cb(new Error("فرمت فایل مجاز نیست."), false);
 };
+
+/* ============================
+   Multer
+============================ */
 
 const upload = multer({
   storage,
@@ -57,18 +42,20 @@ const upload = multer({
   },
 });
 
-export const uploadSingle = (fieldName, folder) => {
-  return (req, res, next) => {
-    req.uploadFolder = folder;
+/* ============================
+   Upload Single
+============================ */
 
-    upload.single(fieldName)(req, res, (error) => {
-      if (error) {
-        return next(error);
-      }
+export const uploadSingle = (fieldName = "file") => {
+  return upload.single(fieldName);
+};
 
-      next();
-    });
-  };
+/* ============================
+   Upload Multiple
+============================ */
+
+export const uploadMultiple = (fieldName = "files") => {
+  return upload.array(fieldName);
 };
 
 export default upload;

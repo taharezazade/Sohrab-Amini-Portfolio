@@ -2,15 +2,13 @@
 
 import { useContext } from "react";
 
-import AuthContext from "../context/AuthContext";
+import AuthContext from "@/context/AuthContext";
 
 const useAuth = () => {
   const context = useContext(AuthContext);
 
-  if (context === null) {
-    throw new Error(
-      "هوک احراز هویت باید فقط داخل کامپوننت AuthProvider استفاده شود.",
-    );
+  if (!context) {
+    throw new Error("useAuth باید درون AuthProvider استفاده شود.");
   }
 
   return context;

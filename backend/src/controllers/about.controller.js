@@ -1,87 +1,35 @@
 /** @format */
 
-import aboutService from "../services/about.service.js";
+import aboutRepository from "../repositories/about.repository.js";
 
-class AboutController {
-  /* ============================
-      Get About
-  ============================ */
-
-  async getAbout(req, res, next) {
-    try {
-      const about = await aboutService.getAbout();
-
-      return res.status(200).json({
-        success: true,
-
-        message: "About information fetched successfully",
-
-        data: about,
-      });
-    } catch (error) {
-      next(error);
-    }
+class AboutService {
+  async getAbout() {
+    return await aboutRepository.find();
   }
 
-  /* ============================
-      Create About
-  ============================ */
-
-  async createAbout(req, res, next) {
-    try {
-      const about = await aboutService.createAbout(req.body);
-
-      return res.status(201).json({
-        success: true,
-
-        message: "About information created successfully",
-
-        data: about,
-      });
-    } catch (error) {
-      next(error);
-    }
+  async createAbout(payload) {
+    return await aboutRepository.create(payload);
   }
 
-  /* ============================
-      Update About
-  ============================ */
+  async updateAbout(payload) {
+    const about = await aboutRepository.find();
 
-  async updateAbout(req, res, next) {
-    try {
-      const about = await aboutService.updateAbout(req.body);
-
-      return res.status(200).json({
-        success: true,
-
-        message: "About information updated successfully",
-
-        data: about,
-      });
-    } catch (error) {
-      next(error);
+    if (!about) {
+      throw new Error("About information not found.");
     }
+
+    return await aboutRepository.update(about.id, payload);
   }
 
-  /* ============================
-      Delete About
-  ============================ */
+  async deleteAbout() {
+    const about = await aboutRepository.find();
 
-  async deleteAbout(req, res, next) {
-    try {
-      const about = await aboutService.deleteAbout();
-
-      return res.status(200).json({
-        success: true,
-
-        message: "About information deleted successfully",
-
-        data: about,
-      });
-    } catch (error) {
-      next(error);
+    if (!about) {
+      throw new Error("About information not found.");
     }
+
+    return await aboutRepository.delete(about.id);
   }
 }
 
-export default new AboutController();
+export default new AboutService();

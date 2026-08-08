@@ -2,6 +2,15 @@
 
 import { Router } from "express";
 
+import authRoutes from "./auth.routes.js";
+import heroRoutes from "./hero.routes.js";
+import aboutRoutes from "./about.routes.js";
+import servicesRoutes from "./services.routes.js";
+import portfolioRoutes from "./portfolio.routes.js";
+import contactRoutes from "./contact.routes.js";
+import settingsRoutes from "./settings.routes.js";
+import profileRoutes from "./profile.routes.js";
+
 const router = Router();
 
 /* ===========================
@@ -19,20 +28,20 @@ router.get("/", (req, res) => {
    Feature Routes
 =========================== */
 
-import authRoutes from "./auth.routes.js";
-import heroRoutes from "./hero.routes.js";
-import aboutRoutes from "./about.routes.js";
-import servicesRoutes from "./services.routes.js";
-import portfolioRoutes from "./portfolio.routes.js";
-import contactRoutes from "./contact.routes.js";
-import settingsRoutes from "./settings.routes.js";
-
 router.use("/auth", authRoutes);
+
+router.use("/profile", profileRoutes);
+
 router.use("/hero", heroRoutes);
+
 router.use("/about", aboutRoutes);
+
 router.use("/services", servicesRoutes);
+
 router.use("/portfolio", portfolioRoutes);
+
 router.use("/contact", contactRoutes);
+
 router.use("/settings", settingsRoutes);
 
 export default router;

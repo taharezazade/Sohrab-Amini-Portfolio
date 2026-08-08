@@ -34,7 +34,7 @@ router.post("/refresh-token", authController.refreshToken);
 /*
     Get Current Administrator
 */
-router.get("/me", authMiddleware, authController.me);
+router.get("/profile", authMiddleware, authController.me);
 
 /*
     Update Profile

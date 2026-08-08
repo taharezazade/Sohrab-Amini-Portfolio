@@ -33,11 +33,11 @@ class ProfileController {
         ...req.body,
       };
 
-      if (req.file) {
-        data.image = req.file.path;
-      }
-
-      const profile = await profileService.updateProfile(adminId, data);
+      const profile = await profileService.updateProfile(
+        adminId,
+        data,
+        req.file,
+      );
 
       return res.status(statusCodes.OK).json({
         success: true,

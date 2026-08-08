@@ -1,30 +1,32 @@
+/** @format */
+
 import { motion } from "framer-motion";
 import { Location, Calendar, Teacher, Code1, Briefcase } from "iconsax-reactjs";
 
-import { personalInfo } from "./about.data";
 import { fadeLeft, cardHover } from "./about.animations";
 
 const icons = [Location, Calendar, Teacher, Code1, Briefcase];
 
-function AboutInfo() {
+function AboutInfo({ data }) {
+  if (!data) return null;
+
   return (
     <motion.div
       variants={fadeLeft}
-      className="
+      className='
         grid
         grid-cols-1
         gap-4
         sm:grid-cols-2
-      "
-    >
-      {personalInfo.map((item, index) => {
+      '>
+      {data.map((item, index) => {
         const Icon = icons[index];
 
         return (
           <motion.div
             key={item.title}
             whileHover={cardHover}
-            className="
+            className='
               group
               rounded-2xl
               border
@@ -34,14 +36,10 @@ function AboutInfo() {
               p-2
               transition-all
               duration-300
-
-            "
-          >
-            <div
-              className="flex items-start gap-4 hover:text-white"
-            >
+            '>
+            <div className='flex items-start gap-4 hover:text-white'>
               <div
-                className="
+                className='
                   flex
                   p-3
                   items-center
@@ -51,28 +49,25 @@ function AboutInfo() {
                   text-primary
                   transition-all
                   group-hover:scale-110
-                "
-              >
-                <Icon variant="Bulk" size={36} />
+                '>
+                <Icon variant='Bulk' size={36} />
               </div>
 
-              <div className="space-y-1">
+              <div className='space-y-1'>
                 <p
-                  className="
+                  className='
                     text-sm
                     text-base-content/55
-                  "
-                >
+                  '>
                   {item.title}
                 </p>
 
                 <h3
-                  className="
+                  className='
                     text-base
                     font-bold
                     text-base-content
-                  "
-                >
+                  '>
                   {item.value}
                 </h3>
               </div>

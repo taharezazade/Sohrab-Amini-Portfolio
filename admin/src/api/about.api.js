@@ -1,39 +1,28 @@
 /** @format */
 
-import api from "./axios.js";
+import api from "./axios";
+
+import { ABOUT_ENDPOINTS } from "../constants/endpoints";
+
+const getAbout = async () => {
+  const { data } = await api.get(ABOUT_ENDPOINTS.GET);
+
+  return data;
+};
+
+const updateAbout = async (formData) => {
+  const { data } = await api.put(ABOUT_ENDPOINTS.UPDATE, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return data;
+};
 
 const aboutApi = {
-  /* =======================================================
-      Get About
-  ======================================================= */
-
-  getAbout() {
-    return api.get("/about");
-  },
-
-  /* =======================================================
-      Create About
-  ======================================================= */
-
-  createAbout(data) {
-    return api.post("/about", data);
-  },
-
-  /* =======================================================
-      Update About
-  ======================================================= */
-
-  updateAbout(data) {
-    return api.put("/about", data);
-  },
-
-  /* =======================================================
-      Delete About
-  ======================================================= */
-
-  deleteAbout() {
-    return api.delete("/about");
-  },
+  getAbout,
+  updateAbout,
 };
 
 export default aboutApi;

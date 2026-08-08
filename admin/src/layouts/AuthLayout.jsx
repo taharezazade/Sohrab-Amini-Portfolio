@@ -1,7 +1,7 @@
 /** @format */
 
 import { Navigate, Outlet } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import useAuth from "@/hooks/useAuth";
 
 const AuthLayout = () => {
   const { loading, isAuthenticated } = useAuth();
@@ -26,4 +26,3 @@ const AuthLayout = () => {
 };
 
 export default AuthLayout;
-

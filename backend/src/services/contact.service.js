@@ -6,15 +6,16 @@ import {
   createContactSchema,
   updateContactSchema,
   contactParamsSchema,
+  contactImageSchema,
 } from "../validations/contact.validation.js";
 
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 class ContactService {
-  /* =========================================
-      Get Contact
-  ========================================= */
+  /* =========================================================
+     Get Contact
+  ========================================================= */
 
   async getContact() {
     const contact = await contactRepository.find();
@@ -30,12 +31,14 @@ class ContactService {
     );
   }
 
-  /* =========================================
-      Get Contact By ID
-  ========================================= */
+  /* =========================================================
+     Get Contact By ID
+  ========================================================= */
 
   async getContactById(id) {
-    contactParamsSchema.parse({ id });
+    contactParamsSchema.parse({
+      id,
+    });
 
     const contact = await contactRepository.findById(id);
 
@@ -50,9 +53,9 @@ class ContactService {
     );
   }
 
-  /* =========================================
-      Create Contact
-  ========================================= */
+  /* =========================================================
+     Create Contact
+  ========================================================= */
 
   async createContact(payload) {
     const data = createContactSchema.parse(payload);
@@ -66,9 +69,7 @@ class ContactService {
     const contact = await contactRepository.create({
       phone: data.phone,
       whatsapp: data.whatsapp,
-      email: data.email,
-      address: data.address,
-      workingHours: data.workingHours,
+      image: data.image || null,
     });
 
     return new ApiResponse(
@@ -78,12 +79,14 @@ class ContactService {
     );
   }
 
-  /* =========================================
-      Update Contact
-  ========================================= */
+  /* =========================================================
+     Update Contact
+  ========================================================= */
 
   async updateContact(id, payload) {
-    contactParamsSchema.parse({ id });
+    contactParamsSchema.parse({
+      id,
+    });
 
     const data = updateContactSchema.parse(payload);
 
@@ -93,13 +96,21 @@ class ContactService {
       throw new ApiError(404, "Contact information not found.");
     }
 
-    const updatedContact = await contactRepository.update(id, {
-      phone: data.phone,
-      whatsapp: data.whatsapp,
-      email: data.email,
-      address: data.address,
-      workingHours: data.workingHours,
-    });
+    const updateData = {};
+
+    if (data.phone !== undefined) {
+      updateData.phone = data.phone;
+    }
+
+    if (data.whatsapp !== undefined) {
+      updateData.whatsapp = data.whatsapp;
+    }
+
+    if (data.image !== undefined) {
+      updateData.image = data.image || null;
+    }
+
+    const updatedContact = await contactRepository.update(id, updateData);
 
     return new ApiResponse(
       200,
@@ -108,34 +119,46 @@ class ContactService {
     );
   }
 
-  /* =========================================
-      Upsert Contact
-  ========================================= */
+  /* =========================================================
+     Upsert Contact
+  ========================================================= */
 
   async upsertContact(payload) {
     const data = updateContactSchema.parse(payload);
 
-    const contact = await contactRepository.upsert({
+    const existingContact = await contactRepository.find();
+
+    if (existingContact) {
+      const updated = await contactRepository.update(existingContact.id, data);
+
+      return new ApiResponse(
+        200,
+        updated,
+        "Contact information updated successfully.",
+      );
+    }
+
+    const contact = await contactRepository.create({
       phone: data.phone,
       whatsapp: data.whatsapp,
-      email: data.email,
-      address: data.address,
-      workingHours: data.workingHours,
+      image: data.image || null,
     });
 
     return new ApiResponse(
-      200,
+      201,
       contact,
-      "Contact information saved successfully.",
+      "Contact information created successfully.",
     );
   }
 
-  /* =========================================
-      Delete Contact
-  ========================================= */
+  /* =========================================================
+     Delete Contact
+  ========================================================= */
 
   async deleteContact(id) {
-    contactParamsSchema.parse({ id });
+    contactParamsSchema.parse({
+      id,
+    });
 
     const contact = await contactRepository.findById(id);
 
@@ -152,31 +175,64 @@ class ContactService {
     );
   }
 
-  /* =========================================
-      Contact Exists
-  ========================================= */
+  /* =========================================================
+     Exists
+  ========================================================= */
 
   async exists() {
     const exists = await contactRepository.exists();
 
     return new ApiResponse(
       200,
-      { exists },
+      {
+        exists,
+      },
       "Contact existence checked successfully.",
     );
   }
 
-  /* =========================================
-      Contact Count
-  ========================================= */
+  /* =========================================================
+     Count
+  ========================================================= */
 
   async count() {
     const total = await contactRepository.count();
 
     return new ApiResponse(
       200,
-      { total },
+      {
+        total,
+      },
       "Contact count fetched successfully.",
+    );
+  }
+
+  /* =========================================================
+     Update Image
+  ========================================================= */
+
+  async updateImage(id, payload) {
+    contactParamsSchema.parse({
+      id,
+    });
+
+    const data = contactImageSchema.parse(payload);
+
+    const contact = await contactRepository.findById(id);
+
+    if (!contact) {
+      throw new ApiError(404, "Contact information not found.");
+    }
+
+    const updatedContact = await contactRepository.updateImage(
+      id,
+      data.image || null,
+    );
+
+    return new ApiResponse(
+      200,
+      updatedContact,
+      "Contact image updated successfully.",
     );
   }
 }

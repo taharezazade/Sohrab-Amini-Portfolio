@@ -3,6 +3,9 @@
 import bcrypt from "bcrypt";
 
 import profileRepository from "../repositories/profile.repository.js";
+import imageService from "./image.service.js";
+
+import { deleteFile } from "../utils/file.js";
 
 class ProfileService {
   /**
@@ -22,15 +25,56 @@ class ProfileService {
 
   /**
    * Update Admin Profile
+   *
+   * data:
+   * {
+   *  firstName,
+   *  lastName,
+   *  displayName,
+   *  username,
+   *  email,
+   *  phone,
+   *  bio
+   * }
+   *
+   * file:
+   * multer image
    */
-  async updateProfile(adminId, data) {
+  async updateProfile(adminId, data, file) {
     const admin = await profileRepository.findById(adminId);
 
     if (!admin) {
       throw new Error("مدیر پیدا نشد.");
     }
 
-    const updated = await profileRepository.update(adminId, data);
+    let imagePath = admin.image;
+
+    /*
+      New Image Upload
+    */
+    if (file) {
+      const isValid = imageService.validateMimeType(file.mimetype);
+
+      if (!isValid) {
+        throw new Error("فرمت تصویر مجاز نیست.");
+      }
+
+      const newImage = await imageService.processImage(file, "profile");
+
+      /*
+        Delete old image
+      */
+      if (admin.image) {
+        await imageService.removeImage(admin.image);
+      }
+
+      imagePath = newImage;
+    }
+
+    const updated = await profileRepository.update(adminId, {
+      ...data,
+      image: imagePath,
+    });
 
     const { password, ...profile } = updated;
 
@@ -78,6 +122,10 @@ class ProfileService {
 
     if (!admin) {
       throw new Error("مدیر پیدا نشد.");
+    }
+
+    if (admin.image) {
+      await imageService.removeImage(admin.image);
     }
 
     const updated = await profileRepository.update(adminId, {

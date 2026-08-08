@@ -1,27 +1,27 @@
 /** @format */
 
 import axios from "axios";
-import toast from "react-hot-toast";
+
+import { STORAGE_KEYS } from "@/constants/storage";
+import { API_CONFIG } from "@/config/env";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL: API_CONFIG.BASE_URL,
 
-  withCredentials: true,
+  timeout: API_CONFIG.TIMEOUT,
 
   headers: {
     "Content-Type": "application/json",
   },
-
-  timeout: 15000,
 });
 
-/* =======================================================
-    Request Interceptor
-======================================================= */
+/*
+  Request Interceptor
+*/
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -30,72 +30,23 @@ api.interceptors.request.use(
     return config;
   },
 
-  (error) => Promise.reject(error),
+  (error) => {
+    return Promise.reject(error);
+  },
 );
 
-/* =======================================================
-    Response Interceptor
-======================================================= */
+/*
+  Response Interceptor
+*/
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
 
-  async (error) => {
-    const originalRequest = error.config;
-
-    // Access Token Expired
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url.includes("/auth/login") &&
-      !originalRequest.url.includes("/auth/refresh-token")
-    ) {
-      originalRequest._retry = true;
-
-      try {
-        const { data } = await axios.post(
-          `${
-            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/auth/refresh-token`,
-          {},
-          {
-            withCredentials: true,
-          },
-        );
-
-        localStorage.setItem("accessToken", data.data.accessToken);
-
-        originalRequest.headers.Authorization = `Bearer ${data.data.accessToken}`;
-
-        return api(originalRequest);
-      } catch {
-        localStorage.removeItem("accessToken");
-        // Session Expired
-        toast.error("نشست شما منقضی شده است. لطفاً دوباره وارد شوید.");
-        if (window.location.pathname !== "/login") {
-          window.location.href = "/login";
-        }
-      }
-    }
-
-    // Backend Errors
-    if (error.response?.data?.message) {
-      toast.error(error.response.data.message);
-    }
-
-    // Network Error
-    else if (error.code === "ERR_NETWORK") {
-      toast.error("ارتباط با سرور برقرار نشد.");
-    }
-
-    // Timeout
-    else if (error.code === "ECONNABORTED") {
-      toast.error("زمان درخواست به پایان رسید.");
-    }
-
-    // Unknown Error
-    else {
-      toast.error("خطایی رخ داد. لطفاً دوباره تلاش کنید.");
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     }
 
     return Promise.reject(error);

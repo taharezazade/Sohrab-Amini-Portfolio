@@ -12,6 +12,7 @@ import {
 } from "iconsax-reactjs";
 
 export const services = [
+  
   {
     id: 1,
 

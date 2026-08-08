@@ -29,13 +29,13 @@ model Admin {
   id String @id @default(cuid())
 
   firstName String?
-  lastName String?
+  lastName  String?
 
   displayName String?
 
-  username String @unique
-  email String @unique
-  phone String?
+  username String  @unique
+  email    String  @unique
+  phone    String?
 
   bio String?
 
@@ -56,19 +56,19 @@ model Admin {
 ////////////////////////////////////////////////////////////
 
 model Hero {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
   title       String
   subtitle    String
   description String
 
-  image       String
-  resume      String?
+  image  String
+  resume String?
 
-  isActive    Boolean  @default(true)
+  isActive Boolean @default(true)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   primaryButtonText String?
   primaryButtonLink String?
@@ -76,7 +76,7 @@ model Hero {
   secondaryButtonText String?
   secondaryButtonLink String?
 
-  seoTitle String?
+  seoTitle       String?
   seoDescription String?
 }
 
@@ -85,20 +85,20 @@ model Hero {
 ////////////////////////////////////////////////////////////
 
 model About {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
   title       String
   description String
 
-  birthYear   Int?
-  location    String?
+  birthYear Int?
+  location  String?
 
-  experience  Int?
+  experience Int?
 
-  image       String?
+  image String?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 ////////////////////////////////////////////////////////////
@@ -106,24 +106,31 @@ model About {
 ////////////////////////////////////////////////////////////
 
 model Service {
-  id            String   @id @default(cuid())
+  id String @id @default(uuid())
 
-  title         String
-  slug          String   @unique
+  title String
 
-  description   String
+  shortDescription String
 
-  category      String
+  description String
 
-  technologies  String[]
-  features      String[]
+  icon String?
 
-  order         Int      @default(0)
+  features Json
 
-  isActive      Boolean  @default(true)
+  category String
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  technologies Json
+
+  color String?
+
+  order Int @default(0)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
 }
 
 ////////////////////////////////////////////////////////////
@@ -131,32 +138,40 @@ model Service {
 ////////////////////////////////////////////////////////////
 
 model Portfolio {
-  id            String          @id @default(cuid())
+  id String @id @default(cuid())
 
-  title         String
-  slug          String          @unique
+  title String
 
-  description   String
+  slug String @unique
 
-  thumbnail     String
+  description String @db.Text
 
-  projectUrl    String?
-  githubUrl     String?
+  thumbnail String?
 
-  category      String
+  projectUrl String?
 
-  technologies  String[]
+  githubUrl String?
 
-  featured      Boolean         @default(false)
+  category String
 
-  order         Int             @default(0)
+  technologies String[]
 
-  status        ProjectStatus   @default(PUBLISHED)
+  featured Boolean @default(false)
 
-  images        PortfolioImage[]
+  order Int @default(0)
 
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  status ProjectStatus @default(PUBLISHED)
+
+  images PortfolioImage[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([featured])
+  @@index([order])
+  @@index([slug])
 }
 
 ////////////////////////////////////////////////////////////
@@ -164,17 +179,19 @@ model Portfolio {
 ////////////////////////////////////////////////////////////
 
 model PortfolioImage {
-  id            String      @id @default(cuid())
+  id String @id @default(cuid())
 
-  image         String
-  alt           String?
+  image String
 
-  order         Int         @default(0)
+  alt String?
 
-  portfolioId   String
-  portfolio     Portfolio   @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  order Int @default(0)
 
-  createdAt     DateTime    @default(now())
+  portfolioId String
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 ////////////////////////////////////////////////////////////
@@ -184,7 +201,7 @@ model PortfolioImage {
 model Contact {
   id String @id @default(cuid())
 
-  phone String
+  phone    String
   whatsapp String
 
   image String?
@@ -200,7 +217,6 @@ model Contact {
 model Setting {
   id String @id @default(cuid())
 
-
   // General
 
   siteName String
@@ -209,20 +225,17 @@ model Setting {
 
   description String
 
-
   // Contact
 
   phone String?
 
   email String?
 
-
   // Branding
 
   logo String?
 
   favicon String?
-
 
   // SEO
 
@@ -233,7 +246,6 @@ model Setting {
   keywords String?
 
   canonicalUrl String?
-
 
   // Social
 
@@ -249,7 +261,6 @@ model Setting {
 
   whatsapp String?
 
-
   // Security
 
   maintenanceMode Boolean @default(false)
@@ -257,7 +268,6 @@ model Setting {
   twoFactor Boolean @default(false)
 
   allowRegistration Boolean @default(false)
-
 
   createdAt DateTime @default(now())
 

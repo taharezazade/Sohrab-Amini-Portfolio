@@ -1,5 +1,7 @@
 /** @format */
 
+import "dotenv/config";
+
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 
@@ -24,15 +26,38 @@ async function main() {
 
     update: {
       username: process.env.ADMIN_USERNAME || "sohrabadmin",
+
       password: hashedPassword,
+
+      displayName: "سهراب امینی",
+
+      firstName: "سهراب",
+
+      lastName: "امینی",
+
+      bio: "توسعه دهنده حرفه‌ای وردپرس و PHP Backend Developer",
     },
 
     create: {
       username: process.env.ADMIN_USERNAME || "sohrabadmin",
+
       email: process.env.ADMIN_EMAIL || "admin@sohrabamini.dev",
+
       password: hashedPassword,
+
+      displayName: "سهراب امینی",
+
+      firstName: "سهراب",
+
+      lastName: "امینی",
+
+      bio: "توسعه دهنده حرفه‌ای وردپرس، PHP و سیستم‌های اختصاصی وب",
+
+      role: "ADMIN",
     },
   });
+
+  console.log("✅ Admin seeded");
 
   ////////////////////////////////////////////////////////////
   // HERO
@@ -43,21 +68,36 @@ async function main() {
   if (!hero) {
     await prisma.hero.create({
       data: {
-        title: "Professional WordPress Developer",
+        title: "توسعه دهنده حرفه‌ای وردپرس",
 
-        subtitle: "Custom WordPress Solutions & PHP Backend Development",
+        subtitle: "طراحی سایت، توسعه وردپرس و برنامه‌نویسی PHP",
 
         description:
-          "I develop custom WordPress themes, plugins, backend systems with PHP, optimize website performance, strengthen security, and build scalable web solutions.",
+          "طراحی قالب اختصاصی وردپرس، توسعه افزونه، ساخت سیستم‌های اختصاصی PHP، بهینه‌سازی سرعت و افزایش امنیت وب‌سایت‌ها.",
 
         image: "/uploads/hero/hero.webp",
 
         resume: "/uploads/hero/Sohrab-Amini-Resume.pdf",
 
         isActive: true,
+
+        primaryButtonText: "مشاهده خدمات",
+
+        primaryButtonLink: "#services",
+
+        secondaryButtonText: "ارتباط با من",
+
+        secondaryButtonLink: "#contact",
+
+        seoTitle: "سهراب امینی | توسعه دهنده وردپرس و PHP",
+
+        seoDescription:
+          "طراحی و توسعه سایت‌های وردپرسی، افزونه اختصاصی و سیستم‌های PHP",
       },
     });
   }
+
+  console.log("✅ Hero seeded");
 
   ////////////////////////////////////////////////////////////
   // ABOUT
@@ -68,14 +108,14 @@ async function main() {
   if (!about) {
     await prisma.about.create({
       data: {
-        title: "About Me",
+        title: "درباره من",
 
         description:
-          "I'm Sohrab Amini, a professional WordPress and PHP Backend Developer specializing in custom WordPress theme development, plugin development, REST API integration, MySQL optimization, security hardening, performance optimization, and advanced troubleshooting.",
+          "من سهراب امینی هستم، توسعه دهنده وردپرس و PHP Backend. در زمینه طراحی قالب اختصاصی وردپرس، توسعه افزونه، REST API، بهینه‌سازی دیتابیس، افزایش امنیت و رفع مشکلات فنی پروژه‌های وب فعالیت می‌کنم.",
 
         birthYear: 1381,
 
-        location: "Tehran, Iran",
+        location: "تهران، ایران",
 
         experience: 5,
 
@@ -84,6 +124,7 @@ async function main() {
     });
   }
 
+  console.log("✅ About seeded");
   ////////////////////////////////////////////////////////////
   // SERVICES
   ////////////////////////////////////////////////////////////
@@ -94,18 +135,36 @@ async function main() {
     await prisma.service.createMany({
       data: [
         {
-          title: "Custom WordPress Theme Development",
+          title: "توسعه قالب اختصاصی وردپرس",
 
-          slug: "custom-wordpress-theme-development",
+          shortDescription:
+            "طراحی و توسعه قالب‌های اختصاصی وردپرس بر اساس نیازهای کسب‌وکار.",
 
           description:
-            "Design and develop completely custom WordPress themes from scratch based on business requirements.",
+            "طراحی و توسعه قالب‌های کاملاً اختصاصی وردپرس با معماری تمیز، عملکرد بالا، امنیت، سئو و قابلیت توسعه.",
 
-          category: "WordPress",
+          icon: "Code",
 
-          technologies: ["WordPress", "PHP", "HTML5", "CSS3", "JavaScript"],
+          category: "توسعه وردپرس",
 
-          features: ["Custom Theme", "Responsive Design", "SEO Friendly"],
+          technologies: [
+            "WordPress",
+            "PHP",
+            "HTML5",
+            "CSS3",
+            "JavaScript",
+            "MySQL",
+          ],
+
+          features: [
+            "توسعه قالب اختصاصی",
+            "طراحی ریسپانسیو",
+            "بهینه سازی سئو",
+            "کدنویسی استاندارد",
+            "عملکرد بالا",
+          ],
+
+          color: "primary",
 
           order: 1,
 
@@ -113,22 +172,29 @@ async function main() {
         },
 
         {
-          title: "Custom Plugin Development",
+          title: "توسعه افزونه اختصاصی وردپرس",
 
-          slug: "custom-wordpress-plugin-development",
+          shortDescription:
+            "ساخت افزونه‌های اختصاصی و افزودن قابلیت‌های پیشرفته به وردپرس.",
 
           description:
-            "Develop scalable and secure custom plugins tailored to business needs.",
+            "توسعه افزونه‌های امن و مقیاس‌پذیر وردپرس با قابلیت‌های اختصاصی، REST API و معماری حرفه‌ای بک‌اند.",
 
-          category: "WordPress",
+          icon: "ProgrammingArrow",
 
-          technologies: ["PHP", "WordPress", "MySQL"],
+          category: "توسعه افزونه",
+
+          technologies: ["PHP", "WordPress", "MySQL", "REST API", "JavaScript"],
 
           features: [
-            "Custom Features",
-            "Secure Coding",
-            "Performance Optimized",
+            "ساخت افزونه اختصاصی",
+            "اتصال REST API",
+            "توسعه پنل مدیریت",
+            "کدنویسی امن",
+            "معماری قابل توسعه",
           ],
+
+          color: "accent",
 
           order: 2,
 
@@ -136,20 +202,149 @@ async function main() {
         },
 
         {
-          title: "Website Performance Optimization",
+          title: "بهینه سازی سرعت وب سایت",
 
-          slug: "website-performance-optimization",
+          shortDescription: "افزایش سرعت سایت و بهبود عملکرد کلی وب سایت.",
 
           description:
-            "Improve loading speed, optimize database queries, configure caching and image optimization.",
+            "تحلیل و بهینه سازی سرعت سایت با استفاده از کش، بهینه سازی دیتابیس، فشرده سازی تصاویر و Core Web Vitals.",
 
-          category: "Optimization",
+          icon: "Flash",
 
-          technologies: ["PHP", "MySQL", "Nginx", "Apache"],
+          category: "بهینه سازی",
 
-          features: ["Caching", "Image Optimization", "Database Optimization"],
+          technologies: ["WordPress", "PHP", "MySQL", "Nginx", "Apache"],
+
+          features: [
+            "بهینه سازی کش",
+            "بهینه سازی دیتابیس",
+            "بهینه سازی تصاویر",
+            "Lazy Loading",
+            "بهبود Core Web Vitals",
+          ],
+
+          color: "warning",
 
           order: 3,
+
+          isActive: true,
+        },
+
+        {
+          title: "امنیت وردپرس",
+
+          shortDescription:
+            "محافظت از سایت در برابر آسیب‌پذیری‌ها و حملات امنیتی.",
+
+          description:
+            "پیاده سازی استانداردهای امنیتی وردپرس شامل سخت‌سازی امنیت، مدیریت دسترسی، رفع آسیب‌پذیری‌ها و جلوگیری از حملات رایج.",
+
+          icon: "ShieldSecurity",
+
+          category: "امنیت",
+
+          technologies: ["WordPress", "PHP", "Apache", "Nginx"],
+
+          features: [
+            "سخت سازی امنیت",
+            "تنظیم فایروال",
+            "مدیریت دسترسی",
+            "رفع مشکلات امنیتی",
+            "مانیتورینگ امنیت",
+          ],
+
+          color: "error",
+
+          order: 4,
+
+          isActive: true,
+        },
+
+        {
+          title: "توسعه بک‌اند با PHP",
+
+          shortDescription:
+            "ساخت سیستم‌های اختصاصی بک‌اند و راهکارهای دیتابیس.",
+
+          description:
+            "توسعه سیستم‌های بک‌اند مقیاس‌پذیر با PHP، MySQL و REST API با تمرکز بر عملکرد و نگهداری آسان.",
+
+          icon: "Driver2",
+
+          category: "بک‌اند",
+
+          technologies: ["PHP", "MySQL", "REST API", "Git", "Nginx"],
+
+          features: [
+            "توسعه بک‌اند",
+            "طراحی دیتابیس",
+            "ساخت API",
+            "بهینه سازی Query",
+            "مدیریت داده",
+          ],
+
+          color: "info",
+
+          order: 5,
+
+          isActive: true,
+        },
+
+        {
+          title: "رفع خطا و عیب یابی",
+
+          shortDescription: "تحلیل و حل مشکلات پیچیده وردپرس و PHP.",
+
+          description:
+            "بررسی پروژه‌های موجود، شناسایی مشکلات فنی و افزایش پایداری، سرعت و کیفیت کد.",
+
+          icon: "Setting4",
+
+          category: "دیباگ",
+
+          technologies: ["PHP", "WordPress", "MySQL", "Git"],
+
+          features: [
+            "رفع باگ",
+            "بهینه سازی کد",
+            "تحلیل خطا",
+            "بهبود عملکرد",
+            "افزایش پایداری سیستم",
+          ],
+
+          color: "success",
+
+          order: 6,
+
+          isActive: true,
+        },
+
+        {
+          title: "مشاوره فنی پروژه",
+
+          shortDescription:
+            "ارائه راهنمایی تخصصی برای پروژه‌های طراحی و توسعه وب.",
+
+          description:
+            "کمک به انتخاب معماری مناسب، تکنولوژی‌های مورد نیاز و استراتژی توسعه برای پروژه‌های موفق.",
+
+          icon: "Cpu",
+
+          category: "مشاوره",
+
+          technologies: ["PHP", "WordPress", "MySQL", "Git", "Nginx"],
+
+          features: [
+            "تحلیل پروژه",
+            "انتخاب تکنولوژی",
+            "طراحی معماری",
+            "استراتژی فنی",
+            "نقشه راه توسعه",
+          ],
+
+          color: "neutral",
+
+          order: 7,
 
           isActive: true,
         },
@@ -157,6 +352,7 @@ async function main() {
     });
   }
 
+  console.log("✅ Services seeded");
   ////////////////////////////////////////////////////////////
   // PORTFOLIO
   ////////////////////////////////////////////////////////////
@@ -166,12 +362,12 @@ async function main() {
   if (!portfolioCount) {
     await prisma.portfolio.create({
       data: {
-        title: "Corporate WordPress Website",
+        title: "وب سایت شرکتی وردپرس",
 
         slug: "corporate-wordpress-website",
 
         description:
-          "A fully customized corporate WordPress website featuring custom theme development, backend programming with PHP, MySQL optimization, advanced security implementation, REST API integration, and high-performance optimization.",
+          "طراحی و توسعه وب سایت شرکتی اختصاصی وردپرس شامل توسعه قالب، برنامه نویسی PHP، بهینه سازی MySQL، افزایش امنیت، REST API و بهبود عملکرد.",
 
         thumbnail: "/uploads/portfolio/corporate-wordpress.webp",
 
@@ -202,7 +398,7 @@ async function main() {
             {
               image: "/uploads/portfolio/corporate-home.webp",
 
-              alt: "Homepage",
+              alt: "صفحه اصلی",
 
               order: 0,
             },
@@ -210,7 +406,7 @@ async function main() {
             {
               image: "/uploads/portfolio/corporate-dashboard.webp",
 
-              alt: "Dashboard",
+              alt: "پنل مدیریت",
 
               order: 1,
             },
@@ -220,16 +416,124 @@ async function main() {
     });
   }
 
-  console.log("✅ Database seeded successfully.");
+  console.log("✅ Portfolio seeded");
+
+  ////////////////////////////////////////////////////////////
+  // CONTACT
+  ////////////////////////////////////////////////////////////
+
+  const contact = await prisma.contact.findFirst();
+
+  if (!contact) {
+    await prisma.contact.create({
+      data: {
+        phone: "+98xxxxxxxxxx",
+
+        whatsapp: "+98xxxxxxxxxx",
+
+        image: "/uploads/contact/contact.webp",
+      },
+    });
+  }
+
+  console.log("✅ Contact seeded");
+  ////////////////////////////////////////////////////////////
+  // SETTINGS
+  ////////////////////////////////////////////////////////////
+
+  const setting = await prisma.setting.findFirst();
+
+  if (!setting) {
+    await prisma.setting.create({
+      data: {
+        //////////////////////////////////////////////////////
+        // GENERAL
+        //////////////////////////////////////////////////////
+
+        siteName: "سهراب امینی",
+
+        siteTitle: "سهراب امینی | توسعه دهنده حرفه‌ای وردپرس و PHP",
+
+        description:
+          "سهراب امینی، توسعه دهنده حرفه‌ای وردپرس و PHP با تخصص در طراحی قالب اختصاصی وردپرس، توسعه افزونه، برنامه نویسی بک‌اند، بهینه سازی سرعت و امنیت وب سایت.",
+
+        //////////////////////////////////////////////////////
+        // CONTACT
+        //////////////////////////////////////////////////////
+
+        phone: "+98xxxxxxxxxx",
+
+        email: "sohrabamini@example.com",
+
+        //////////////////////////////////////////////////////
+        // BRANDING
+        //////////////////////////////////////////////////////
+
+        logo: "/uploads/settings/logo.webp",
+
+        favicon: "/uploads/settings/favicon.ico",
+
+        //////////////////////////////////////////////////////
+        // SEO
+        //////////////////////////////////////////////////////
+
+        metaTitle: "توسعه دهنده حرفه‌ای وردپرس | سهراب امینی",
+
+        metaDescription:
+          "خدمات تخصصی طراحی سایت وردپرس، توسعه افزونه، برنامه نویسی PHP، بهینه سازی سرعت و امنیت وب سایت.",
+
+        keywords:
+          "وردپرس, برنامه نویسی PHP, طراحی سایت, توسعه افزونه وردپرس, بهینه سازی سایت",
+
+        canonicalUrl: "https://sohrabamini.dev",
+
+        //////////////////////////////////////////////////////
+        // SOCIAL
+        //////////////////////////////////////////////////////
+
+        instagram: "",
+
+        linkedin: "",
+
+        github: "",
+
+        telegram: "",
+
+        twitter: "",
+
+        whatsapp: "",
+
+        //////////////////////////////////////////////////////
+        // SECURITY
+        //////////////////////////////////////////////////////
+
+        maintenanceMode: false,
+
+        twoFactor: false,
+
+        allowRegistration: false,
+      },
+    });
+  }
+
+  console.log("✅ Settings seeded");
+
+  ////////////////////////////////////////////////////////////
+  // FINAL MESSAGE
+  ////////////////////////////////////////////////////////////
+
+  console.log("🎉 Database seeded successfully.");
 }
 
 main()
   .catch((error) => {
     console.error("❌ Seed failed");
+
     console.error(error);
 
     process.exit(1);
   })
+
   .finally(async () => {
     await prisma.$disconnect();
   });

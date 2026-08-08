@@ -1,40 +1,41 @@
+/** @format */
+
 import { motion } from "framer-motion";
 
-import { aboutContent } from "./about.data";
 import { fadeRight } from "./about.animations";
 
-function AboutContent() {
+function AboutContent({ data }) {
+  if (!data) return null;
+
   return (
     <motion.div variants={fadeRight}>
-      <div className="space-y-0">
+      <div className='space-y-0'>
         <span
-          className="
+          className='
             inline-flex
             text-6xl
             font-black
             pb-4
             text-primary
-          "
-        >
-          {aboutContent.title}
+          '>
+          {data.title}
         </span>
 
         <h2
-          className="
+          className='
             text-3xl
             font-black
             pb-2
             text-base-content
             md:text-4xl
             xl:text-5xl
-          "
-        >
-          {aboutContent.heading}
+          '>
+          {data.heading}
         </h2>
       </div>
 
       <p
-        className="
+        className='
           whitespace-pre-line
           text-justify
           leading-5
@@ -42,9 +43,8 @@ function AboutContent() {
           font-light
           text-base-content/75
           md:text-lg
-        "
-      >
-        {aboutContent.description}
+        '>
+        {data.description}
       </p>
     </motion.div>
   );

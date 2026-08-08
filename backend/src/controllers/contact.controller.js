@@ -3,107 +3,135 @@
 import contactService from "../services/contact.service.js";
 
 class ContactController {
-  /* ============================
-      Create Contact Message
-  ============================ */
+  /* =========================================================
+     Get Contact
+  ========================================================= */
 
-  async createMessage(req, res, next) {
+  async getContact(req, res, next) {
     try {
-      const message = await contactService.createMessage(req.body);
+      const response = await contactService.getContact();
 
-      return res.status(201).json({
-        success: true,
-
-        message: "Contact message sent successfully",
-
-        data: message,
-      });
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Get All Messages
-  ============================ */
+  /* =========================================================
+     Get Contact By ID
+  ========================================================= */
 
-  async getAllMessages(req, res, next) {
-    try {
-      const messages = await contactService.getAllMessages();
-
-      return res.status(200).json({
-        success: true,
-
-        message: "Contact messages fetched successfully",
-
-        data: messages,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* ============================
-      Get Single Message
-  ============================ */
-
-  async getMessageById(req, res, next) {
+  async getById(req, res, next) {
     try {
       const { id } = req.params;
 
-      const message = await contactService.getMessageById(id);
+      const response = await contactService.getContactById(id);
 
-      return res.status(200).json({
-        success: true,
-
-        message: "Contact message fetched successfully",
-
-        data: message,
-      });
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Mark Message As Read
-  ============================ */
+  /* =========================================================
+     Create Contact
+  ========================================================= */
 
-  async markAsRead(req, res, next) {
+  async create(req, res, next) {
     try {
-      const { id } = req.params;
+      const response = await contactService.createContact(req.body);
 
-      const message = await contactService.markAsRead(id);
-
-      return res.status(200).json({
-        success: true,
-
-        message: "Message marked as read",
-
-        data: message,
-      });
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Delete Message
-  ============================ */
+  /* =========================================================
+     Update Contact
+  ========================================================= */
 
-  async deleteMessage(req, res, next) {
+  async update(req, res, next) {
     try {
       const { id } = req.params;
 
-      const result = await contactService.deleteMessage(id);
+      const response = await contactService.updateContact(id, req.body);
 
-      return res.status(200).json({
-        success: true,
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-        message: "Contact message deleted successfully",
+  /* =========================================================
+     Upsert Contact
+  ========================================================= */
 
-        data: result,
-      });
+  async upsert(req, res, next) {
+    try {
+      const response = await contactService.upsertContact(req.body);
+
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     Delete Contact
+  ========================================================= */
+
+  async delete(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const response = await contactService.deleteContact(id);
+
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     Exists
+  ========================================================= */
+
+  async exists(req, res, next) {
+    try {
+      const response = await contactService.exists();
+
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     Count
+  ========================================================= */
+
+  async count(req, res, next) {
+    try {
+      const response = await contactService.count();
+
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     Update Image
+  ========================================================= */
+
+  async updateImage(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const response = await contactService.updateImage(id, req.body);
+
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }

@@ -1,62 +1,39 @@
 /** @format */
 
-import api from "./axios.js";
+import api from "./axios";
+import { AUTH_ENDPOINTS, PROFILE_ENDPOINTS } from "./endpoints";
 
 const authApi = {
-  /* =======================================================
-      Login
-  ======================================================= */
-
-  login(data) {
-    return api.post("/auth/login", data);
+  login: (data) => {
+    return api.post(AUTH_ENDPOINTS.LOGIN, data);
   },
 
-  /* =======================================================
-      Register
-  ======================================================= */
-
-  register(data) {
-    return api.post("/auth/register", data);
+  logout: () => {
+    return api.post(AUTH_ENDPOINTS.LOGOUT);
   },
 
-  /* =======================================================
-      Logout
-  ======================================================= */
-
-  logout() {
-    return api.post("/auth/logout");
+  refresh: () => {
+    return api.post(AUTH_ENDPOINTS.REFRESH);
   },
 
-  /* =======================================================
-      Get Current Admin
-  ======================================================= */
-
-  getProfile() {
-    return api.get("/auth/me");
+  me: () => {
+    return api.get(AUTH_ENDPOINTS.ME);
   },
 
-  /* =======================================================
-      Update Profile
-  ======================================================= */
-
-  updateProfile(data) {
-    return api.put("/auth/profile", data);
+  getProfile: () => {
+    return api.get(PROFILE_ENDPOINTS.GET);
   },
 
-  /* =======================================================
-      Change Password
-  ======================================================= */
-
-  changePassword(data) {
-    return api.patch("/auth/change-password", data);
+  updateProfile: (data) => {
+    return api.patch(PROFILE_ENDPOINTS.UPDATE, data);
   },
 
-  /* =======================================================
-      Refresh Access Token
-  ======================================================= */
+  changePassword: (data) => {
+    return api.patch(PROFILE_ENDPOINTS.CHANGE_PASSWORD, data);
+  },
 
-  refreshToken() {
-    return api.post("/auth/refresh-token");
+  deleteImage: () => {
+    return api.delete(PROFILE_ENDPOINTS.DELETE_IMAGE);
   },
 };
 

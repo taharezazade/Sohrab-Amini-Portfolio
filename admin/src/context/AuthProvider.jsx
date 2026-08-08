@@ -1,18 +1,18 @@
 /** @format */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-
 import toast from "react-hot-toast";
 
-import authApi from "../api/auth.api";
-
+import authApi from "@/api/auth.api";
+import { STORAGE_KEYS } from "@/constants/storage";
+import authService from "@/services/auth.service";
 import AuthContext from "./AuthContext";
 
 export function AuthProvider({ children }) {
   const [admin, setAdmin] = useState(null);
 
   const [loading, setLoading] = useState(
-    () => !!localStorage.getItem("accessToken"),
+    () => !!localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN),
   );
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
 
       setIsAuthenticated(true);
     } catch {
-      localStorage.removeItem("accessToken");
+      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
 
       setAdmin(null);
 
@@ -42,9 +42,9 @@ export function AuthProvider({ children }) {
   ======================================================= */
 
   const login = useCallback(async (payload) => {
-    const { data } = await authApi.login(payload);
+    const { data } = await authService.login(payload);
 
-    localStorage.setItem("accessToken", data.data.accessToken);
+    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, data.data.accessToken);
 
     setAdmin(data.data.admin);
 
@@ -63,7 +63,7 @@ export function AuthProvider({ children }) {
     try {
       await authApi.logout();
     } finally {
-      localStorage.removeItem("accessToken");
+      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
 
       setAdmin(null);
 
@@ -113,7 +113,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const initialize = async () => {
-      if (!localStorage.getItem("accessToken")) {
+      if (!localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)) {
         setLoading(false);
 
         return;
@@ -136,19 +136,26 @@ export function AuthProvider({ children }) {
       admin,
       loading,
       isAuthenticated,
+
       login,
       logout,
+
       refreshProfile,
+
       updateProfile,
       changePassword,
     }),
+
     [
       admin,
       loading,
       isAuthenticated,
+
       login,
       logout,
+
       refreshProfile,
+
       updateProfile,
       changePassword,
     ],

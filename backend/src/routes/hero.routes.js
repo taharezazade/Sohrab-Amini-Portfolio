@@ -2,7 +2,12 @@
 
 import { Router } from "express";
 
-import heroController from "../controllers/hero.controller.js";
+import {
+  getHero,
+  createHero,
+  updateHero,
+  deleteHero,
+} from "../controllers/hero.controller.js";
 
 const router = Router();
 
@@ -13,7 +18,7 @@ const router = Router();
 /*
     Get Hero Information
 */
-router.get("/", heroController.getHero);
+router.get("/", getHero);
 
 /* ============================
     Admin Routes
@@ -22,16 +27,16 @@ router.get("/", heroController.getHero);
 /*
     Create Hero Information
 */
-router.post("/", heroController.createHero);
+router.post("/", createHero);
 
 /*
     Update Hero Information
 */
-router.put("/", heroController.updateHero);
+router.put("/", updateHero);
 
 /*
     Delete Hero Information
 */
-router.delete("/", heroController.deleteHero);
+router.delete("/", deleteHero);
 
 export default router;

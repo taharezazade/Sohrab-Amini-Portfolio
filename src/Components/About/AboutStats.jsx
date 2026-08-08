@@ -2,11 +2,13 @@
 
 import { motion } from "framer-motion";
 
-import { stats } from "./about.data";
 import { containerVariants, scaleIn } from "./about.animations";
+
 import BorderGlow from "../common/BorderGlow";
 
-function AboutStats() {
+function AboutStats({ data }) {
+  if (!data) return null;
+
   return (
     <motion.section
       variants={containerVariants}
@@ -16,65 +18,60 @@ function AboutStats() {
         md:grid-cols-2
         xl:grid-cols-3
       '>
-      {stats.map((item) => {
+      {data.map((item) => {
         const Icon = item.icon;
 
         return (
-          <BorderGlow>
+          <BorderGlow key={item.title}>
             <motion.article
-              key={item.title}
               variants={scaleIn}
               transition={{
                 duration: 0.25,
               }}
               className='
-              group
-              relative
-              overflow-hidden
-              rounded-3xl
-              border
-              border-base-300
-              bg-base-100
-              p-7
-              shadow-lg
-              transition-all
-              duration-300
-            '>
-              {/* Background Icon */}
+                group
+                relative
+                overflow-hidden
+                rounded-3xl
+                border
+                border-base-300
+                bg-base-100
+                p-7
+                shadow-lg
+                transition-all
+                duration-300
+              '>
               <Icon
                 variant='Bulk'
                 className='
-                absolute
-                top-0
-                left-0
-                h-36
-                w-36
-                text-primary/10
-                pointer-events-none
-                transition-all
-                duration-500
-                group-hover:text-primary/15
-              '
+                  absolute
+                  top-0
+                  left-0
+                  h-36
+                  w-36
+                  text-primary/10
+                  pointer-events-none
+                '
               />
 
               <div className='relative z-10'>
                 <h2
                   className='
-                  text-6xl
-                  font-black
-                  text-primary
-                '>
+                    text-6xl
+                    font-black
+                    text-primary
+                  '>
                   {item.value}
                   {item.suffix}
                 </h2>
 
                 <h3
                   className='
-                  mt-4
-                  text-xl
-                  font-bold
-                  text-base-content
-                '>
+                    mt-4
+                    text-xl
+                    font-bold
+                    text-base-content
+                  '>
                   {item.title}
                 </h3>
 
@@ -82,9 +79,9 @@ function AboutStats() {
 
                 <p
                   className='
-                  leading-8
-                  text-base-content/70
-                '>
+                    leading-8
+                    text-base-content/70
+                  '>
                   {item.description}
                 </p>
               </div>

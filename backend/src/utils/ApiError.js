@@ -1,18 +1,14 @@
 /** @format */
 
 class ApiError extends Error {
-  constructor({
-    statusCode = 500,
-    message = "Internal Server Error.",
-    errors = [],
-  } = {}) {
+  constructor(statusCode = 500, message = "خطای داخلی سرور.", errors = []) {
     super(message);
 
     this.name = "ApiError";
 
     this.success = false;
 
-    this.statusCode = statusCode;
+    this.statusCode = Number.isInteger(statusCode) ? statusCode : 500;
 
     this.message = message;
 
@@ -20,15 +16,19 @@ class ApiError extends Error {
 
     this.timestamp = new Date().toISOString();
 
-    Error.captureStackTrace?.(this, this.constructor);
+    Error.captureStackTrace(this, this.constructor);
   }
 
   toJSON() {
     return {
-      success: this.success,
+      success: false,
+
       statusCode: this.statusCode,
+
       message: this.message,
+
       errors: this.errors,
+
       timestamp: this.timestamp,
     };
   }

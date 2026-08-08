@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Code1, Hierarchy, Monitor, Cpu } from "iconsax-reactjs";
 
-import { skills } from "./about.data";
 import { containerVariants, scaleIn, cardHover } from "./about.animations";
 
 const icons = {
@@ -13,7 +12,9 @@ const icons = {
   Tools: Cpu,
 };
 
-function AboutSkills() {
+function AboutSkills({ data }) {
+  if (!data) return null;
+
   return (
     <motion.section variants={containerVariants} className='mt-10'>
       <div className='mb-10 text-center'>
@@ -59,95 +60,94 @@ function AboutSkills() {
           sm:grid-cols-2
           xl:grid-cols-4
         '>
-        {skills.map((skill) => {
+        {data.map((skill) => {
           const Icon = icons[skill.title];
 
           return (
-            <div className='hover-3d' key={skill}>
-              {/* content */}
+            <div className='hover-3d' key={skill.title}>
               <figure className='max-w-100 rounded-3xl'>
                 <motion.div
-                  key={skill.title}
                   variants={scaleIn}
                   whileHover={cardHover}
                   className='
-                group
-                rounded-3xl
-                border
-                border-base-300
-                bg-base-100/60
-                backdrop-blur-xl
-                p-3
-                transition-all
-                duration-300
-              '>
+                    group
+                    rounded-3xl
+                    border
+                    border-base-300
+                    bg-base-100/60
+                    backdrop-blur-xl
+                    p-3
+                    transition-all
+                    duration-300
+                  '>
                   <div className='flex flex-row gap-3'>
                     <div
                       className='
-                  flex
-                  h-14
-                  w-14
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  bg-primary/10
-                  text-primary
-                  transition-transform
-                  group-hover:rotate-6
-                  group-hover:scale-110
-                '>
+                        flex
+                        h-14
+                        w-14
+                        items-center
+                        justify-center
+                        rounded-2xl
+                        bg-primary/10
+                        text-primary
+                        transition-transform
+                        group-hover:rotate-6
+                        group-hover:scale-110
+                      '>
                       <Icon variant='Bulk' size={44} />
                     </div>
 
                     <p
                       className='
-                  mt-6
-                  text-xl
-                  font-bold
-                  text-primary
-                '>
+                        mt-6
+                        text-xl
+                        font-bold
+                        text-primary
+                      '>
                       {skill.title}
                     </p>
                   </div>
+
                   <div
                     className='
-                  mt-5
-                  flex
-                  flex-wrap
-                  gap-2
-                '>
+                      mt-5
+                      flex
+                      flex-wrap
+                      gap-2
+                    '>
                     {skill.items.map((item) => (
                       <span
                         key={item}
                         className='
-                      rounded-full
-                      border
-                      border-primary/20
-                      bg-primary/10
-                      px-2
-                      py-1.5
-                      text-xs
-                      font-medium
-                      text-primary
-                      transition-all
-                      hover:bg-primary
-                      hover:text-primary-content
-                    '>
+                          rounded-full
+                          border
+                          border-primary/20
+                          bg-primary/10
+                          px-2
+                          py-1.5
+                          text-xs
+                          font-medium
+                          text-primary
+                          transition-all
+                          hover:bg-primary
+                          hover:text-primary-content
+                        '>
                         {item}
                       </span>
                     ))}
                   </div>
-                </motion.div>{" "}
+                </motion.div>
               </figure>
-              {/* 8 empty divs needed for the 3D effect */}
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
+
+              <div />
+              <div />
+              <div />
+              <div />
+              <div />
+              <div />
+              <div />
+              <div />
             </div>
           );
         })}

@@ -3,129 +3,169 @@
 import portfolioService from "../services/portfolio.service.js";
 
 class PortfolioController {
-  /* ============================
+  /* =========================================
       Create Portfolio
-  ============================ */
+  ========================================= */
 
-  async createPortfolio(req, res, next) {
+  async create(req, res, next) {
     try {
-      const portfolio = await portfolioService.createPortfolio(req.body);
+      const response = await portfolioService.create(req.body);
 
-      return res.status(201).json({
-        success: true,
-
-        message: "Portfolio created successfully",
-
-        data: portfolio,
-      });
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
+  /* =========================================
       Get All Portfolios
-  ============================ */
+  ========================================= */
 
-  async getAllPortfolios(req, res, next) {
+  async getAll(req, res, next) {
     try {
-      const portfolios = await portfolioService.getAllPortfolios();
+      const response = await portfolioService.getAll();
 
-      return res.status(200).json({
-        success: true,
-
-        message: "Portfolios fetched successfully",
-
-        data: portfolios,
-      });
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Get Single Portfolio
-  ============================ */
+  /* =========================================
+      Get Published Portfolios
+  ========================================= */
 
-  async getPortfolioById(req, res, next) {
+  async getPublished(req, res, next) {
+    try {
+      const response = await portfolioService.getPublished();
+
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================
+      Get Featured Portfolios
+  ========================================= */
+
+  async getFeatured(req, res, next) {
+    try {
+      const response = await portfolioService.getFeatured();
+
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================
+      Get Portfolio By ID
+  ========================================= */
+
+  async getById(req, res, next) {
     try {
       const { id } = req.params;
 
-      const portfolio = await portfolioService.getPortfolioById(id);
+      const response = await portfolioService.getById(id);
 
-      return res.status(200).json({
-        success: true,
-
-        message: "Portfolio fetched successfully",
-
-        data: portfolio,
-      });
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
+  /* =========================================
       Get Portfolio By Slug
-  ============================ */
+  ========================================= */
 
-  async getPortfolioBySlug(req, res, next) {
+  async getBySlug(req, res, next) {
     try {
       const { slug } = req.params;
 
-      const portfolio = await portfolioService.getPortfolioBySlug(slug);
+      const response = await portfolioService.getBySlug(slug);
 
-      return res.status(200).json({
-        success: true,
-
-        message: "Portfolio fetched successfully",
-
-        data: portfolio,
-      });
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
+  /* =========================================
       Update Portfolio
-  ============================ */
+  ========================================= */
 
-  async updatePortfolio(req, res, next) {
+  async update(req, res, next) {
     try {
       const { id } = req.params;
 
-      const portfolio = await portfolioService.updatePortfolio(id, req.body);
+      const response = await portfolioService.update(id, req.body);
 
-      return res.status(200).json({
-        success: true,
-
-        message: "Portfolio updated successfully",
-
-        data: portfolio,
-      });
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
+  /* =========================================
       Delete Portfolio
-  ============================ */
+  ========================================= */
 
-  async deletePortfolio(req, res, next) {
+  async delete(req, res, next) {
     try {
       const { id } = req.params;
 
-      const result = await portfolioService.deletePortfolio(id);
+      const response = await portfolioService.delete(id);
 
-      return res.status(200).json({
-        success: true,
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-        message: "Portfolio deleted successfully",
+  /* =========================================
+      Update Status
+  ========================================= */
 
-        data: result,
-      });
+  async updateStatus(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const response = await portfolioService.updateStatus(id, req.body);
+
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================
+      Toggle Featured
+  ========================================= */
+
+  async toggleFeatured(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const response = await portfolioService.toggleFeatured(id, req.body);
+
+      return res.status(response.statusCode).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================
+      Update Order
+  ========================================= */
+
+  async updateOrder(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const response = await portfolioService.updateOrder(id, req.body);
+
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       next(error);
     }

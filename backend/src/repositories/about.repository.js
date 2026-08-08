@@ -102,4 +102,4 @@ class AboutRepository {
   }
 }
 
-export default AboutRepository;
+export default new AboutRepository();

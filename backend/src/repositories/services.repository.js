@@ -162,4 +162,4 @@ class ServiceRepository {
   }
 }
 
-export default ServiceRepository;
+export default new ServiceRepository();

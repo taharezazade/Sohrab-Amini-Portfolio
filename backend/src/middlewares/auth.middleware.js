@@ -12,14 +12,14 @@ const authMiddleware = (req, res, next) => {
     if (!authorization) {
       throw new ApiError({
         statusCode: 401,
-        message: "Authorization header is required.",
+        message: "هدر احراز هویت ارسال نشده است.",
       });
     }
 
     if (!authorization.startsWith("Bearer ")) {
       throw new ApiError({
         statusCode: 401,
-        message: "Invalid authorization format.",
+        message: "فرمت هدر احراز هویت معتبر نیست.",
       });
     }
 
@@ -28,18 +28,27 @@ const authMiddleware = (req, res, next) => {
     if (!token) {
       throw new ApiError({
         statusCode: 401,
-        message: "Access token is required.",
+        message: "توکن دسترسی ارسال نشده است.",
       });
     }
 
     const decoded = jwt.verify(token, jwtConfig.secret, {
       issuer: jwtConfig.issuer,
+
       audience: jwtConfig.audience,
     });
 
+    if (!decoded.id) {
+      throw new ApiError({
+        statusCode: 401,
+        message: "اطلاعات داخل توکن معتبر نیست.",
+      });
+    }
+
     req.user = {
       id: decoded.id,
-      role: decoded.role,
+
+      role: decoded.role || null,
     };
 
     next();
@@ -51,7 +60,7 @@ const authMiddleware = (req, res, next) => {
       return next(
         new ApiError({
           statusCode: 401,
-          message: "Invalid or expired access token.",
+          message: "توکن نامعتبر یا منقضی شده است.",
         }),
       );
     }

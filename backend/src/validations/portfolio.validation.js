@@ -2,158 +2,152 @@
 
 import { z } from "zod";
 
-/* =========================================
-   Common Fields
-========================================= */
+/* =====================================================
+    Constants
+===================================================== */
 
-const title = z
-  .string({
-    required_error: "Title is required.",
-  })
-  .trim()
-  .min(3)
-  .max(120);
+export const PROJECT_STATUS = ["DRAFT", "PUBLISHED", "ARCHIVED"];
 
-const slug = z
-  .string({
-    required_error: "Slug is required.",
-  })
-  .trim()
-  .toLowerCase()
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Invalid slug format.");
+/* =====================================================
+    Helpers
+===================================================== */
 
-const description = z
-  .string({
-    required_error: "Description is required.",
-  })
-  .trim()
-  .min(20)
-  .max(5000);
-
-const thumbnail = z
-  .string({
-    required_error: "Thumbnail is required.",
-  })
-  .trim()
-  .min(1);
-
-const projectUrl = z
+const urlSchema = z
   .string()
   .trim()
-  .url("Invalid project URL.")
+  .url("Invalid URL.")
   .optional()
-  .or(z.literal(""));
+  .or(z.literal(""))
+  .nullable();
 
-const githubUrl = z
+const imageSchema = z.string().trim().min(1, "Image is required.");
+
+const slugSchema = z
   .string()
   .trim()
-  .url("Invalid GitHub URL.")
-  .optional()
-  .or(z.literal(""));
+  .min(3, "Slug must contain at least 3 characters.")
+  .max(200)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug format is invalid.");
 
-const category = z
-  .string({
-    required_error: "Category is required.",
+/* =====================================================
+    Params
+===================================================== */
+
+export const portfolioParamsSchema = z
+  .object({
+    id: z.string().cuid("Invalid portfolio id."),
   })
-  .trim()
-  .min(2)
+  .strict();
+
+/* =====================================================
+    Slug Params
+===================================================== */
+
+export const portfolioSlugSchema = z
+  .object({
+    slug: slugSchema,
+  })
+  .strict();
+
+/* =====================================================
+    Create Portfolio
+===================================================== */
+
+export const createPortfolioSchema = z
+  .object({
+    title: z.string().trim().min(3).max(150),
+
+    slug: slugSchema,
+
+    description: z.string().trim().min(10).max(10000),
+
+    thumbnail: imageSchema.optional().nullable(),
+
+    projectUrl: urlSchema,
+
+    githubUrl: urlSchema,
+
+    category: z.string().trim().min(2).max(100),
+
+    technologies: z
+      .array(z.string().trim().min(1))
+      .max(50)
+      .transform((items) => [...new Set(items)])
+      .default([]),
+
+    featured: z.boolean().default(false),
+
+    order: z.number().int().min(0).default(0),
+
+    status: z.enum(PROJECT_STATUS).default("PUBLISHED"),
+  })
+  .strict();
+
+/* =====================================================
+    Update Portfolio
+===================================================== */
+
+export const updatePortfolioSchema = createPortfolioSchema.partial();
+
+/* =====================================================
+    Status
+===================================================== */
+
+export const portfolioStatusSchema = z
+  .object({
+    status: z.enum(PROJECT_STATUS),
+  })
+  .strict();
+
+/* =====================================================
+    Featured
+===================================================== */
+
+export const portfolioFeaturedSchema = z
+  .object({
+    featured: z.boolean(),
+  })
+  .strict();
+
+/* =====================================================
+    Order
+===================================================== */
+
+export const portfolioOrderSchema = z
+  .object({
+    order: z.number().int().min(0),
+  })
+  .strict();
+
+/* =====================================================
+    Portfolio Image
+===================================================== */
+
+export const portfolioImageSchema = z
+  .object({
+    image: imageSchema,
+
+    alt: z.string().trim().max(255).optional().nullable(),
+
+    order: z.number().int().min(0).default(0),
+  })
+  .strict();
+
+/* =====================================================
+    Portfolio Image Order
+===================================================== */
+
+export const portfolioImageOrderSchema = z
+  .object({
+    order: z.number().int().min(0),
+  })
+  .strict();
+
+/* =====================================================
+    Bulk Images
+===================================================== */
+
+export const portfolioImagesSchema = z
+  .array(portfolioImageSchema)
+  .min(1)
   .max(100);
-
-const technologies = z
-  .array(z.string().trim().min(1))
-  .min(1, "At least one technology is required.");
-
-const featured = z.boolean().optional();
-
-const order = z.number().int().min(0).optional();
-
-const status = z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]);
-
-const id = z.string().cuid("Invalid Portfolio ID.");
-
-const images = z
-  .array(
-    z.object({
-      image: z.string().min(1),
-      alt: z.string().optional().or(z.literal("")),
-      order: z.number().int().min(0).optional(),
-    }),
-  )
-  .optional();
-
-////////////////////////////////////////////////////////////
-
-export const createPortfolioSchema = z.object({
-  title,
-  slug,
-  description,
-  thumbnail,
-  projectUrl,
-  githubUrl,
-  category,
-  technologies,
-  featured,
-  order,
-  status,
-  images,
-});
-
-////////////////////////////////////////////////////////////
-
-export const updatePortfolioSchema = createPortfolioSchema;
-
-////////////////////////////////////////////////////////////
-
-export const portfolioParamsSchema = z.object({
-  id,
-});
-
-////////////////////////////////////////////////////////////
-
-export const toggleFeaturedSchema = z.object({
-  featured: z.boolean(),
-});
-
-////////////////////////////////////////////////////////////
-
-export const changePortfolioStatusSchema = z.object({
-  status,
-});
-
-/* ============================
-    Portfolio Featured Validation
-============================ */
-
-export const portfolioFeaturedSchema = z.object({
-  isFeatured: z.boolean({
-    required_error: "Featured status is required",
-  }),
-});
-
-/* ============================
-    Portfolio Order Validation
-============================ */
-
-export const portfolioOrderSchema = z.object({
-  order: z
-    .array(
-      z.object({
-        id: z.string().min(1, "Portfolio id is required"),
-
-        position: z
-          .number()
-          .int()
-          .nonnegative("Position must be a positive number"),
-      }),
-    )
-    .min(1, "Order list cannot be empty"),
-});
-
-/* ============================
-    Portfolio Status Validation
-============================ */
-export const portfolioStatusSchema = z.object({
-  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"], {
-    required_error: "Portfolio status is required",
-  }),
-});

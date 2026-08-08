@@ -3,41 +3,17 @@
 import prisma from "../config/prisma.js";
 
 class HeroRepository {
-  /* ============================
+  /* =========================================
       Get Hero
-  ============================ */
+  ========================================= */
 
   async find() {
     return await prisma.hero.findFirst();
   }
 
-  /* ============================
-      Get By ID
-  ============================ */
-
-  async findById(id) {
-    return await prisma.hero.findUnique({
-      where: {
-        id,
-      },
-    });
-  }
-
-  /* ============================
-      Get Active Hero
-  ============================ */
-
-  async findActive() {
-    return await prisma.hero.findFirst({
-      where: {
-        isActive: true,
-      },
-    });
-  }
-
-  /* ============================
-      Create
-  ============================ */
+  /* =========================================
+      Create Hero
+  ========================================= */
 
   async create(data) {
     return await prisma.hero.create({
@@ -45,70 +21,49 @@ class HeroRepository {
     });
   }
 
-  /* ============================
-      Update
-  ============================ */
+  /* =========================================
+      Update Hero
+  ========================================= */
 
-  async update(id, data) {
-    return await prisma.hero.update({
-      where: {
-        id,
-      },
-      data,
-    });
-  }
+  async update(data) {
+    const hero = await this.find();
 
-  /* ============================
-      Upsert
-  ============================ */
+    console.log("REPOSITORY HERO:", hero);
+    console.log("UPDATE DATA:", data);
 
-  async upsert(data) {
-    const hero = await prisma.hero.findFirst();
-
-    if (hero) {
-      return await prisma.hero.update({
-        where: {
-          id: hero.id,
-        },
-        data,
-      });
+    if (!hero) {
+      return null;
     }
 
-    return await prisma.hero.create({
+    return await prisma.hero.update({
+      where: {
+        id: hero.id,
+      },
       data,
     });
   }
 
-  /* ============================
-      Toggle Active
-  ============================ */
+  /* =========================================
+      Delete Hero
+  ========================================= */
 
-  async toggleStatus(id, isActive) {
-    return await prisma.hero.update({
-      where: {
-        id,
-      },
-      data: {
-        isActive,
-      },
-    });
-  }
+  async delete() {
+    const hero = await this.find();
 
-  /* ============================
-      Delete
-  ============================ */
+    if (!hero) {
+      return null;
+    }
 
-  async delete(id) {
     return await prisma.hero.delete({
       where: {
-        id,
+        id: hero.id,
       },
     });
   }
 
-  /* ============================
-      Exists
-  ============================ */
+  /* =========================================
+      Hero Exists
+  ========================================= */
 
   async exists() {
     const hero = await prisma.hero.findFirst({
@@ -117,16 +72,8 @@ class HeroRepository {
       },
     });
 
-    return !!hero;
-  }
-
-  /* ============================
-      Count
-  ============================ */
-
-  async count() {
-    return await prisma.hero.count();
+    return Boolean(hero);
   }
 }
 
-export default HeroRepository;
+export default new HeroRepository();

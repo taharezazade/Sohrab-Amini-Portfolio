@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-export const updateProfileSchema = z.object({
+const profileBodySchema = z.object({
   firstName: z
     .string()
     .min(2, "نام باید حداقل ۲ کاراکتر باشد.")
@@ -38,23 +38,37 @@ export const updateProfileSchema = z.object({
     .string()
     .max(500, "توضیحات نباید بیشتر از ۵۰۰ کاراکتر باشد.")
     .optional(),
-
-  image: z.string().optional(),
 });
 
-export const changePasswordSchema = z
-  .object({
-    currentPassword: z
-      .string()
-      .min(6, "رمز عبور فعلی باید حداقل ۶ کاراکتر باشد."),
+export const updateProfileSchema = z.object({
+  body: profileBodySchema,
 
-    newPassword: z.string().min(8, "رمز عبور جدید باید حداقل ۸ کاراکتر باشد."),
+  params: z.object({}).optional(),
 
-    confirmPassword: z
-      .string()
-      .min(8, "تکرار رمز عبور باید حداقل ۸ کاراکتر باشد."),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "رمز عبور جدید و تکرار آن یکسان نیستند.",
-    path: ["confirmPassword"],
-  });
+  query: z.object({}).optional(),
+});
+
+export const changePasswordSchema = z.object({
+  body: z
+    .object({
+      currentPassword: z
+        .string()
+        .min(6, "رمز عبور فعلی باید حداقل ۶ کاراکتر باشد."),
+
+      newPassword: z
+        .string()
+        .min(8, "رمز عبور جدید باید حداقل ۸ کاراکتر باشد."),
+
+      confirmPassword: z
+        .string()
+        .min(8, "تکرار رمز عبور باید حداقل ۸ کاراکتر باشد."),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+      message: "رمز عبور جدید و تکرار آن یکسان نیستند.",
+      path: ["confirmPassword"],
+    }),
+
+  params: z.object({}).optional(),
+
+  query: z.object({}).optional(),
+});

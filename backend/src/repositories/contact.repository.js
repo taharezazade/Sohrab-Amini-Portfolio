@@ -3,17 +3,21 @@
 import prisma from "../config/prisma.js";
 
 class ContactRepository {
-  /* ============================
-      Get Contact
-  ============================ */
+  /* =========================================================
+     Find Contact
+  ========================================================= */
 
   async find() {
-    return await prisma.contact.findFirst();
+    return await prisma.contact.findFirst({
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
   }
 
-  /* ============================
-      Get By ID
-  ============================ */
+  /* =========================================================
+     Find Contact By ID
+  ========================================================= */
 
   async findById(id) {
     return await prisma.contact.findUnique({
@@ -23,53 +27,62 @@ class ContactRepository {
     });
   }
 
-  /* ============================
-      Create
-  ============================ */
+  /* =========================================================
+     Create Contact
+  ========================================================= */
 
   async create(data) {
     return await prisma.contact.create({
-      data,
+      data: {
+        phone: data.phone,
+        whatsapp: data.whatsapp,
+        image: data.image ?? null,
+      },
     });
   }
 
-  /* ============================
-      Update
-  ============================ */
+  /* =========================================================
+     Update Contact
+  ========================================================= */
 
   async update(id, data) {
     return await prisma.contact.update({
       where: {
         id,
       },
-      data,
+      data: {
+        ...(data.phone !== undefined && {
+          phone: data.phone,
+        }),
+
+        ...(data.whatsapp !== undefined && {
+          whatsapp: data.whatsapp,
+        }),
+
+        ...(data.image !== undefined && {
+          image: data.image,
+        }),
+      },
     });
   }
 
-  /* ============================
-      Create Or Update
-  ============================ */
+  /* =========================================================
+     Upsert Contact
+  ========================================================= */
 
   async upsert(data) {
-    const contact = await prisma.contact.findFirst();
+    const contact = await this.find();
 
     if (contact) {
-      return await prisma.contact.update({
-        where: {
-          id: contact.id,
-        },
-        data,
-      });
+      return await this.update(contact.id, data);
     }
 
-    return await prisma.contact.create({
-      data,
-    });
+    return await this.create(data);
   }
 
-  /* ============================
-      Delete
-  ============================ */
+  /* =========================================================
+     Delete Contact
+  ========================================================= */
 
   async delete(id) {
     return await prisma.contact.delete({
@@ -79,9 +92,9 @@ class ContactRepository {
     });
   }
 
-  /* ============================
-      Exists
-  ============================ */
+  /* =========================================================
+     Exists
+  ========================================================= */
 
   async exists() {
     const contact = await prisma.contact.findFirst({
@@ -90,20 +103,20 @@ class ContactRepository {
       },
     });
 
-    return !!contact;
+    return Boolean(contact);
   }
 
-  /* ============================
-      Count
-  ============================ */
+  /* =========================================================
+     Count
+  ========================================================= */
 
   async count() {
     return await prisma.contact.count();
   }
 
-  /* ============================
-      Update Phone
-  ============================ */
+  /* =========================================================
+     Update Phone
+  ========================================================= */
 
   async updatePhone(id, phone) {
     return await prisma.contact.update({
@@ -116,9 +129,9 @@ class ContactRepository {
     });
   }
 
-  /* ============================
-      Update WhatsApp
-  ============================ */
+  /* =========================================================
+     Update WhatsApp
+  ========================================================= */
 
   async updateWhatsapp(id, whatsapp) {
     return await prisma.contact.update({
@@ -131,50 +144,35 @@ class ContactRepository {
     });
   }
 
-  /* ============================
-      Update Email
-  ============================ */
+  /* =========================================================
+     Update Image
+  ========================================================= */
 
-  async updateEmail(id, email) {
+  async updateImage(id, image) {
     return await prisma.contact.update({
       where: {
         id,
       },
       data: {
-        email,
+        image: image ?? null,
       },
     });
   }
 
-  /* ============================
-      Update Address
-  ============================ */
+  /* =========================================================
+     Clear Image
+  ========================================================= */
 
-  async updateAddress(id, address) {
+  async clearImage(id) {
     return await prisma.contact.update({
       where: {
         id,
       },
       data: {
-        address,
-      },
-    });
-  }
-
-  /* ============================
-      Update Working Hours
-  ============================ */
-
-  async updateWorkingHours(id, workingHours) {
-    return await prisma.contact.update({
-      where: {
-        id,
-      },
-      data: {
-        workingHours,
+        image: null,
       },
     });
   }
 }
 
-export default ContactRepository;
+export default new ContactRepository();

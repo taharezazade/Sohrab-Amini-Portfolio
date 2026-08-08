@@ -7,10 +7,17 @@ CREATE TYPE "public"."ProjectStatus" AS ENUM ('DRAFT', 'PUBLISHED', 'ARCHIVED');
 -- CreateTable
 CREATE TABLE "public"."Admin" (
     "id" TEXT NOT NULL,
+    "firstName" TEXT,
+    "lastName" TEXT,
+    "displayName" TEXT,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "phone" TEXT,
+    "bio" TEXT,
+    "image" TEXT,
     "password" TEXT NOT NULL,
     "role" "public"."Role" NOT NULL DEFAULT 'ADMIN',
+    "lastLogin" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -28,6 +35,12 @@ CREATE TABLE "public"."Hero" (
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "primaryButtonText" TEXT,
+    "primaryButtonLink" TEXT,
+    "secondaryButtonText" TEXT,
+    "secondaryButtonLink" TEXT,
+    "seoTitle" TEXT,
+    "seoDescription" TEXT,
 
     CONSTRAINT "Hero_pkey" PRIMARY KEY ("id")
 );
@@ -51,11 +64,13 @@ CREATE TABLE "public"."About" (
 CREATE TABLE "public"."Service" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
-    "slug" TEXT NOT NULL,
+    "shortDescription" TEXT NOT NULL,
     "description" TEXT NOT NULL,
+    "icon" TEXT,
+    "features" JSONB NOT NULL,
     "category" TEXT NOT NULL,
-    "technologies" TEXT[],
-    "features" TEXT[],
+    "technologies" JSONB NOT NULL,
+    "color" TEXT,
     "order" INTEGER NOT NULL DEFAULT 0,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -101,9 +116,7 @@ CREATE TABLE "public"."Contact" (
     "id" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "whatsapp" TEXT NOT NULL,
-    "email" TEXT,
-    "address" TEXT,
-    "workingHours" TEXT,
+    "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -113,11 +126,26 @@ CREATE TABLE "public"."Contact" (
 -- CreateTable
 CREATE TABLE "public"."Setting" (
     "id" TEXT NOT NULL,
+    "siteName" TEXT NOT NULL,
     "siteTitle" TEXT NOT NULL,
-    "siteDescription" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "phone" TEXT,
+    "email" TEXT,
     "logo" TEXT,
     "favicon" TEXT,
-    "resume" TEXT,
+    "metaTitle" TEXT,
+    "metaDescription" TEXT,
+    "keywords" TEXT,
+    "canonicalUrl" TEXT,
+    "instagram" TEXT,
+    "linkedin" TEXT,
+    "github" TEXT,
+    "telegram" TEXT,
+    "twitter" TEXT,
+    "whatsapp" TEXT,
+    "maintenanceMode" BOOLEAN NOT NULL DEFAULT false,
+    "twoFactor" BOOLEAN NOT NULL DEFAULT false,
+    "allowRegistration" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -129,9 +157,6 @@ CREATE UNIQUE INDEX "Admin_username_key" ON "public"."Admin"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Admin_email_key" ON "public"."Admin"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Service_slug_key" ON "public"."Service"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Portfolio_slug_key" ON "public"."Portfolio"("slug");
