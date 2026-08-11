@@ -4,56 +4,52 @@ import api from "@/api/axios";
 import { ABOUT_ENDPOINTS } from "@/api/endpoints";
 
 const aboutService = {
-  /* =========================================
-      Get About
-  ========================================= */
-
   async getAbout() {
-    console.log(import.meta.env.VITE_API_URL);
-
-    const response = await api.get(ABOUT_ENDPOINTS.GET);
-
-    return response;
+    return await api.get(ABOUT_ENDPOINTS.GET);
   },
 
-  /* =========================================
-      Create About
-  ========================================= */
+  async getAboutById(id) {
+    return await api.get(ABOUT_ENDPOINTS.GET_BY_ID(id));
+  },
+
+  async exists() {
+    return await api.get(ABOUT_ENDPOINTS.EXISTS);
+  },
+
+  async count() {
+    return await api.get(ABOUT_ENDPOINTS.COUNT);
+  },
 
   async createAbout(payload) {
-    const response = await api.post(ABOUT_ENDPOINTS.CREATE, payload);
-
-    return response;
+    return await api.post(ABOUT_ENDPOINTS.CREATE, payload);
   },
-
-  /* =========================================
-      Update About
-  ========================================= */
 
   async updateAbout(payload) {
-    const response = await api.put(ABOUT_ENDPOINTS.UPDATE, payload);
-
-    return response;
+    return await api.put(ABOUT_ENDPOINTS.UPDATE, payload);
   },
 
-  /* =========================================
-      Upsert About
-  ========================================= */
+  async updateAboutById(id, payload) {
+    return await api.put(ABOUT_ENDPOINTS.UPDATE_BY_ID(id), payload);
+  },
 
   async upsertAbout(payload) {
-    const response = await api.put(ABOUT_ENDPOINTS.UPSERT, payload);
-
-    return response;
+    return await api.post(ABOUT_ENDPOINTS.UPSERT, payload);
   },
 
-  /* =========================================
-      Delete About
-  ========================================= */
-
   async deleteAbout() {
-    const response = await api.delete(ABOUT_ENDPOINTS.DELETE);
+    return await api.delete(ABOUT_ENDPOINTS.DELETE);
+  },
 
-    return response;
+  async deleteAboutById(id) {
+    return await api.delete(ABOUT_ENDPOINTS.DELETE_BY_ID(id));
+  },
+
+  async updateImage(id, payload) {
+    return await api.put(ABOUT_ENDPOINTS.UPDATE_IMAGE(id), payload);
+  },
+
+  async clearImage(id) {
+    return await api.delete(ABOUT_ENDPOINTS.CLEAR_IMAGE(id));
   },
 };
 

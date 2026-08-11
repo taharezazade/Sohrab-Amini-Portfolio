@@ -9,39 +9,72 @@ import servicesRoutes from "./services.routes.js";
 import portfolioRoutes from "./portfolio.routes.js";
 import contactRoutes from "./contact.routes.js";
 import settingsRoutes from "./settings.routes.js";
-import profileRoutes from "./profile.routes.js";
+import uploadRoutes from "./upload.routes.js";
 
 const router = Router();
 
-/* ===========================
-   Health Check
-=========================== */
-
-router.get("/", (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "Sohrab Amini API Routes are working 🚀",
-  });
-});
-
-/* ===========================
-   Feature Routes
-=========================== */
+/**
+ * =========================================================
+ * AUTH
+ * =========================================================
+ */
 
 router.use("/auth", authRoutes);
 
-router.use("/profile", profileRoutes);
+/**
+ * =========================================================
+ * HERO
+ * =========================================================
+ */
 
 router.use("/hero", heroRoutes);
 
+/**
+ * =========================================================
+ * ABOUT
+ * =========================================================
+ */
+
 router.use("/about", aboutRoutes);
+
+/**
+ * =========================================================
+ * SERVICES
+ * =========================================================
+ */
 
 router.use("/services", servicesRoutes);
 
+/**
+ * =========================================================
+ * PORTFOLIO
+ * =========================================================
+ */
+
 router.use("/portfolio", portfolioRoutes);
+
+/**
+ * =========================================================
+ * CONTACT
+ * =========================================================
+ */
 
 router.use("/contact", contactRoutes);
 
+/**
+ * =========================================================
+ * SETTINGS
+ * =========================================================
+ */
+
 router.use("/settings", settingsRoutes);
+
+/**
+ * =========================================================
+ * UPLOAD
+ * =========================================================
+ */
+
+router.use("/upload", uploadRoutes);
 
 export default router;

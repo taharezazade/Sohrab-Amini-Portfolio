@@ -3,17 +3,21 @@
 import prisma from "../config/prisma.js";
 
 class AboutRepository {
-  /* ============================
-      Get About
-  ============================ */
+  /* =========================================================
+     Find About
+  ========================================================= */
 
   async find() {
-    return await prisma.about.findFirst();
+    return await prisma.about.findFirst({
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
   }
 
-  /* ============================
-      Get By ID
-  ============================ */
+  /* =========================================================
+     Find About By ID
+  ========================================================= */
 
   async findById(id) {
     return await prisma.about.findUnique({
@@ -23,53 +27,78 @@ class AboutRepository {
     });
   }
 
-  /* ============================
-      Create
-  ============================ */
+  /* =========================================================
+     Create About
+  ========================================================= */
 
   async create(data) {
     return await prisma.about.create({
-      data,
+      data: {
+        title: data.title,
+        description: data.description,
+        birthYear: data.birthYear ?? null,
+        location: data.location ?? null,
+        experience: data.experience ?? null,
+        image: data.image ?? null,
+      },
     });
   }
 
-  /* ============================
-      Update
-  ============================ */
+  /* =========================================================
+     Update About
+  ========================================================= */
 
   async update(id, data) {
     return await prisma.about.update({
       where: {
         id,
       },
-      data,
+      data: {
+        ...(data.title !== undefined && {
+          title: data.title,
+        }),
+
+        ...(data.description !== undefined && {
+          description: data.description,
+        }),
+
+        ...(data.birthYear !== undefined && {
+          birthYear: data.birthYear,
+        }),
+
+        ...(data.location !== undefined && {
+          location: data.location,
+        }),
+
+        ...(data.experience !== undefined && {
+          experience: data.experience,
+        }),
+
+        ...(data.image !== undefined && {
+          image: data.image,
+        }),
+      },
     });
   }
 
-  /* ============================
-      Upsert
-  ============================ */
+  /* =========================================================
+     Upsert About
+     Singleton
+  ========================================================= */
 
   async upsert(data) {
-    const about = await prisma.about.findFirst();
+    const about = await this.find();
 
     if (about) {
-      return await prisma.about.update({
-        where: {
-          id: about.id,
-        },
-        data,
-      });
+      return await this.update(about.id, data);
     }
 
-    return await prisma.about.create({
-      data,
-    });
+    return await this.create(data);
   }
 
-  /* ============================
-      Delete
-  ============================ */
+  /* =========================================================
+     Delete About
+  ========================================================= */
 
   async delete(id) {
     return await prisma.about.delete({
@@ -79,9 +108,9 @@ class AboutRepository {
     });
   }
 
-  /* ============================
-      Exists
-  ============================ */
+  /* =========================================================
+     Exists
+  ========================================================= */
 
   async exists() {
     const about = await prisma.about.findFirst({
@@ -90,15 +119,45 @@ class AboutRepository {
       },
     });
 
-    return !!about;
+    return Boolean(about);
   }
 
-  /* ============================
-      Count
-  ============================ */
+  /* =========================================================
+     Count
+  ========================================================= */
 
   async count() {
     return await prisma.about.count();
+  }
+
+  /* =========================================================
+     Update Image
+  ========================================================= */
+
+  async updateImage(id, image) {
+    return await prisma.about.update({
+      where: {
+        id,
+      },
+      data: {
+        image,
+      },
+    });
+  }
+
+  /* =========================================================
+     Clear Image
+  ========================================================= */
+
+  async clearImage(id) {
+    return await prisma.about.update({
+      where: {
+        id,
+      },
+      data: {
+        image: null,
+      },
+    });
   }
 }
 

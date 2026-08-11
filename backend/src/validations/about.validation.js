@@ -2,9 +2,9 @@
 
 import { z } from "zod";
 
-/* =========================================
+/* =========================================================
    Common Fields
-========================================= */
+========================================================= */
 
 const title = z
   .string({
@@ -12,7 +12,7 @@ const title = z
   })
   .trim()
   .min(3, "Title must be at least 3 characters.")
-  .max(120, "Title must be less than 120 characters.");
+  .max(120, "Title must not exceed 120 characters.");
 
 const description = z
   .string({
@@ -20,11 +20,11 @@ const description = z
   })
   .trim()
   .min(20, "Description must be at least 20 characters.")
-  .max(3000, "Description must be less than 3000 characters.");
+  .max(3000, "Description must not exceed 3000 characters.");
 
-const birthYear = z
+const birthYear = z.coerce
   .number()
-  .int()
+  .int("Birth year must be an integer.")
   .min(1300, "Birth year is invalid.")
   .max(1500, "Birth year is invalid.")
   .optional();
@@ -33,28 +33,29 @@ const location = z
   .string()
   .trim()
   .min(2, "Location must be at least 2 characters.")
-  .max(100, "Location must be less than 100 characters.")
+  .max(100, "Location must not exceed 100 characters.")
   .optional()
   .or(z.literal(""));
 
-const experience = z
+const experience = z.coerce
   .number()
-  .int()
+  .int("Experience must be an integer.")
   .min(0, "Experience cannot be negative.")
   .max(60, "Experience is invalid.")
   .optional();
 
-const image = z.string().trim().optional().or(z.literal(""));
+const image = z
+  .string()
+  .trim()
+  .max(500, "Image path is too long.")
+  .optional()
+  .or(z.literal(""));
 
-const id = z
-  .string({
-    required_error: "About ID is required.",
-  })
-  .cuid("Invalid About ID.");
+const id = z.string().cuid("Invalid About ID.");
 
-////////////////////////////////////////////////////////////
-// Create About
-////////////////////////////////////////////////////////////
+/* =========================================================
+   Create
+========================================================= */
 
 export const createAboutSchema = z.object({
   title,
@@ -65,23 +66,34 @@ export const createAboutSchema = z.object({
   image,
 });
 
-////////////////////////////////////////////////////////////
-// Update About
-////////////////////////////////////////////////////////////
+/* =========================================================
+   Update
+   Partial update
+========================================================= */
 
-export const updateAboutSchema = z.object({
-  title,
-  description,
-  birthYear,
-  location,
-  experience,
-  image,
-});
+export const updateAboutSchema = z
+  .object({
+    title,
+    description,
+    birthYear,
+    location,
+    experience,
+    image,
+  })
+  .partial();
 
-////////////////////////////////////////////////////////////
-// Params
-////////////////////////////////////////////////////////////
+/* =========================================================
+   Params
+========================================================= */
 
 export const aboutParamsSchema = z.object({
   id,
+});
+
+/* =========================================================
+   Image
+========================================================= */
+
+export const updateAboutImageSchema = z.object({
+  image: image,
 });

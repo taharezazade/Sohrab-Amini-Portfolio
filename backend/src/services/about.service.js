@@ -6,15 +6,17 @@ import {
   createAboutSchema,
   updateAboutSchema,
   aboutParamsSchema,
+  updateAboutImageSchema,
 } from "../validations/about.validation.js";
 
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 class AboutService {
-  /* =========================================
-      Get About
-  ========================================= */
+  /* =========================================================
+     GET ABOUT
+     Singleton
+  ========================================================= */
 
   async getAbout() {
     const about = await aboutRepository.find();
@@ -26,12 +28,14 @@ class AboutService {
     return new ApiResponse(200, about, "About section fetched successfully.");
   }
 
-  /* =========================================
-      Get About By ID
-  ========================================= */
+  /* =========================================================
+     GET ABOUT BY ID
+  ========================================================= */
 
   async getAboutById(id) {
-    aboutParamsSchema.parse({ id });
+    aboutParamsSchema.parse({
+      id,
+    });
 
     const about = await aboutRepository.findById(id);
 
@@ -42,9 +46,9 @@ class AboutService {
     return new ApiResponse(200, about, "About section fetched successfully.");
   }
 
-  /* =========================================
-      Create About
-  ========================================= */
+  /* =========================================================
+     CREATE ABOUT
+  ========================================================= */
 
   async createAbout(payload) {
     const data = createAboutSchema.parse(payload);
@@ -55,24 +59,42 @@ class AboutService {
       throw new ApiError(409, "About section already exists.");
     }
 
-    const about = await aboutRepository.create({
-      title: data.title,
-      description: data.description,
-      birthYear: data.birthYear,
-      location: data.location,
-      experience: data.experience,
-      image: data.image,
-    });
+    const about = await aboutRepository.create(data);
 
     return new ApiResponse(201, about, "About section created successfully.");
   }
 
-  /* =========================================
-      Update About
-  ========================================= */
+  /* =========================================================
+     UPDATE ABOUT
+     Singleton
+  ========================================================= */
 
-  async updateAbout(id, payload) {
-    aboutParamsSchema.parse({ id });
+  async updateAbout(payload) {
+    const data = updateAboutSchema.parse(payload);
+
+    const about = await aboutRepository.find();
+
+    if (!about) {
+      throw new ApiError(404, "About section not found.");
+    }
+
+    const updatedAbout = await aboutRepository.update(about.id, data);
+
+    return new ApiResponse(
+      200,
+      updatedAbout,
+      "About section updated successfully.",
+    );
+  }
+
+  /* =========================================================
+     UPDATE ABOUT BY ID
+  ========================================================= */
+
+  async updateAboutById(id, payload) {
+    aboutParamsSchema.parse({
+      id,
+    });
 
     const data = updateAboutSchema.parse(payload);
 
@@ -82,19 +104,152 @@ class AboutService {
       throw new ApiError(404, "About section not found.");
     }
 
-    const updatedAbout = await aboutRepository.update(id, {
-      title: data.title,
-      description: data.description,
-      birthYear: data.birthYear,
-      location: data.location,
-      experience: data.experience,
-      image: data.image,
-    });
+    const updatedAbout = await aboutRepository.update(id, data);
 
     return new ApiResponse(
       200,
       updatedAbout,
       "About section updated successfully.",
+    );
+  }
+
+  /* =========================================================
+     UPSERT ABOUT
+     Singleton
+  ========================================================= */
+
+  async upsertAbout(payload) {
+    const data = updateAboutSchema.parse(payload);
+
+    const about = await aboutRepository.upsert(data);
+
+    return new ApiResponse(200, about, "About section saved successfully.");
+  }
+
+  /* =========================================================
+     DELETE ABOUT
+     Singleton
+  ========================================================= */
+
+  async deleteAbout() {
+    const about = await aboutRepository.find();
+
+    if (!about) {
+      throw new ApiError(404, "About section not found.");
+    }
+
+    const deletedAbout = await aboutRepository.delete(about.id);
+
+    return new ApiResponse(
+      200,
+      deletedAbout,
+      "About section deleted successfully.",
+    );
+  }
+
+  /* =========================================================
+     DELETE ABOUT BY ID
+  ========================================================= */
+
+  async deleteAboutById(id) {
+    aboutParamsSchema.parse({
+      id,
+    });
+
+    const about = await aboutRepository.findById(id);
+
+    if (!about) {
+      throw new ApiError(404, "About section not found.");
+    }
+
+    const deletedAbout = await aboutRepository.delete(id);
+
+    return new ApiResponse(
+      200,
+      deletedAbout,
+      "About section deleted successfully.",
+    );
+  }
+
+  /* =========================================================
+     UPDATE IMAGE
+  ========================================================= */
+
+  async updateImage(id, payload) {
+    aboutParamsSchema.parse({
+      id,
+    });
+
+    const data = updateAboutImageSchema.parse(payload);
+
+    const about = await aboutRepository.findById(id);
+
+    if (!about) {
+      throw new ApiError(404, "About section not found.");
+    }
+
+    const updatedAbout = await aboutRepository.updateImage(id, data.image);
+
+    return new ApiResponse(
+      200,
+      updatedAbout,
+      "About image updated successfully.",
+    );
+  }
+
+  /* =========================================================
+     CLEAR IMAGE
+  ========================================================= */
+
+  async clearImage(id) {
+    aboutParamsSchema.parse({
+      id,
+    });
+
+    const about = await aboutRepository.findById(id);
+
+    if (!about) {
+      throw new ApiError(404, "About section not found.");
+    }
+
+    const updatedAbout = await aboutRepository.clearImage(id);
+
+    return new ApiResponse(
+      200,
+      updatedAbout,
+      "About image cleared successfully.",
+    );
+  }
+
+  /* =========================================================
+     EXISTS
+  ========================================================= */
+
+  async exists() {
+    const exists = await aboutRepository.exists();
+
+    return new ApiResponse(
+      200,
+      {
+        exists,
+      },
+      "About existence checked successfully.",
+    );
+  }
+
+  /* =========================================================
+     COUNT
+  ========================================================= */
+
+  async count() {
+    const total = await aboutRepository.count();
+
+    return new ApiResponse(
+      200,
+      {
+        total,
+      },
+      "About count fetched successfully.",
     );
   }
 }

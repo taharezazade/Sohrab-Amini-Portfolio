@@ -4,54 +4,36 @@ import api from "@/api/axios";
 import { HERO_ENDPOINTS } from "@/api/endpoints";
 
 const heroService = {
-  /* =========================================
-      Get Hero
-  ========================================= */
+  /* =========================================================
+     GET HERO
+  ========================================================= */
 
   async getHero() {
-    const response = await api.get(HERO_ENDPOINTS.GET);
-
-    return response;
+    return await api.get(HERO_ENDPOINTS.GET);
   },
 
-  /* =========================================
-      Create Hero
-  ========================================= */
+  /* =========================================================
+     CREATE HERO
+  ========================================================= */
 
   async createHero(payload) {
-    const response = await api.post(HERO_ENDPOINTS.CREATE, payload);
-
-    return response;
+    return await api.post(HERO_ENDPOINTS.CREATE, payload);
   },
 
-  /* =========================================
-      Update Hero
-  ========================================= */
+  /* =========================================================
+     UPDATE HERO
+  ========================================================= */
 
   async updateHero(payload) {
-    const response = await api.put(HERO_ENDPOINTS.UPDATE, payload);
-
-    return response;
+    return await api.put(HERO_ENDPOINTS.UPDATE, payload);
   },
 
-  /* =========================================
-      Upsert Hero
-  ========================================= */
-
-  async upsertHero(payload) {
-    const response = await api.put(HERO_ENDPOINTS.UPDATE, payload);
-
-    return response;
-  },
-
-  /* =========================================
-      Delete Hero
-  ========================================= */
+  /* =========================================================
+     DELETE HERO
+  ========================================================= */
 
   async deleteHero() {
-    const response = await api.delete(HERO_ENDPOINTS.DELETE);
-
-    return response;
+    return await api.delete(HERO_ENDPOINTS.DELETE);
   },
 };
 
