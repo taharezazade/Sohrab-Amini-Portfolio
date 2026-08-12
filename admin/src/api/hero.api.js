@@ -1,43 +1,45 @@
 /** @format */
 
-import api from "./axios";
+import api from "@/api/axios";
 
-/**
- * Get Hero Data
- */
-export const getHero = async () => {
-  const response = await api.get("/hero");
+import { HERO_ENDPOINTS } from "@/api/endpoints";
 
-  return response.data;
+/* =========================================================
+   Hero API
+========================================================= */
+
+const heroApi = {
+  /* =======================================================
+     GET
+  ======================================================= */
+
+  get() {
+    return api.get(HERO_ENDPOINTS.GET);
+  },
+
+  /* =======================================================
+     CREATE
+  ======================================================= */
+
+  create(payload) {
+    return api.post(HERO_ENDPOINTS.CREATE, payload);
+  },
+
+  /* =======================================================
+     UPDATE
+  ======================================================= */
+
+  update(payload) {
+    return api.put(HERO_ENDPOINTS.UPDATE, payload);
+  },
+
+  /* =======================================================
+     DELETE
+  ======================================================= */
+
+  remove() {
+    return api.delete(HERO_ENDPOINTS.DELETE);
+  },
 };
 
-/**
- * Update Hero Data
- */
-export const updateHero = async (data) => {
-  const response = await api.put("/hero", data);
-
-  return response.data;
-};
-
-/**
- * Upload Hero Image
- */
-export const uploadHeroImage = async (formData) => {
-  const response = await api.post("/upload/hero", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-
-  return response.data;
-};
-
-/**
- * Delete Hero Image
- */
-export const deleteHeroImage = async (imageId) => {
-  const response = await api.delete(`/upload/hero/${imageId}`);
-
-  return response.data;
-};
+export default heroApi;

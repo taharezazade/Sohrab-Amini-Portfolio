@@ -1,78 +1,183 @@
 /** @format */
 
-// Auth
+/* =========================================================
+   AUTHENTICATION
+========================================================= */
 
 export const AUTH_ENDPOINTS = {
   LOGIN: "/auth/login",
+
   LOGOUT: "/auth/logout",
-  REFRESH: "/auth/refresh",
+
   ME: "/auth/me",
+
+  PROFILE: "/auth/profile",
+
+  CHANGE_PASSWORD: "/auth/change-password",
 };
 
-// Profile
-
-export const PROFILE_ENDPOINTS = {
-  GET: "/profile",
-  UPDATE: "/profile",
-  CHANGE_PASSWORD: "/profile/password",
-  DELETE_IMAGE: "/profile/image",
-};
-
-// Hero
+/* =========================================================
+   HERO
+========================================================= */
 
 export const HERO_ENDPOINTS = {
   GET: "/hero",
+
+  CREATE: "/hero",
+
   UPDATE: "/hero",
+
+  DELETE: "/hero",
 };
 
-// About
+/* =========================================================
+   ABOUT
+========================================================= */
 
 export const ABOUT_ENDPOINTS = {
   GET: "/about",
+
+  GET_BY_ID: (id) => `/about/${id}`,
+
+  EXISTS: "/about/exists",
+
+  COUNT: "/about/count",
+
+  CREATE: "/about",
+
   UPDATE: "/about",
+
+  UPDATE_BY_ID: (id) => `/about/${id}`,
+
+  UPSERT: "/about/upsert",
+
+  DELETE: "/about",
+
+  DELETE_BY_ID: (id) => `/about/${id}`,
+
+  UPDATE_IMAGE: (id) => `/about/${id}/image`,
+
+  CLEAR_IMAGE: (id) => `/about/${id}/image`,
 };
 
-// Services
+/* =========================================================
+   SERVICES
+========================================================= */
 
 export const SERVICES_ENDPOINTS = {
   GET_ALL: "/services",
+
   GET_BY_ID: (id) => `/services/${id}`,
+
+  EXISTS: "/services/exists",
+
+  COUNT: "/services/count",
+
   CREATE: "/services",
+
   UPDATE: (id) => `/services/${id}`,
+
   DELETE: (id) => `/services/${id}`,
+
+  UPDATE_IMAGE: (id) => `/services/${id}/image`,
+
+  CLEAR_IMAGE: (id) => `/services/${id}/image`,
+
   REORDER: "/services/reorder",
 };
 
-// Portfolio
+/* =========================================================
+   PORTFOLIO
+========================================================= */
 
 export const PORTFOLIO_ENDPOINTS = {
   GET_ALL: "/portfolio",
+
+  GET_PUBLISHED: "/portfolio/published",
+
+  GET_FEATURED: "/portfolio/featured",
+
   GET_BY_ID: (id) => `/portfolio/${id}`,
+
+  GET_BY_SLUG: (slug) => `/portfolio/slug/${slug}`,
+
+  EXISTS: "/portfolio/exists",
+
+  COUNT: "/portfolio/count",
+
   CREATE: "/portfolio",
+
   UPDATE: (id) => `/portfolio/${id}`,
+
   DELETE: (id) => `/portfolio/${id}`,
+
+  UPDATE_STATUS: (id) => `/portfolio/${id}/status`,
+
+  UPDATE_IMAGE: (id) => `/portfolio/${id}/image`,
+
+  CLEAR_IMAGE: (id) => `/portfolio/${id}/image`,
+
   UPLOAD_IMAGES: (id) => `/portfolio/${id}/images`,
+
   DELETE_IMAGE: (id) => `/portfolio/images/${id}`,
+
   REORDER: "/portfolio/reorder",
 };
 
-// Contact
+/* =========================================================
+   CONTACT
+========================================================= */
 
 export const CONTACT_ENDPOINTS = {
   GET: "/contact",
-  UPDATE: "/contact",
+
+  GET_BY_ID: (id) => `/contact/${id}`,
+
+  EXISTS: "/contact/exists",
+
+  COUNT: "/contact/count",
+
+  CREATE: "/contact",
+
+  UPDATE: (id) => `/contact/${id}`,
+
+  UPSERT: "/contact/upsert",
+
+  DELETE: (id) => `/contact/${id}`,
+
+  PHONE: (id) => `/contact/${id}/phone`,
+
+  WHATSAPP: (id) => `/contact/${id}/whatsapp`,
+
+  UPDATE_IMAGE: (id) => `/contact/${id}/image`,
+
+  CLEAR_IMAGE: (id) => `/contact/${id}/image`,
 };
 
-// Settings
+/* =========================================================
+   SETTINGS
+========================================================= */
 
 export const SETTINGS_ENDPOINTS = {
   GET: "/settings",
+
+  CREATE: "/settings",
+
   UPDATE: "/settings",
+
+  DELETE: "/settings",
 };
 
-// Dashboard
+/* =========================================================
+   UPLOAD
+========================================================= */
 
-export const DASHBOARD_ENDPOINTS = {
-  STATS: "/dashboard",
+export const UPLOAD_ENDPOINTS = {
+  SINGLE: "/upload",
+
+  MULTIPLE: "/upload/multiple",
+
+  REPLACE: "/upload/replace",
+
+  DELETE: "/upload",
 };
-

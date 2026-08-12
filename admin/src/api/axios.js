@@ -5,19 +5,26 @@ import axios from "axios";
 import { STORAGE_KEYS } from "@/constants/storage";
 import { API_CONFIG } from "@/config/env";
 
+/* =========================================================
+   Axios Instance
+========================================================= */
+
 const api = axios.create({
   baseURL: API_CONFIG.BASE_URL,
 
   timeout: API_CONFIG.TIMEOUT,
 
+  withCredentials: true,
+
   headers: {
+    Accept: "application/json",
     "Content-Type": "application/json",
   },
 });
 
-/*
-  Request Interceptor
-*/
+/* =========================================================
+   Request Interceptor
+========================================================= */
 
 api.interceptors.request.use(
   (config) => {
@@ -25,6 +32,17 @@ api.interceptors.request.use(
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    /*
+     * FormData
+     *
+     * Let the browser/Axios automatically
+     * generate multipart/form-data boundary.
+     */
+
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
     }
 
     return config;
@@ -35,9 +53,9 @@ api.interceptors.request.use(
   },
 );
 
-/*
-  Response Interceptor
-*/
+/* =========================================================
+   Response Interceptor
+========================================================= */
 
 api.interceptors.response.use(
   (response) => {
@@ -45,7 +63,9 @@ api.interceptors.response.use(
   },
 
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status;
+
+    if (status === 401) {
       localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     }
 

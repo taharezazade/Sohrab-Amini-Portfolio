@@ -1,56 +1,53 @@
 /** @format */
 
-import api from "./axios";
+import api from "@/api/axios";
 
-import { SERVICES_ENDPOINTS } from "../constants/endpoints";
+import { SERVICES_ENDPOINTS } from "@/api/endpoints";
 
-const getServices = async (params = {}) => {
-  const { data } = await api.get(SERVICES_ENDPOINTS.GET_ALL, {
-    params,
-  });
-
-  return data;
-};
-
-const getServiceById = async (id) => {
-  const { data } = await api.get(SERVICES_ENDPOINTS.GET_BY_ID(id));
-
-  return data;
-};
-
-const createService = async (payload) => {
-  const { data } = await api.post(SERVICES_ENDPOINTS.CREATE, payload);
-
-  return data;
-};
-
-const updateService = async (id, payload) => {
-  const { data } = await api.put(SERVICES_ENDPOINTS.UPDATE(id), payload);
-
-  return data;
-};
-
-const deleteService = async (id) => {
-  const { data } = await api.delete(SERVICES_ENDPOINTS.DELETE(id));
-
-  return data;
-};
-
-const reorderServices = async (services) => {
-  const { data } = await api.patch(SERVICES_ENDPOINTS.REORDER, {
-    services,
-  });
-
-  return data;
-};
+/* =========================================================
+   Services API
+========================================================= */
 
 const servicesApi = {
-  getServices,
-  getServiceById,
-  createService,
-  updateService,
-  deleteService,
-  reorderServices,
+  getAll() {
+    return api.get(SERVICES_ENDPOINTS.GET_ALL);
+  },
+
+  getById(id) {
+    return api.get(SERVICES_ENDPOINTS.GET_BY_ID(id));
+  },
+
+  exists() {
+    return api.get(SERVICES_ENDPOINTS.EXISTS);
+  },
+
+  count() {
+    return api.get(SERVICES_ENDPOINTS.COUNT);
+  },
+
+  create(payload) {
+    return api.post(SERVICES_ENDPOINTS.CREATE, payload);
+  },
+
+  update(id, payload) {
+    return api.put(SERVICES_ENDPOINTS.UPDATE(id), payload);
+  },
+
+  remove(id) {
+    return api.delete(SERVICES_ENDPOINTS.DELETE(id));
+  },
+
+  updateImage(id, payload) {
+    return api.put(SERVICES_ENDPOINTS.UPDATE_IMAGE(id), payload);
+  },
+
+  clearImage(id) {
+    return api.delete(SERVICES_ENDPOINTS.CLEAR_IMAGE(id));
+  },
+
+  reorder(payload) {
+    return api.patch(SERVICES_ENDPOINTS.REORDER, payload);
+  },
 };
 
 export default servicesApi;

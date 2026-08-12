@@ -1,25 +1,19 @@
 /** @format */
 
-// Axios Instance
 export { default as api } from "./axios";
 
-// Auth API
-export * from "./auth.api";
+export { default as authApi } from "./auth.api";
 
-// Hero API
-export * from "./hero.api";
+export { default as heroApi } from "./hero.api";
 
-// About API
-export * from "./about.api";
+export { default as aboutApi } from "./about.api";
 
-// Services API
-export * from "./services.api";
+export { default as servicesApi } from "./services.api";
 
-// Portfolio API
-export * from "./portfolio.api";
+export { default as portfolioApi } from "./portfolio.api";
 
-// Contact API
-export * from "./contact.api";
+export { default as contactApi } from "./contact.api";
 
-// Settings API
-export * from "./settings.api";
+export { default as settingsApi } from "./settings.api";
+
+export { default as uploadApi } from "./upload.api";

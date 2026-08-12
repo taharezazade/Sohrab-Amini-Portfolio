@@ -1,39 +1,60 @@
 /** @format */
 
-import api from "./axios";
-import { AUTH_ENDPOINTS, PROFILE_ENDPOINTS } from "./endpoints";
+import api from "@/api/axios";
+
+import { AUTH_ENDPOINTS } from "@/api/endpoints";
+
+/* =========================================================
+   Authentication API
+========================================================= */
 
 const authApi = {
-  login: (data) => {
-    return api.post(AUTH_ENDPOINTS.LOGIN, data);
+  /* =======================================================
+     LOGIN
+  ======================================================= */
+
+  login(payload) {
+    return api.post(AUTH_ENDPOINTS.LOGIN, payload);
   },
 
-  logout: () => {
+  /* =======================================================
+     LOGOUT
+  ======================================================= */
+
+  logout() {
     return api.post(AUTH_ENDPOINTS.LOGOUT);
   },
 
-  refresh: () => {
-    return api.post(AUTH_ENDPOINTS.REFRESH);
-  },
+  /* =======================================================
+     CURRENT ADMIN
+  ======================================================= */
 
-  me: () => {
+  me() {
     return api.get(AUTH_ENDPOINTS.ME);
   },
 
-  getProfile: () => {
-    return api.get(PROFILE_ENDPOINTS.GET);
+  /* =======================================================
+     PROFILE
+  ======================================================= */
+
+  getProfile() {
+    return api.get(AUTH_ENDPOINTS.PROFILE);
   },
 
-  updateProfile: (data) => {
-    return api.patch(PROFILE_ENDPOINTS.UPDATE, data);
+  /* =======================================================
+     UPDATE PROFILE
+  ======================================================= */
+
+  updateProfile(payload) {
+    return api.put(AUTH_ENDPOINTS.PROFILE, payload);
   },
 
-  changePassword: (data) => {
-    return api.patch(PROFILE_ENDPOINTS.CHANGE_PASSWORD, data);
-  },
+  /* =======================================================
+     CHANGE PASSWORD
+  ======================================================= */
 
-  deleteImage: () => {
-    return api.delete(PROFILE_ENDPOINTS.DELETE_IMAGE);
+  changePassword(payload) {
+    return api.patch(AUTH_ENDPOINTS.CHANGE_PASSWORD, payload);
   },
 };
 
