@@ -1,168 +1,115 @@
 /** @format */
 
-import { User, Code1, TickCircle } from "iconsax-reactjs";
+import {
+  User,
+  Location,
+  Calendar,
+  Briefcase,
+  TickCircle,
+} from "iconsax-reactjs";
 
-const AboutPreview = () => {
+const AboutPreview = ({ about }) => {
+  const hasData = Boolean(about);
+
   return (
-    <div
-      className='
-        card
-        bg-base-100
-        border
-        border-base-300
-        shadow-sm
-      '>
+    <div className='card border border-base-300 bg-base-100 shadow-sm'>
       <div className='card-body'>
         {/* Header */}
-        <div
-          className='
-            flex
-            items-center
-            gap-3
-            mb-5
-          '>
-          <div
-            className='
-              flex
-              items-center
-              justify-center
-              w-10
-              h-10
-              rounded-xl
-              bg-primary/10
-              text-primary
-            '>
+
+        <div className='mb-5 flex items-center gap-3'>
+          <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary'>
             <User size={22} variant='Bulk' />
           </div>
 
           <div>
-            <h2
-              className='
-                font-bold
-                text-lg
-              '>
-              پیش‌نمایش
-            </h2>
+            <h2 className='text-lg font-bold'>پیش‌نمایش</h2>
 
-            <p
-              className='
-                text-sm
-                text-base-content/60
-              '>
-              نمایش نتیجه نهایی About
+            <p className='text-sm text-base-content/60'>
+              نمایش اطلاعات فعلی About
             </p>
           </div>
         </div>
 
-        {/* Preview Card */}
-        <div
-          className='
-            rounded-xl
-            border
-            border-base-300
-            overflow-hidden
-            bg-base-200
-          '>
+        {/* Preview */}
+
+        <div className='overflow-hidden rounded-xl border border-base-300 bg-base-200'>
           {/* Image */}
-          <div
-            className='
-              h-44
-              bg-base-300
-              flex
-              items-center
-              justify-center
-            '>
-            <div
-              className='
-                w-24
-                h-24
-                rounded-full
-                bg-base-100
-                flex
-                items-center
-                justify-center
-                border
-                border-base-300
-              '>
-              <User size={42} variant='Bulk' className='text-primary' />
-            </div>
+
+          <div className='flex h-48 items-center justify-center bg-base-300'>
+            {about?.image ?
+              <img
+                src={about.image}
+                alt={about.title || "About"}
+                className='h-full w-full object-cover'
+              />
+            : <div className='flex h-24 w-24 items-center justify-center rounded-full border border-base-300 bg-base-100'>
+                <User size={42} variant='Bulk' className='text-primary' />
+              </div>
+            }
           </div>
 
           {/* Content */}
-          <div
-            className='
-              p-5
-              space-y-4
-            '>
+
+          <div className='space-y-4 p-5'>
             {/* Status */}
-            <div
-              className='
-                flex
-                items-center
-                justify-between
-              '>
+
+            <div className='flex items-center justify-between'>
               <span
-                className='
-                  badge
-                  badge-success
-                  gap-1
-                '>
-                <TickCircle size={14} />
-                فعال
+                className={`badge gap-1 ${
+                  hasData ? "badge-success" : "badge-error"
+                }`}>
+                {hasData && <TickCircle size={14} />}
+
+                {hasData ? "اطلاعات موجود" : "بدون اطلاعات"}
               </span>
             </div>
 
-            {/* Name */}
-            <div>
-              <h3
-                className='
-                  text-xl
-                  font-bold
-                '>
-                سهراب امینی
-              </h3>
+            {/* Title */}
 
-              <p
-                className='
-                  text-sm
-                  text-base-content/60
-                  mt-1
-                '>
-                توسعه‌دهنده وردپرس
-              </p>
+            <div>
+              <h3 className='text-xl font-bold'>
+                {about?.title || "عنوان About"}
+              </h3>
             </div>
 
             {/* Description */}
-            <p
-              className='
-                text-sm
-                leading-7
-                text-base-content/70
-              '>
-              طراحی و توسعه سایت‌های حرفه‌ای، ساخت قالب‌های اختصاصی وردپرس،
-              بهینه‌سازی سرعت و توسعه راهکارهای سفارشی وب.
+
+            <p className='text-sm leading-7 text-base-content/70'>
+              {about?.description || "هنوز توضیحی برای بخش About ثبت نشده است."}
             </p>
 
-            {/* Technologies */}
-            <div
-              className='
-                flex
-                flex-wrap
-                gap-2
-                pt-2
-              '>
-              {["PHP", "WordPress", "JavaScript", "React"].map((item) => (
-                <span
-                  key={item}
-                  className='
-                      badge
-                      badge-outline
-                    '>
-                  <Code1 size={13} />
+            {/* Information */}
 
-                  {item}
-                </span>
-              ))}
+            <div className='grid grid-cols-1 gap-2 text-sm'>
+              {about?.location && (
+                <div className='flex items-center gap-2 text-base-content/70'>
+                  <Location size={16} variant='Bulk' className='text-primary' />
+
+                  <span>{about.location}</span>
+                </div>
+              )}
+
+              {about?.birthYear && (
+                <div className='flex items-center gap-2 text-base-content/70'>
+                  <Calendar size={16} variant='Bulk' className='text-primary' />
+
+                  <span>متولد {about.birthYear}</span>
+                </div>
+              )}
+
+              {about?.experience !== null &&
+                about?.experience !== undefined &&
+                about?.experience !== "" && (
+                  <div className='flex items-center gap-2 text-base-content/70'>
+                    <Briefcase
+                      size={16}
+                      variant='Bulk'
+                      className='text-primary'
+                    />
+
+                    <span>{about.experience} سال تجربه</span>
+                  </div>
+                )}
             </div>
           </div>
         </div>

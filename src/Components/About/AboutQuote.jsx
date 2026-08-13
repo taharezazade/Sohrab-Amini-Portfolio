@@ -1,66 +1,61 @@
 /** @format */
 
-import { motion } from "framer-motion";
 import { QuoteUp } from "iconsax-reactjs";
 
-import { quoteVariant } from "./about.animations";
-
-function AboutQuote({ data }) {
-  if (!data) return null;
+const AboutQuote = ({ about }) => {
+  if (!about?.description) {
+    return null;
+  }
 
   return (
-    <motion.section variants={quoteVariant} className='mt-16'>
+    <section
+      className='
+        relative
+        overflow-hidden
+        rounded-3xl
+        p-4
+      '>
       <div
         className='
-          relative
-          overflow-hidden
-          w-full
-          py-5
-          text-center
-        '>
+          absolute
+          -right-10
+          -top-10
+          h-32
+          w-32
+          rounded-full
+          bg-primary/10
+          blur-3xl
+        '
+      />
+
+      <div className='relative'>
         <div
           className='
-            absolute
-            -top-20
-            left-1/2
-            h-64
-            w-64
-            -translate-x-1/2
-            rounded-full
+            mb-5
+            flex
+            h-12
+            w-12
+            items-center
+            justify-center
+            rounded-2xl
             bg-primary/10
-            blur-[110px]
-          '
-        />
-
-        <motion.div
-          animate={{
-            rotate: [0, 4, -4, 0],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 8,
-          }}
-          className='relative z-10'>
-          <QuoteUp variant='Bulk' size={46} className='mx-auto text-primary' />
-        </motion.div>
-
-        <h3
-          className='
-            relative
-            z-10
-            mt-8
-            mx-auto
-            max-w-4xl
-            text-2xl
-            font-bold
-            text-base-content
-            md:text-3xl
+            text-primary
           '>
-          "{data}"
-        </h3>
+          <QuoteUp size={24} variant='Bulk' />
+        </div>
+        <p
+          className='
+            whitespace-pre-line
+            text-base
+            leading-8
+            text-base-content
+            font-medium
+          '>
+          {about.description}
+        </p>
       </div>
-    </motion.section>
+    </section>
   );
-}
+};
 
 export default AboutQuote;

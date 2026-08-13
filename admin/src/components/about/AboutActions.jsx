@@ -1,99 +1,54 @@
 /** @format */
 
-import { Save2, Refresh2, Trash } from "iconsax-reactjs";
+import { Refresh, TickCircle } from "iconsax-reactjs";
 
-const AboutActions = () => {
-  const isSubmitting = false;
-
-  const handleSubmit = () => {
-    // TODO: connect API
-  };
-
-  const handleReset = () => {
-    // TODO: reset form
-  };
-
-  const handleDelete = () => {
-    // TODO: delete about data
-  };
-
+const AboutActions = ({
+  isSubmitting = false,
+  hasChanges = false,
+  onSubmit,
+  onReset,
+}) => {
   return (
-    <div
-      className='
-        card
-        bg-base-100
-        border
-        border-base-300
-        shadow-sm
-      '>
-      <div
-        className='
-          card-body
-        '>
-        <div
-          className='
-            flex
-            flex-col
-            sm:flex-row
-            justify-between
-            gap-3
-          '>
-          {/* Left Actions */}
-          <div
-            className='
-              flex
-              flex-col
-              sm:flex-row
-              gap-3
-            '>
-            {/* Save */}
-            <button
-              type='button'
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className='
-                btn
-                btn-primary
-                gap-2
-              '>
-              {isSubmitting ?
-                <span
-                  className='
-                      loading
-                      loading-spinner
-                    '
-                />
-              : <Save2 size={18} variant='Bulk' />}
+    <div className='card border border-base-300 bg-base-100 shadow-sm'>
+      <div className='card-body'>
+        <div className='flex flex-col gap-3 sm:flex-row sm:justify-end'>
+          {/* Reset */}
 
-              {isSubmitting ? "در حال ذخیره..." : "ذخیره تغییرات"}
-            </button>
-
-            {/* Reset */}
-            <button
-              type='button'
-              onClick={handleReset}
-              className='
-                btn
-                btn-outline
-                gap-2
-              '>
-              <Refresh2 size={18} />
-              بازنشانی
-            </button>
-          </div>
-
-          {/* Delete */}
           <button
             type='button'
-            onClick={handleDelete}
+            onClick={onReset}
+            disabled={isSubmitting || !hasChanges}
             className='
               btn
-              btn-error
-              btn-outline
+              btn-ghost
               gap-2
             '>
-            <Trash size={18} />
-            حذف اطلاعات
+            <Refresh size={18} />
+            بازنشانی
+          </button>
+
+          {/* Update */}
+
+          <button
+            type='button'
+            onClick={onSubmit}
+            disabled={isSubmitting || !hasChanges}
+            className='
+              btn
+              btn-primary
+              gap-2
+              min-w-40
+            '>
+            {isSubmitting ?
+              <>
+                <span className='loading loading-spinner loading-sm' />
+                در حال ذخیره...
+              </>
+            : <>
+                <TickCircle size={18} />
+                ذخیره تغییرات
+              </>
+            }
           </button>
         </div>
       </div>

@@ -4,11 +4,11 @@ import prisma from "../config/prisma.js";
 
 class AboutRepository {
   /* =========================================================
-     Find About
+     FIND
   ========================================================= */
 
   async find() {
-    return await prisma.about.findFirst({
+    return prisma.about.findFirst({
       orderBy: {
         createdAt: "asc",
       },
@@ -16,11 +16,11 @@ class AboutRepository {
   }
 
   /* =========================================================
-     Find About By ID
+     FIND BY ID
   ========================================================= */
 
   async findById(id) {
-    return await prisma.about.findUnique({
+    return prisma.about.findUnique({
       where: {
         id,
       },
@@ -28,80 +28,34 @@ class AboutRepository {
   }
 
   /* =========================================================
-     Create About
+     CREATE
   ========================================================= */
 
   async create(data) {
-    return await prisma.about.create({
-      data: {
-        title: data.title,
-        description: data.description,
-        birthYear: data.birthYear ?? null,
-        location: data.location ?? null,
-        experience: data.experience ?? null,
-        image: data.image ?? null,
-      },
+    return prisma.about.create({
+      data,
     });
   }
 
   /* =========================================================
-     Update About
+     UPDATE
   ========================================================= */
 
   async update(id, data) {
-    return await prisma.about.update({
+    return prisma.about.update({
       where: {
         id,
       },
-      data: {
-        ...(data.title !== undefined && {
-          title: data.title,
-        }),
-
-        ...(data.description !== undefined && {
-          description: data.description,
-        }),
-
-        ...(data.birthYear !== undefined && {
-          birthYear: data.birthYear,
-        }),
-
-        ...(data.location !== undefined && {
-          location: data.location,
-        }),
-
-        ...(data.experience !== undefined && {
-          experience: data.experience,
-        }),
-
-        ...(data.image !== undefined && {
-          image: data.image,
-        }),
-      },
+      data,
     });
   }
 
   /* =========================================================
-     Upsert About
-     Singleton
-  ========================================================= */
-
-  async upsert(data) {
-    const about = await this.find();
-
-    if (about) {
-      return await this.update(about.id, data);
-    }
-
-    return await this.create(data);
-  }
-
-  /* =========================================================
-     Delete About
+     DELETE
   ========================================================= */
 
   async delete(id) {
-    return await prisma.about.delete({
+    return prisma.about.delete({
       where: {
         id,
       },
@@ -109,55 +63,11 @@ class AboutRepository {
   }
 
   /* =========================================================
-     Exists
-  ========================================================= */
-
-  async exists() {
-    const about = await prisma.about.findFirst({
-      select: {
-        id: true,
-      },
-    });
-
-    return Boolean(about);
-  }
-
-  /* =========================================================
-     Count
+     COUNT
   ========================================================= */
 
   async count() {
-    return await prisma.about.count();
-  }
-
-  /* =========================================================
-     Update Image
-  ========================================================= */
-
-  async updateImage(id, image) {
-    return await prisma.about.update({
-      where: {
-        id,
-      },
-      data: {
-        image,
-      },
-    });
-  }
-
-  /* =========================================================
-     Clear Image
-  ========================================================= */
-
-  async clearImage(id) {
-    return await prisma.about.update({
-      where: {
-        id,
-      },
-      data: {
-        image: null,
-      },
-    });
+    return prisma.about.count();
   }
 }
 

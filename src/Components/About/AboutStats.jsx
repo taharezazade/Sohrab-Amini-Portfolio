@@ -1,96 +1,159 @@
 /** @format */
 
-import { motion } from "framer-motion";
+import { Briefcase, Calendar, User } from "iconsax-reactjs";
 
-import { containerVariants, scaleIn } from "./about.animations";
+const AboutStats = ({ about }) => {
+  if (!about) {
+    return null;
+  }
 
-import BorderGlow from "../common/BorderGlow";
-
-function AboutStats({ data }) {
-  if (!data) return null;
+  const stats = [
+    {
+      key: "birthYear",
+      label: "سال تولد",
+      value: about.birthYear ?? "—",
+      icon: Calendar,
+    },
+    {
+      key: "experience",
+      label: "سابقه فعالیت",
+      value:
+        about.experience !== null && about.experience !== undefined ?
+          `${about.experience}+ سال`
+        : "—",
+      icon: Briefcase,
+    },
+    {
+      key: "status",
+      label: "وضعیت فعالیت",
+      value: "فعال",
+      icon: User,
+    },
+  ];
 
   return (
-    <motion.section
-      variants={containerVariants}
+    <section
       className='
         grid
-        gap-6
-        md:grid-cols-2
-        xl:grid-cols-3
+        grid-cols-1
+        gap-3
+        sm:grid-cols-3
+        md:gap-4
       '>
-      {data.map((item) => {
-        const Icon = item.icon;
+      {stats.map((stat) => {
+        const Icon = stat.icon;
 
         return (
-          <BorderGlow key={item.title}>
-            <motion.article
-              variants={scaleIn}
-              transition={{
-                duration: 0.25,
-              }}
+          <article
+            key={stat.key}
+            className='
+              group
+              relative
+              overflow-hidden
+              rounded-2xl
+              bg-base-100
+              px-4
+              py-4
+              shadow-sm
+              transition-all
+              duration-300
+
+              dark:bg-base-100/80
+            '>
+            {/* Background Glow */}
+
+            <div
               className='
-                group
-                relative
-                overflow-hidden
-                rounded-3xl
-                border
-                border-base-300
-                bg-base-100
-                p-7
-                shadow-lg
-                transition-all
+                pointer-events-none
+                absolute
+                -right-8
+                -top-8
+                h-20
+                w-20
+                rounded-full
+                bg-primary/20
+                opacity-0
+                blur-2xl
+                transition-opacity
                 duration-300
-              '>
-              <Icon
-                variant='Bulk'
+                group-hover:opacity-100
+              '
+            />
+
+            {/* Content */}
+
+            <div className='relative flex items-center gap-3'>
+              {/* Icon */}
+
+              <div
                 className='
-                  absolute
-                  top-0
-                  left-0
-                  h-36
-                  w-36
-                  text-primary/10
-                  pointer-events-none
-                '
-              />
+                  flex
+                  h-10
+                  w-10
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-xl
+                  bg-primary/10
+                  text-primary
+                  transition-all
+                  duration-300
 
-              <div className='relative z-10'>
-                <h2
+                  group-hover:bg-primary
+                  group-hover:text-primary-content
+                '>
+                <Icon size={20} variant='Bulk' />
+              </div>
+
+              {/* Text */}
+
+              <div className='min-w-0'>
+                <p
                   className='
-                    text-6xl
-                    font-black
-                    text-primary
+                    truncate
+                    text-[11px]
+                    font-medium
+                    text-base-content/50
                   '>
-                  {item.value}
-                  {item.suffix}
-                </h2>
-
-                <h3
-                  className='
-                    mt-4
-                    text-xl
-                    font-bold
-                    text-base-content
-                  '>
-                  {item.title}
-                </h3>
-
-                <div className='my-5 h-px bg-base-300' />
+                  {stat.label}
+                </p>
 
                 <p
                   className='
-                    leading-8
-                    text-base-content/70
+                    mt-0.5
+                    truncate
+                    text-base
+                    font-bold
+                    leading-tight
+                    text-base-content
                   '>
-                  {item.description}
+                  {stat.value}
                 </p>
               </div>
-            </motion.article>
-          </BorderGlow>
+            </div>
+
+            {/* Bottom Accent */}
+
+            <div
+              className='
+                absolute
+                bottom-0
+                left-4
+                right-4
+                h-px
+                origin-right
+                scale-x-0
+                bg-primary/40
+                transition-transform
+                duration-300
+                group-hover:scale-x-100
+              '
+            />
+          </article>
         );
       })}
-    </motion.section>
+    </section>
   );
-}
+};
 
 export default AboutStats;

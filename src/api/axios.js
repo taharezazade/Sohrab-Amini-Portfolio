@@ -1,7 +1,10 @@
 /** @format */
 
 import axios from "axios";
-import toast from "react-hot-toast";
+
+/* =========================================================
+   Axios Instance
+========================================================= */
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -26,12 +29,10 @@ api.interceptors.request.use(
     }
 
     /*
-     * Do NOT manually set Content-Type for FormData.
-     * Axios/browser will automatically set:
+     * FormData
      *
-     * multipart/form-data; boundary=...
+     * Let Axios/browser generate the multipart boundary.
      */
-
     if (config.data instanceof FormData) {
       delete config.headers["Content-Type"];
     } else {
@@ -56,23 +57,28 @@ api.interceptors.response.use(
   },
 
   (error) => {
-    const status = error.response?.status;
-
-    const message =
-      error.response?.data?.message ||
-      error.message ||
-      "Server error occurred.";
-
-    if (status === 401) {
+    /*
+     * Unauthorized
+     *
+     * Remove invalid/expired access token.
+     */
+    if (error.response?.status === 401) {
       localStorage.removeItem("accessToken");
-
-      toast.error("Your session has expired.");
-    } else {
-      toast.error(message);
     }
 
+    /*
+     * Do not log errors here.
+     * Do not expose API response data.
+     * Do not show toast from Axios.
+     *
+     * Let the caller handle the error.
+     */
     return Promise.reject(error);
   },
 );
+
+/* =========================================================
+   Export
+========================================================= */
 
 export default api;

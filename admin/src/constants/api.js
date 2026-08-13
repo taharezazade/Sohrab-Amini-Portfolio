@@ -4,6 +4,7 @@ const API = {
   AUTH: {
     LOGIN: "/auth/login",
     LOGOUT: "/auth/logout",
+    ME: "/auth/me",
     PROFILE: "/auth/profile",
     CHANGE_PASSWORD: "/auth/change-password",
   },

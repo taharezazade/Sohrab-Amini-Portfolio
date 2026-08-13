@@ -1,128 +1,63 @@
 /** @format */
 
-import { TextBlock, Code, TickCircle, Image } from "iconsax-reactjs";
+import { Calendar, Location, Briefcase, Image } from "iconsax-reactjs";
 
-const AboutStats = () => {
+const AboutStats = ({ about }) => {
   const stats = [
     {
-      id: 1,
-      title: "تعداد توضیحات",
-      value: "120",
-      unit: "کلمه",
-      icon: TextBlock,
+      label: "سال تولد",
+      value: about?.birthYear || "—",
+      icon: Calendar,
     },
     {
-      id: 2,
-      title: "مهارت‌ها",
-      value: "8",
-      unit: "مورد",
-      icon: Code,
+      label: "محل سکونت",
+      value: about?.location || "—",
+      icon: Location,
     },
     {
-      id: 3,
-      title: "وضعیت",
-      value: "فعال",
-      unit: "",
-      icon: TickCircle,
+      label: "سابقه کاری",
+      value:
+        (
+          about?.experience !== null &&
+          about?.experience !== undefined &&
+          about?.experience !== ""
+        ) ?
+          `${about.experience} سال`
+        : "—",
+      icon: Briefcase,
     },
     {
-      id: 4,
-      title: "تصویر",
-      value: "1",
-      unit: "فایل",
+      label: "تصویر",
+      value: about?.image ? "ثبت شده" : "ثبت نشده",
       icon: Image,
     },
   ];
 
   return (
-    <div
-      className='
-        grid
-        grid-cols-1
-        sm:grid-cols-2
-        xl:grid-cols-4
-        gap-4
-      '>
-      {stats.map(({ id, title, value, unit, icon: Icon }) => (
-        <div
-          key={id}
-          className='
-                card
-                bg-base-100
-                border
-                border-base-300
-                shadow-sm
-              '>
+    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
+      {stats.map((item) => {
+        const Icon = item.icon;
+
+        return (
           <div
-            className='
-                  card-body
-                  p-5
-                '>
-            <div
-              className='
-                    flex
-                    items-center
-                    justify-between
-                    gap-3
-                  '>
-              <div
-                className='
-                      w-11
-                      h-11
-                      rounded-xl
-                      bg-primary/10
-                      text-primary
-                      flex
-                      items-center
-                      justify-center
-                    '>
-                <Icon size={24} variant='Bulk' />
-              </div>
+            key={item.label}
+            className='card border border-base-300 bg-base-100 shadow-sm'>
+            <div className='card-body'>
+              <div className='flex items-center gap-4'>
+                <div className='flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary'>
+                  <Icon size={24} variant='Bulk' />
+                </div>
 
-              <div
-                className='
-                      text-right
-                    '>
-                <p
-                  className='
-                        text-sm
-                        text-base-content/60
-                      '>
-                  {title}
-                </p>
+                <div>
+                  <p className='text-xs text-base-content/50'>{item.label}</p>
 
-                <div
-                  className='
-                        flex
-                        items-end
-                        gap-1
-                        justify-end
-                        mt-1
-                      '>
-                  <span
-                    className='
-                          text-2xl
-                          font-bold
-                        '>
-                    {value}
-                  </span>
-
-                  {unit && (
-                    <span
-                      className='
-                              text-xs
-                              text-base-content/60
-                              mb-1
-                            '>
-                      {unit}
-                    </span>
-                  )}
+                  <p className='mt-1 font-bold'>{item.value}</p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

@@ -3,97 +3,64 @@
 import { z } from "zod";
 
 /* =========================================================
-   Common Fields
+   DEFAULT ABOUT
 ========================================================= */
 
-const title = z
-  .string({
-    required_error: "Title is required.",
-  })
-  .trim()
-  .min(3, "Title must be at least 3 characters.")
-  .max(120, "Title must not exceed 120 characters.");
+export const DEFAULT_ABOUT = {
+  title: "درباره من",
 
-const description = z
-  .string({
-    required_error: "Description is required.",
-  })
-  .trim()
-  .min(20, "Description must be at least 20 characters.")
-  .max(3000, "Description must not exceed 3000 characters.");
+  description: "توسعه‌دهنده وب و متخصص طراحی و توسعه سیستم‌های حرفه‌ای.",
 
-const birthYear = z.coerce
-  .number()
-  .int("Birth year must be an integer.")
-  .min(1300, "Birth year is invalid.")
-  .max(1500, "Birth year is invalid.")
-  .optional();
+  birthYear: 1381,
 
-const location = z
-  .string()
-  .trim()
-  .min(2, "Location must be at least 2 characters.")
-  .max(100, "Location must not exceed 100 characters.")
-  .optional()
-  .or(z.literal(""));
+  location: "تهران",
 
-const experience = z.coerce
-  .number()
-  .int("Experience must be an integer.")
-  .min(0, "Experience cannot be negative.")
-  .max(60, "Experience is invalid.")
-  .optional();
-
-const image = z
-  .string()
-  .trim()
-  .max(500, "Image path is too long.")
-  .optional()
-  .or(z.literal(""));
-
-const id = z.string().cuid("Invalid About ID.");
+  experience: 5,
+};
 
 /* =========================================================
-   Create
-========================================================= */
-
-export const createAboutSchema = z.object({
-  title,
-  description,
-  birthYear,
-  location,
-  experience,
-  image,
-});
-
-/* =========================================================
-   Update
-   Partial update
+   UPDATE ABOUT SCHEMA
 ========================================================= */
 
 export const updateAboutSchema = z
   .object({
-    title,
-    description,
-    birthYear,
-    location,
-    experience,
-    image,
+    title: z
+      .string({
+        required_error: "عنوان الزامی است.",
+      })
+      .trim()
+      .min(1, "عنوان الزامی است.")
+      .max(200, "عنوان نمی‌تواند بیشتر از 200 کاراکتر باشد."),
+
+    description: z
+      .string({
+        required_error: "توضیحات الزامی است.",
+      })
+      .trim()
+      .min(20, "توضیحات باید حداقل 20 کاراکتر باشد.")
+      .max(3000, "توضیحات نمی‌تواند بیشتر از 3000 کاراکتر باشد."),
+
+    birthYear: z
+      .number()
+      .int("سال تولد باید عدد صحیح باشد.")
+      .min(1300, "سال تولد معتبر نیست.")
+      .max(1500, "سال تولد معتبر نیست.")
+      .nullable()
+      .optional(),
+
+    location: z
+      .string()
+      .trim()
+      .max(100, "محل سکونت نمی‌تواند بیشتر از 100 کاراکتر باشد.")
+      .nullable()
+      .optional(),
+
+    experience: z
+      .number()
+      .int("سابقه باید عدد صحیح باشد.")
+      .min(0, "سابقه نمی‌تواند منفی باشد.")
+      .max(60, "سابقه نمی‌تواند بیشتر از 60 سال باشد.")
+      .nullable()
+      .optional(),
   })
-  .partial();
-
-/* =========================================================
-   Params
-========================================================= */
-
-export const aboutParamsSchema = z.object({
-  id,
-});
-
-/* =========================================================
-   Image
-========================================================= */
-
-export const updateAboutImageSchema = z.object({
-  image: image,
-});
+  .strict();

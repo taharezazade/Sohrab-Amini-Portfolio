@@ -5,13 +5,10 @@ import heroService from "../services/hero.service.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
-/**
- * =========================================================
- * Get Hero
- * =========================================================
- *
- * GET /api/hero
- */
+/* =========================================================
+   Get Hero
+========================================================= */
+
 export const getHero = asyncHandler(async (req, res) => {
   const hero = await heroService.getHero();
 
@@ -20,13 +17,10 @@ export const getHero = asyncHandler(async (req, res) => {
     .json(ApiResponse.ok(hero, "Hero section fetched successfully."));
 });
 
-/**
- * =========================================================
- * Get Hero By ID
- * =========================================================
- *
- * GET /api/hero/:id
- */
+/* =========================================================
+   Get Hero By ID
+========================================================= */
+
 export const getHeroById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -37,13 +31,10 @@ export const getHeroById = asyncHandler(async (req, res) => {
     .json(ApiResponse.ok(hero, "Hero section fetched successfully."));
 });
 
-/**
- * =========================================================
- * Create Hero
- * =========================================================
- *
- * POST /api/hero
- */
+/* =========================================================
+   Create Hero
+========================================================= */
+
 export const createHero = asyncHandler(async (req, res) => {
   const hero = await heroService.createHero(req.body);
 
@@ -52,13 +43,10 @@ export const createHero = asyncHandler(async (req, res) => {
     .json(ApiResponse.created(hero, "Hero section created successfully."));
 });
 
-/**
- * =========================================================
- * Update Hero
- * =========================================================
- *
- * PUT /api/hero
- */
+/* =========================================================
+   Update Hero
+========================================================= */
+
 export const updateHero = asyncHandler(async (req, res) => {
   const hero = await heroService.updateHero(req.body);
 
@@ -67,13 +55,10 @@ export const updateHero = asyncHandler(async (req, res) => {
     .json(ApiResponse.updated(hero, "Hero section updated successfully."));
 });
 
-/**
- * =========================================================
- * Upsert Hero
- * =========================================================
- *
- * PUT /api/hero/upsert
- */
+/* =========================================================
+   Upsert Hero
+========================================================= */
+
 export const upsertHero = asyncHandler(async (req, res) => {
   const hero = await heroService.upsertHero(req.body);
 
@@ -82,13 +67,10 @@ export const upsertHero = asyncHandler(async (req, res) => {
     .json(ApiResponse.updated(hero, "Hero section saved successfully."));
 });
 
-/**
- * =========================================================
- * Toggle Hero Status
- * =========================================================
- *
- * PATCH /api/hero/status
- */
+/* =========================================================
+   Toggle Status
+========================================================= */
+
 export const toggleHeroStatus = asyncHandler(async (req, res) => {
   const hero = await heroService.toggleHeroStatus(req.body);
 
@@ -97,13 +79,10 @@ export const toggleHeroStatus = asyncHandler(async (req, res) => {
     .json(ApiResponse.updated(hero, "Hero status updated successfully."));
 });
 
-/**
- * =========================================================
- * Delete Hero
- * =========================================================
- *
- * DELETE /api/hero
- */
+/* =========================================================
+   Delete Hero
+========================================================= */
+
 export const deleteHero = asyncHandler(async (req, res) => {
   await heroService.deleteHero();
 

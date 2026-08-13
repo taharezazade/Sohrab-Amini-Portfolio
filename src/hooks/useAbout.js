@@ -2,29 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import aboutService from "@/services/about.service";
+import aboutApi from "@/api/about.api";
 
-import {
-  aboutContent,
-  personalInfo,
-  skills,
-  stats,
-  quote,
-} from "@/components/About/about.data";
-
-const defaultAbout = {
-  content: aboutContent,
-  personalInfo,
-  skills,
-  stats,
-  quote,
-};
-
-export default function useAbout() {
-  const [about, setAbout] = useState(defaultAbout);
-
+const useAbout = () => {
+  const [about, setAbout] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState(null);
 
   const fetchAbout = useCallback(async () => {
@@ -32,37 +14,21 @@ export default function useAbout() {
       setLoading(true);
       setError(null);
 
-      const response = await aboutService.getAbout();
+      const response = await aboutApi.get();
 
-      const data = response.data?.data;
+      console.log("PUBLIC ABOUT RESPONSE:", response);
 
-      if (!data) {
-        setAbout(defaultAbout);
-        return;
-      }
+      const data =
+        response?.data?.data ?? response?.data?.about ?? response?.data ?? null;
 
-      setAbout({
-        content: {
-          ...aboutContent,
+      console.log("PUBLIC ABOUT DATA:", data);
 
-          title: data.title ?? aboutContent.title,
-
-          description: data.description ?? aboutContent.description,
-        },
-
-        personalInfo: data.personalInfo ?? personalInfo,
-
-        skills: data.skills ?? skills,
-
-        stats: data.stats ?? stats,
-
-        quote: data.quote ?? quote,
-      });
+      setAbout(data);
     } catch (err) {
-      console.error("Failed to fetch about:", err);
+      console.error("PUBLIC ABOUT ERROR:", err);
 
       setError(err);
-      setAbout(defaultAbout);
+      setAbout(null);
     } finally {
       setLoading(false);
     }
@@ -76,6 +42,8 @@ export default function useAbout() {
     about,
     loading,
     error,
-    refresh: fetchAbout,
+    refetch: fetchAbout,
   };
-}
+};
+
+export default useAbout;

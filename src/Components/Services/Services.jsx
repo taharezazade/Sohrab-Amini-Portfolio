@@ -36,8 +36,8 @@ function Services() {
         className='
           relative
           overflow-hidden
-          py-24
-          md:py-32
+          py-4
+          md:py-10
         '>
         {/* Background */}
 

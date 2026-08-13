@@ -2,66 +2,55 @@
 
 import multer from "multer";
 
-/**
- * =========================================================
- * Constants
- * =========================================================
- */
+import { IMAGE_MIME_TYPES, DOCUMENT_MIME_TYPES } from "../config/multer.js";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+/* =========================================================
+   Constants
+========================================================= */
 
-const ALLOWED_MIME_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/svg+xml",
-];
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-/**
- * =========================================================
- * Storage
- * =========================================================
- *
- * Files are temporarily stored in memory.
- *
- * The actual file will be written to:
- *
- * uploads/
- *
- * by upload.service.js
- */
+/* =========================================================
+   Allowed Types
+========================================================= */
+
+const ALLOWED_MIME_TYPES = [...IMAGE_MIME_TYPES, ...DOCUMENT_MIME_TYPES];
+
+/* =========================================================
+   Storage
+========================================================= */
 
 const storage = multer.memoryStorage();
 
-/**
- * =========================================================
- * File Filter
- * =========================================================
- */
+/* =========================================================
+   File Filter
+========================================================= */
 
-const fileFilter = (req, file, cb) => {
+const fileFilter = (req, file, callback) => {
   if (!file) {
-    return cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE"), false);
+    const error = new Error("File is required.");
+
+    error.code = "FILE_REQUIRED";
+
+    return callback(error, false);
   }
 
   if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
     const error = new Error(
-      "Invalid file type. Only JPEG, PNG, WEBP and SVG files are allowed.",
+      "Invalid file type. Supported files are JPG, PNG, WEBP, SVG, PDF, DOC and DOCX.",
     );
 
     error.code = "INVALID_FILE_TYPE";
 
-    return cb(error, false);
+    return callback(error, false);
   }
 
-  return cb(null, true);
+  callback(null, true);
 };
 
-/**
- * =========================================================
- * Multer Instance
- * =========================================================
- */
+/* =========================================================
+   Multer
+========================================================= */
 
 const upload = multer({
   storage,
@@ -74,62 +63,46 @@ const upload = multer({
   },
 });
 
-/**
- * =========================================================
- * Upload Single
- * =========================================================
- */
+/* =========================================================
+   Single
+========================================================= */
 
 export const uploadSingle = (fieldName = "file") => {
   return upload.single(fieldName);
 };
 
-/**
- * =========================================================
- * Upload Multiple
- * =========================================================
- */
+/* =========================================================
+   Multiple
+========================================================= */
 
 export const uploadMultiple = (fieldName = "files", maxCount = 20) => {
   return upload.array(fieldName, maxCount);
 };
 
-/**
- * =========================================================
- * Upload Fields
- * =========================================================
- */
+/* =========================================================
+   Fields
+========================================================= */
 
 export const uploadFields = (fields = []) => {
   return upload.fields(fields);
 };
 
-/**
- * =========================================================
- * Upload Any
- * =========================================================
- */
+/* =========================================================
+   Any
+========================================================= */
 
 export const uploadAny = () => {
   return upload.any();
 };
 
-/**
- * =========================================================
- * Upload Error Handler
- * =========================================================
- */
+/* =========================================================
+   Upload Error Handler
+========================================================= */
 
 export const handleUploadError = (error, req, res, next) => {
   if (!error) {
     return next();
   }
-
-  /**
-   * ---------------------------------------------------------
-   * Multer Errors
-   * ---------------------------------------------------------
-   */
 
   if (error instanceof multer.MulterError) {
     switch (error.code) {
@@ -177,31 +150,19 @@ export const handleUploadError = (error, req, res, next) => {
     return next(error);
   }
 
-  /**
-   * ---------------------------------------------------------
-   * Invalid File Type
-   * ---------------------------------------------------------
-   */
-
   if (error.code === "INVALID_FILE_TYPE") {
     error.statusCode = 400;
 
     return next(error);
   }
 
-  /**
-   * ---------------------------------------------------------
-   * Unknown Upload Error
-   * ---------------------------------------------------------
-   */
+  if (error.code === "FILE_REQUIRED") {
+    error.statusCode = 400;
+
+    return next(error);
+  }
 
   return next(error);
 };
-
-/**
- * =========================================================
- * Export
- * =========================================================
- */
 
 export default upload;

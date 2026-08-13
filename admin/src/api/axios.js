@@ -30,17 +30,22 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
 
+    /*
+     * Authorization
+     */
     if (token) {
+      config.headers = config.headers || {};
+
       config.headers.Authorization = `Bearer ${token}`;
     }
 
     /*
      * FormData
      *
-     * Let the browser/Axios automatically
-     * generate multipart/form-data boundary.
+     * Do not manually set multipart/form-data.
+     * Axios/browser will automatically generate
+     * the required boundary.
      */
-
     if (config.data instanceof FormData) {
       delete config.headers["Content-Type"];
     }
@@ -62,15 +67,36 @@ api.interceptors.response.use(
     return response;
   },
 
-  (error) => {
-    const status = error.response?.status;
-
-    if (status === 401) {
+  async (error) => {
+    /*
+     * Unauthorized
+     *
+     * Remove invalid/expired access token.
+     *
+     * Navigation should be handled by
+     * AuthProvider / ProtectedRoute.
+     */
+    if (error.response?.status === 401) {
       localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
     }
 
+    /*
+     * Do not log:
+     * - request data
+     * - response data
+     * - tokens
+     * - API URLs
+     * - network errors
+     * - server errors
+     *
+     * Let the caller handle the error.
+     */
     return Promise.reject(error);
   },
 );
+
+/* =========================================================
+   Export
+========================================================= */
 
 export default api;

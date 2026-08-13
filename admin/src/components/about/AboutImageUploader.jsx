@@ -1,160 +1,231 @@
 /** @format */
 
-import { useRef, useState } from "react";
-import { GalleryAdd, Trash, Refresh2 } from "iconsax-reactjs";
+import { useEffect, useRef, useState } from "react";
 
-const AboutImageUploader = () => {
+import { GalleryAdd, Trash, Refresh2, TickCircle } from "iconsax-reactjs";
+
+import { toast } from "react-hot-toast";
+
+import uploadApi from "@/api/upload.api";
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
+const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
+const AboutImageUploader = ({
+  image = "",
+  onImageChange,
+  disabled = false,
+}) => {
   const inputRef = useRef(null);
 
-  const [preview, setPreview] = useState(null);
+  const [preview, setPreview] = useState(image || null);
 
-  const handleFileChange = (event) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  /* =========================================================
+     Sync Image
+  ========================================================= */
+
+  useEffect(() => {
+    setPreview(image || null);
+  }, [image]);
+
+  /* =========================================================
+     Get Uploaded URL
+  ========================================================= */
+
+  const getUploadedUrl = (response) => {
+    const data = response?.data?.data ?? response?.data ?? null;
+
+    return data?.url ?? data?.path ?? data?.fileUrl ?? data?.location ?? null;
+  };
+
+  /* =========================================================
+     Select Image
+  ========================================================= */
+
+  const handleFileChange = async (event) => {
     const file = event.target.files?.[0];
 
-    if (!file) return;
+    event.target.value = "";
 
-    const imageUrl = URL.createObjectURL(file);
+    if (!file) {
+      return;
+    }
 
-    setPreview(imageUrl);
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error("فرمت تصویر باید PNG، JPG یا WEBP باشد.");
+
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast.error("حجم تصویر نباید بیشتر از 5MB باشد.");
+
+      return;
+    }
+
+    const localPreview = URL.createObjectURL(file);
+
+    setPreview(localPreview);
+
+    try {
+      setIsUploading(true);
+
+      const formData = new FormData();
+
+      formData.append("file", file);
+      formData.append("folder", "about");
+
+      const response = await uploadApi.single(formData);
+
+      const imageUrl = getUploadedUrl(response);
+
+      if (!imageUrl) {
+        throw new Error("Uploaded image URL was not returned.");
+      }
+
+      /*
+       * فقط فرم والد را تغییر می‌دهیم.
+       * ذخیره واقعی About با دکمه Save انجام می‌شود.
+       */
+
+      onImageChange?.(imageUrl);
+
+      setPreview(imageUrl);
+
+      toast.success("تصویر با موفقیت آپلود شد.");
+    } catch (error) {
+      console.error("UPLOAD ABOUT IMAGE ERROR:", error);
+
+      setPreview(image || null);
+
+      toast.error(error?.response?.data?.message || "آپلود تصویر انجام نشد.");
+    } finally {
+      setIsUploading(false);
+
+      URL.revokeObjectURL(localPreview);
+    }
   };
+
+  /* =========================================================
+     Remove Image
+  ========================================================= */
 
   const handleRemove = () => {
     setPreview(null);
 
-    if (inputRef.current) {
-      inputRef.current.value = "";
+    onImageChange?.("");
+  };
+
+  /* =========================================================
+     Open Dialog
+  ========================================================= */
+
+  const handleClick = () => {
+    if (!isUploading && !disabled) {
+      inputRef.current?.click();
     }
   };
 
-  const handleClick = () => {
-    inputRef.current?.click();
-  };
+  /* =========================================================
+     Render
+  ========================================================= */
 
   return (
-    <div
-      className='
-        card
-        bg-base-100
-        border
-        border-base-300
-        shadow-sm
-      '>
-      <div
-        className='
-          card-body
-        '>
+    <div className='card border border-base-300 bg-base-100 shadow-sm'>
+      <div className='card-body'>
         {/* Header */}
-        <div
-          className='
-            flex
-            items-center
-            gap-3
-            mb-4
-          '>
-          <div
-            className='
-              w-10
-              h-10
-              rounded-xl
-              bg-primary/10
-              text-primary
-              flex
-              items-center
-              justify-center
-            '>
+
+        <div className='mb-4 flex items-center gap-3'>
+          <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary'>
             <GalleryAdd size={22} variant='Bulk' />
           </div>
 
           <div>
-            <h2
-              className='
-                font-bold
-                text-lg
-              '>
-              تصویر درباره من
-            </h2>
+            <h2 className='text-lg font-bold'>تصویر درباره من</h2>
 
-            <p
-              className='
-                text-sm
-                text-base-content/60
-              '>
-              تصویر پروفایل بخش About را انتخاب کنید
+            <p className='text-sm text-base-content/60'>
+              تصویر پروفایل بخش About را مدیریت کنید
             </p>
           </div>
         </div>
 
-        {/* Upload Area */}
+        {/* Upload */}
+
         {!preview ?
           <button
             type='button'
             onClick={handleClick}
+            disabled={isUploading || disabled}
             className='
-              border
-              border-dashed
-              border-base-300
-              rounded-xl
-              min-h-52
               flex
+              min-h-52
               flex-col
               items-center
               justify-center
               gap-3
-              hover:border-primary
-              transition
-            '>
-            <GalleryAdd size={42} className='text-primary' variant='Bulk' />
-
-            <span
-              className='
-                text-sm
-                text-base-content/70
-              '>
-              برای انتخاب تصویر کلیک کنید
-            </span>
-
-            <span
-              className='
-                text-xs
-                text-base-content/50
-              '>
-              PNG , JPG , WEBP
-            </span>
-          </button>
-        : <div
-            className='
-              relative
               rounded-xl
-              overflow-hidden
               border
+              border-dashed
               border-base-300
+              transition
+              hover:border-primary
+              disabled:pointer-events-none
+              disabled:opacity-60
             '>
+            {isUploading ?
+              <>
+                <span className='loading loading-spinner loading-md text-primary' />
+
+                <span className='text-sm text-base-content/70'>
+                  در حال آپلود تصویر...
+                </span>
+              </>
+            : <>
+                <GalleryAdd size={42} className='text-primary' variant='Bulk' />
+
+                <span className='text-sm text-base-content/70'>
+                  برای انتخاب تصویر کلیک کنید
+                </span>
+
+                <span className='text-xs text-base-content/50'>
+                  PNG , JPG , WEBP — حداکثر 5MB
+                </span>
+              </>
+            }
+          </button>
+        : <div className='relative overflow-hidden rounded-xl border border-base-300'>
             <img
               src={preview}
-              alt='About preview'
-              className='
-                w-full
-                h-60
-                object-cover
-              '
+              alt='About'
+              className='h-72 w-full object-cover'
             />
 
-            <div
-              className='
-                absolute
-                bottom-3
-                right-3
-                flex
-                gap-2
-              '>
+            {/* Status */}
+
+            <div className='absolute left-3 top-3'>
+              {isUploading ?
+                <span className='badge badge-warning gap-2'>
+                  <span className='loading loading-spinner loading-xs' />
+                  در حال آپلود
+                </span>
+              : <span className='badge badge-success gap-1'>
+                  <TickCircle size={14} />
+                  انتخاب شده
+                </span>
+              }
+            </div>
+
+            {/* Actions */}
+
+            <div className='absolute bottom-3 right-3 flex gap-2'>
               <button
                 type='button'
                 onClick={handleClick}
-                className='
-                  btn
-                  btn-sm
-                  btn-primary
-                '>
+                disabled={isUploading || disabled}
+                className='btn btn-sm btn-primary'>
                 <Refresh2 size={16} />
                 تغییر
               </button>
@@ -162,17 +233,16 @@ const AboutImageUploader = () => {
               <button
                 type='button'
                 onClick={handleRemove}
-                className='
-                  btn
-                  btn-sm
-                  btn-error
-                '>
+                disabled={isUploading || disabled}
+                className='btn btn-sm btn-error'>
                 <Trash size={16} />
                 حذف
               </button>
             </div>
           </div>
         }
+
+        {/* Input */}
 
         <input
           ref={inputRef}

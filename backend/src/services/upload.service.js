@@ -4,13 +4,13 @@ import path from "path";
 import fs from "fs/promises";
 import crypto from "crypto";
 
-/**
- * =========================================================
- * Constants
- * =========================================================
- */
+import env from "../config/env.js";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+/* =========================================================
+   Constants
+========================================================= */
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const ALLOWED_MIME_TYPES = [
   "image/jpeg",
@@ -19,15 +19,13 @@ const ALLOWED_MIME_TYPES = [
   "image/svg+xml",
 ];
 
-/**
- * =========================================================
- * Upload Service
- * =========================================================
- */
+/* =========================================================
+   Upload Service
+========================================================= */
 
 class UploadService {
   constructor() {
-    this.uploadRoot = path.join(process.cwd(), "uploads");
+    this.uploadRoot = path.resolve(process.cwd(), "uploads");
 
     this.maxFileSize = MAX_FILE_SIZE;
 
@@ -44,11 +42,9 @@ class UploadService {
     ];
   }
 
-  /**
-   * =========================================================
-   * Validate File
-   * =========================================================
-   */
+  /* =======================================================
+     Validate File
+  ======================================================= */
 
   validateFile(file) {
     if (!file) {
@@ -79,11 +75,9 @@ class UploadService {
     return true;
   }
 
-  /**
-   * =========================================================
-   * Validate Folder
-   * =========================================================
-   */
+  /* =======================================================
+     Validate Folder
+  ======================================================= */
 
   validateFolder(folder) {
     const normalizedFolder = String(folder || "temp")
@@ -105,11 +99,9 @@ class UploadService {
     return normalizedFolder;
   }
 
-  /**
-   * =========================================================
-   * Generate File Name
-   * =========================================================
-   */
+  /* =======================================================
+     Generate File Name
+  ======================================================= */
 
   generateFileName(originalName) {
     const extension = path.extname(originalName || "").toLowerCase();
@@ -119,11 +111,9 @@ class UploadService {
     return `${uniqueName}${extension}`;
   }
 
-  /**
-   * =========================================================
-   * Get Folder Path
-   * =========================================================
-   */
+  /* =======================================================
+     Get Folder Path
+  ======================================================= */
 
   getFolderPath(folder) {
     const normalizedFolder = this.validateFolder(folder);
@@ -131,11 +121,21 @@ class UploadService {
     return path.join(this.uploadRoot, normalizedFolder);
   }
 
-  /**
-   * =========================================================
-   * Upload Single File
-   * =========================================================
-   */
+  /* =======================================================
+     Get Public URL
+  ======================================================= */
+
+  getPublicUrl(folder, fileName) {
+    const normalizedFolder = this.validateFolder(folder);
+
+    const baseUrl = env.API_URL || `http://localhost:${env.PORT || 5000}`;
+
+    return `${baseUrl.replace(/\/$/, "")}/uploads/${normalizedFolder}/${fileName}`;
+  }
+
+  /* =======================================================
+     Upload Single
+  ======================================================= */
 
   async upload(file, folder = "temp") {
     this.validateFile(file);
@@ -154,21 +154,29 @@ class UploadService {
 
     await fs.writeFile(filePath, file.buffer);
 
+    const relativePath = `/uploads/${normalizedFolder}/${fileName}`;
+
+    const url = this.getPublicUrl(normalizedFolder, fileName);
+
     return {
       fileName,
       originalName: file.originalname,
-      path: `/uploads/${normalizedFolder}/${fileName}`,
+
+      path: relativePath,
+
+      url,
+
       size: file.size,
+
       type: file.mimetype,
+
       folder: normalizedFolder,
     };
   }
 
-  /**
-   * =========================================================
-   * Upload Multiple Files
-   * =========================================================
-   */
+  /* =======================================================
+     Upload Multiple
+  ======================================================= */
 
   async uploadMultiple(files, folder = "temp") {
     if (!Array.isArray(files) || files.length === 0) {
@@ -192,11 +200,9 @@ class UploadService {
     return uploadedFiles;
   }
 
-  /**
-   * =========================================================
-   * Delete File
-   * =========================================================
-   */
+  /* =======================================================
+     Delete
+  ======================================================= */
 
   async delete(filePath) {
     if (!filePath) {
@@ -207,7 +213,17 @@ class UploadService {
       throw error;
     }
 
-    const normalizedPath = String(filePath)
+    let normalizedPath = String(filePath).trim();
+
+    try {
+      const parsedUrl = new URL(normalizedPath);
+
+      normalizedPath = parsedUrl.pathname;
+    } catch {
+      // Path is already relative.
+    }
+
+    normalizedPath = normalizedPath
       .replace(/^[/\\]+/, "")
       .replace(/\//g, path.sep);
 
@@ -219,7 +235,17 @@ class UploadService {
       throw error;
     }
 
-    const fullPath = path.join(process.cwd(), normalizedPath);
+    const fullPath = path.resolve(process.cwd(), normalizedPath);
+
+    const uploadsRoot = path.resolve(process.cwd(), "uploads");
+
+    if (!fullPath.startsWith(`${uploadsRoot}${path.sep}`)) {
+      const error = new Error("Invalid file path.");
+
+      error.statusCode = 400;
+
+      throw error;
+    }
 
     try {
       await fs.unlink(fullPath);
@@ -234,11 +260,9 @@ class UploadService {
     }
   }
 
-  /**
-   * =========================================================
-   * Replace File
-   * =========================================================
-   */
+  /* =======================================================
+     Replace
+  ======================================================= */
 
   async replace(oldFilePath, newFile, folder = "temp") {
     if (!newFile) {

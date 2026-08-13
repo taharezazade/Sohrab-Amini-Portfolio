@@ -1,53 +1,51 @@
 /** @format */
 
-import { motion } from "framer-motion";
-
-import { fadeRight } from "./about.animations";
-
-function AboutContent({ data }) {
-  if (!data) return null;
+const AboutContent = ({ about }) => {
+  if (!about) {
+    return null;
+  }
 
   return (
-    <motion.div variants={fadeRight}>
-      <div className='space-y-0'>
+    <div className='space-y-6'>
+      <div>
         <span
           className='
             inline-flex
-            text-6xl
-            font-black
-            pb-4
+            rounded-full
+            bg-primary/10
+            px-4
+            py-2
+            text-sm
+            font-semibold
             text-primary
           '>
-          {data.title}
+          درباره من
         </span>
-
-        <h2
-          className='
-            text-3xl
-            font-black
-            pb-2
-            text-base-content
-            md:text-4xl
-            xl:text-5xl
-          '>
-          {data.heading}
-        </h2>
       </div>
+
+      <h2
+        className='
+          text-3xl
+          font-black
+          leading-tight
+          md:text-4xl
+        '>
+        {about.title}
+      </h2>
 
       <p
         className='
+          max-w-2xl
           whitespace-pre-line
-          text-justify
-          leading-5
           text-base
-          font-light
-          text-base-content/75
+          leading-8
+          text-base-content/70
           md:text-lg
         '>
-        {data.description}
+        {about.description}
       </p>
-    </motion.div>
+    </div>
   );
-}
+};
 
 export default AboutContent;

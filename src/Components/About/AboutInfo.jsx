@@ -1,82 +1,86 @@
 /** @format */
 
-import { motion } from "framer-motion";
-import { Location, Calendar, Teacher, Code1, Briefcase } from "iconsax-reactjs";
+import { Location, Calendar, Briefcase } from "iconsax-reactjs";
 
-import { fadeLeft, cardHover } from "./about.animations";
+const AboutInfo = ({ about }) => {
+  if (!about) {
+    return null;
+  }
 
-const icons = [Location, Calendar, Teacher, Code1, Briefcase];
-
-function AboutInfo({ data }) {
-  if (!data) return null;
+  const items = [
+    {
+      key: "location",
+      label: "محل زندگی",
+      value: about.location,
+      icon: Location,
+    },
+    {
+      key: "birthYear",
+      label: "سال تولد",
+      value: about.birthYear,
+      icon: Calendar,
+    },
+    {
+      key: "experience",
+      label: "سابقه فعالیت",
+      value:
+        about.experience !== null && about.experience !== undefined ?
+          `${about.experience} سال`
+        : "",
+      icon: Briefcase,
+    },
+  ];
 
   return (
-    <motion.div
-      variants={fadeLeft}
+    <div
       className='
-        grid
-        grid-cols-1
-        gap-4
-        sm:grid-cols-2
-      '>
-      {data.map((item, index) => {
-        const Icon = icons[index];
 
-        return (
-          <motion.div
-            key={item.title}
-            whileHover={cardHover}
-            className='
-              group
-              rounded-2xl
-              border
-              border-base-300
-              bg-base-100/60
-              backdrop-blur-xl
-              p-2
-              transition-all
-              duration-300
-            '>
-            <div className='flex items-start gap-4 hover:text-white'>
+      '>
+      <div className='space-y-4'>
+        {items.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <div
+              key={item.key}
+              className='
+                flex
+                items-center
+                gap-4
+                rounded-2xl
+                border
+                border-base-300
+                bg-base-200
+                p-4
+              '>
               <div
                 className='
                   flex
-                  p-3
+                  h-11
+                  w-11
+                  shrink-0
                   items-center
                   justify-center
                   rounded-xl
                   bg-primary/10
                   text-primary
-                  transition-all
-                  group-hover:scale-110
                 '>
-                <Icon variant='Bulk' size={36} />
+                <Icon size={21} variant='Bulk' />
               </div>
 
-              <div className='space-y-1'>
-                <p
-                  className='
-                    text-sm
-                    text-base-content/55
-                  '>
-                  {item.title}
-                </p>
+              <div className='min-w-0'>
+                <p className='text-md text-base-content/50'>{item.label}</p>
 
-                <h3
-                  className='
-                    text-base
-                    font-bold
-                    text-base-content
-                  '>
-                  {item.value}
-                </h3>
+                <p className='mt-1 truncate text-sm font-semibold'>
+                  {item.value || "—"}
+                </p>
               </div>
             </div>
-          </motion.div>
-        );
-      })}
-    </motion.div>
+          );
+        })}
+      </div>
+    </div>
   );
-}
+};
 
 export default AboutInfo;

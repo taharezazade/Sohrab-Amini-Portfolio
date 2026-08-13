@@ -4,14 +4,14 @@ import { motion } from "framer-motion";
 
 import AboutContent from "./AboutContent";
 import AboutInfo from "./AboutInfo";
-import AboutSkills from "./AboutSkills";
 import AboutStats from "./AboutStats";
-import AboutQuote from "./AboutQuote";
 
 import { containerVariants } from "./about.animations";
 
-function AboutGrid({ about }) {
-  if (!about) return null;
+const AboutGrid = ({ about }) => {
+  if (!about) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -22,7 +22,7 @@ function AboutGrid({ about }) {
         once: true,
         amount: 0.25,
       }}
-      className='space-y-24'>
+      className='space-y-4'>
       <section
         className='
           grid
@@ -30,18 +30,16 @@ function AboutGrid({ about }) {
           gap-14
           lg:grid-cols-[1.3fr_.9fr]
         '>
-        <AboutContent data={about.content} />
+        <span className="flex flex-col gap-2">
+          <AboutContent about={about} />
+        </span>
 
-        <AboutInfo data={about.personalInfo} />
+        <AboutInfo about={about} />
       </section>
 
-      <AboutSkills data={about.skills} />
-
-      <AboutStats data={about.stats} />
-
-      <AboutQuote data={about.quote} />
+      <AboutStats about={about} />
     </motion.div>
   );
-}
+};
 
 export default AboutGrid;

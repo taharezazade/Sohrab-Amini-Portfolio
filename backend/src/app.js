@@ -5,53 +5,57 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import path from "path";
+import cors from "cors";
 
 import routes from "./routes/index.js";
 
 import env from "./config/env.js";
 import corsOptions from "./config/cors.js";
 
-import rateLimiter from "./middlewares/rateLimiter.middleware.js";
 import notFoundMiddleware from "./middlewares/notFound.middleware.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 
+/* =========================================================
+   APP
+========================================================= */
+
 const app = express();
 
-/**
- * =========================================================
- * SECURITY
- * =========================================================
- */
+/* =========================================================
+   TRUST PROXY
+========================================================= */
+
+if (env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
+/* =========================================================
+   SECURITY
+========================================================= */
 
 app.use(
   helmet({
     crossOriginResourcePolicy: {
       policy: "cross-origin",
     },
+
+    crossOriginOpenerPolicy: {
+      policy: "same-origin-allow-popups",
+    },
+
+    crossOriginEmbedderPolicy: false,
   }),
 );
 
-/**
- * =========================================================
- * CORS
- * =========================================================
- */
+/* =========================================================
+   CORS
+========================================================= */
 
 app.use(corsOptions);
 
-/**
- * =========================================================
- * RATE LIMITER
- * =========================================================
- */
-
-app.use(rateLimiter);
-
-/**
- * =========================================================
- * BODY PARSERS
- * =========================================================
- */
+/* =========================================================
+   BODY PARSERS
+========================================================= */
 
 app.use(
   express.json({
@@ -66,78 +70,125 @@ app.use(
   }),
 );
 
-/**
- * =========================================================
- * COOKIE PARSER
- * =========================================================
- */
+/* =========================================================
+   COOKIE PARSER
+========================================================= */
 
 app.use(cookieParser());
 
-/**
- * =========================================================
- * STATIC UPLOADS
- * =========================================================
- *
- * Physical directory:
- *
- * backend/uploads/
- *
- * Public URL:
- *
- * http://localhost:5000/uploads/...
- */
+/* =========================================================
+   STATIC UPLOADS
+========================================================= */
 
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+const uploadsPath = path.resolve(process.cwd(), "uploads");
 
-/**
- * =========================================================
- * LOGGER
- * =========================================================
- */
+app.use(
+  "/uploads",
+  express.static(uploadsPath, {
+    fallthrough: true,
+
+    etag: true,
+
+    maxAge: env.NODE_ENV === "production" ? "7d" : 0,
+
+    setHeaders: (res) => {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+
+      res.setHeader("Cache-Control", "public, max-age=0");
+    },
+  }),
+);
+
+/* =========================================================
+   DEVELOPMENT LOG
+========================================================= */
+
+if (env.NODE_ENV === "development") {
+  console.log("==============================================");
+  console.log("UPLOAD DIRECTORY");
+  console.log("==============================================");
+  console.log(`Physical path: ${uploadsPath}`);
+  console.log(`Public URL: http://localhost:${env.PORT || 5000}/uploads`);
+  console.log("==============================================");
+}
+
+/* =========================================================
+   LOGGER
+========================================================= */
 
 if (env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-/**
- * =========================================================
- * HEALTH CHECK
- * =========================================================
- */
+/* =========================================================
+   HEALTH CHECK
+========================================================= */
 
 app.get("/api", (req, res) => {
   return res.status(200).json({
     success: true,
-    message: "Sohrab Amini Portfolio API is running 🚀",
+    statusCode: 200,
+    message: "Sohrab Amini Portfolio API is running.",
     version: "1.0.0",
     environment: env.NODE_ENV,
     timestamp: new Date().toISOString(),
   });
 });
 
-/**
- * =========================================================
- * API ROUTES
- * =========================================================
- */
+/* =========================================================
+   UPLOAD HEALTH CHECK
+========================================================= */
+
+app.get("/api/upload/health", (req, res) => {
+  return res.status(200).json({
+    success: true,
+    statusCode: 200,
+    message: "Upload system is available.",
+    data: {
+      uploadDirectory: uploadsPath,
+      publicPath: "/uploads",
+    },
+  });
+});
+
+/* =========================================================
+   API ROUTES
+========================================================= */
+
+/*
+  All application routes are registered here.
+
+  Example:
+
+  /api/auth
+  /api/about
+  /api/hero
+  /api/services
+  /api/portfolio
+  /api/contact
+  /api/settings
+  /api/profile
+  /api/upload
+*/
 
 app.use("/api", routes);
 
-/**
- * =========================================================
- * 404
- * =========================================================
- */
+/* =========================================================
+   NOT FOUND
+========================================================= */
 
 app.use(notFoundMiddleware);
 
-/**
- * =========================================================
- * ERROR HANDLER
- * =========================================================
- */
+/* =========================================================
+   GLOBAL ERROR HANDLER
+========================================================= */
 
 app.use(errorMiddleware);
+
+/* =========================================================
+   EXPORT
+========================================================= */
 
 export default app;
