@@ -16,16 +16,16 @@ const useAbout = () => {
 
       const response = await aboutApi.get();
 
-      console.log("PUBLIC ABOUT RESPONSE:", response);
+      // console.log("PUBLIC ABOUT RESPONSE:", response);
 
       const data =
         response?.data?.data ?? response?.data?.about ?? response?.data ?? null;
 
-      console.log("PUBLIC ABOUT DATA:", data);
+      // console.log("PUBLIC ABOUT DATA:", data);
 
       setAbout(data);
     } catch (err) {
-      console.error("PUBLIC ABOUT ERROR:", err);
+      // console.error("PUBLIC ABOUT ERROR:", err);
 
       setError(err);
       setAbout(null);

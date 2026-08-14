@@ -1,49 +1,42 @@
 /** @format */
 
-import api from "@/api/axios";
-import API from "@/constants/api";
+import servicesApi from "@/api/services.api";
 
 const servicesService = {
-  /**
-   * Get All Services
-   */
-  getAll() {
-    return api.get(API.GET_ALL);
+  async getServices() {
+    return servicesApi.getAll();
   },
 
-  /**
-   * Get Service By ID
-   */
-  getById(id) {
-    return api.get(API.GET_BY_ID(id));
+  async getActiveServices() {
+    return servicesApi.getActive();
   },
 
-  /**
-   * Create Service
-   */
-  create(payload) {
-    return api.post(API.CREATE, payload);
+  async getStats() {
+    return servicesApi.getStats();
   },
 
-  /**
-   * Update Service
-   */
-  update(id, payload) {
-    return api.put(API.UPDATE(id), payload);
+  async getServiceById(id) {
+    return servicesApi.getById(id);
   },
 
-  /**
-   * Delete Service
-   */
-  remove(id) {
-    return api.delete(API.DELETE(id));
+  async createService(payload) {
+    return servicesApi.create(payload);
   },
 
-  /**
-   * Reorder Services
-   */
-  reorder(payload) {
-    return api.patch(API.REORDER, payload);
+  async updateService(id, payload) {
+    return servicesApi.update(id, payload);
+  },
+
+  async toggleServiceStatus(id) {
+    return servicesApi.toggleStatus(id);
+  },
+
+  async deleteService(id) {
+    return servicesApi.delete(id);
+  },
+
+  async reorderServices(items) {
+    return servicesApi.reorder(items);
   },
 };
 

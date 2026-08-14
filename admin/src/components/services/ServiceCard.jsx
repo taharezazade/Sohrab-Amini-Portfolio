@@ -1,9 +1,10 @@
 /** @format */
 
 import { motion } from "framer-motion";
-import { Edit2, Trash, Eye, EyeSlash, More, Category } from "iconsax-reactjs";
-
+import { Edit2, Trash, Eye, EyeSlash, More } from "iconsax-reactjs";
+import { getServiceIcon } from "../../utils/serviceIcons";
 const ServiceCard = ({ service, onEdit, onDelete, onToggleStatus }) => {
+  const ServiceIcon = getServiceIcon(service?.icon);
   return (
     <motion.div
       layout
@@ -17,14 +18,19 @@ const ServiceCard = ({ service, onEdit, onDelete, onToggleStatus }) => {
         {/* Header */}
         <div className='flex items-start justify-between'>
           <div className='flex items-center gap-4'>
-            <div className='bg-primary/10 text-primary flex h-14 w-14 items-center justify-center rounded-2xl'>
-              {service.icon ?
-                <img
-                  src={service.icon}
-                  alt={service.title}
-                  className='h-8 w-8 object-contain'
-                />
-              : <Category size={26} variant='Bold' />}
+            <div
+              className='
+                flex
+                h-14
+                w-14
+                shrink-0
+                items-center
+                justify-center
+                rounded-2xl
+                bg-primary/10
+                text-primary
+              '>
+              <ServiceIcon size={26} variant='Bulk' />
             </div>
 
             <div>

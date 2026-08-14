@@ -3,168 +3,185 @@
 import servicesService from "../services/services.service.js";
 
 class ServicesController {
-  /* ============================
-      Create Service
-  ============================ */
+  /* =========================================================
+     GET ALL
+  ========================================================= */
 
-  async createService(req, res, next) {
+  async getAll(req, res, next) {
     try {
-      const service = await servicesService.createService(req.body);
+      const data = await servicesService.getAllServices();
+
+      return res.status(200).json({
+        success: true,
+        message: "سرویس‌ها با موفقیت دریافت شدند.",
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     GET ACTIVE
+  ========================================================= */
+
+  async getActive(req, res, next) {
+    try {
+      const data = await servicesService.getActiveServices();
+
+      return res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     GET BY ID
+  ========================================================= */
+
+  async getById(req, res, next) {
+    try {
+      const data = await servicesService.getServiceById(req.params.id);
+
+      return res.status(200).json({
+        success: true,
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /* =========================================================
+     CREATE
+  ========================================================= */
+
+  async create(req, res, next) {
+    try {
+      const data = await servicesService.createService(req.body);
 
       return res.status(201).json({
         success: true,
-
-        message: "Service created successfully",
-
-        data: service,
+        message: "سرویس با موفقیت ایجاد شد.",
+        data,
       });
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Get All Services
-  ============================ */
+  /* =========================================================
+     UPDATE
+  ========================================================= */
 
-  async getAllServices(req, res, next) {
+  async update(req, res, next) {
     try {
-      const services = await servicesService.getAllServices();
+      const data = await servicesService.updateService(req.params.id, req.body);
 
       return res.status(200).json({
         success: true,
-
-        message: "Services fetched successfully",
-
-        data: services,
+        message: "سرویس با موفقیت بروزرسانی شد.",
+        data,
       });
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Get Active Services
-  ============================ */
+  /* =========================================================
+     DELETE
+  ========================================================= */
 
-  async getActiveServices(req, res, next) {
+  async delete(req, res, next) {
     try {
-      const services = await servicesService.getActiveServices();
+      const data = await servicesService.deleteService(req.params.id);
 
       return res.status(200).json({
         success: true,
-
-        message: "Active services fetched successfully",
-
-        data: services,
+        message: "سرویس با موفقیت حذف شد.",
+        data,
       });
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Get Single Service
-  ============================ */
+  /* =========================================================
+     TOGGLE STATUS
+  ========================================================= */
 
-  async getServiceById(req, res, next) {
+  async toggleStatus(req, res, next) {
     try {
-      const { id } = req.params;
-
-      const service = await servicesService.getServiceById(id);
+      const data = await servicesService.toggleServiceStatus(req.params.id);
 
       return res.status(200).json({
         success: true,
-
-        message: "Service fetched successfully",
-
-        data: service,
+        message: "وضعیت سرویس بروزرسانی شد.",
+        data,
       });
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Update Service
-  ============================ */
+  /* =========================================================
+     REORDER
+  ========================================================= */
 
-  async updateService(req, res, next) {
+  async reorder(req, res, next) {
     try {
-      const { id } = req.params;
-
-      const service = await servicesService.updateService(id, req.body);
+      const data = await servicesService.reorderServices(req.body);
 
       return res.status(200).json({
         success: true,
-
-        message: "Service updated successfully",
-
-        data: service,
+        message: "ترتیب سرویس‌ها بروزرسانی شد.",
+        data,
       });
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Delete Service
-  ============================ */
+  /* =========================================================
+     STATS
+  ========================================================= */
 
-  async deleteService(req, res, next) {
+  async stats(req, res, next) {
     try {
-      const { id } = req.params;
-
-      const result = await servicesService.deleteService(id);
+      const data = await servicesService.getStats();
 
       return res.status(200).json({
         success: true,
-
-        message: "Service deleted successfully",
-
-        data: result,
+        data,
       });
     } catch (error) {
       next(error);
     }
   }
 
-  /* ============================
-      Toggle Service Status
-  ============================ */
+  /* =========================================================
+     TECHNOLOGY SEARCH
+  ========================================================= */
 
-  async toggleServiceStatus(req, res, next) {
+  async searchTechnologies(req, res, next) {
     try {
-      const { id } = req.params;
+      const query = req.query.q;
 
-      const service = await servicesService.toggleServiceStatus(id);
+      if (!query?.trim()) {
+        return res.status(200).json({
+          success: true,
+          data: [],
+        });
+      }
+
+      const data = await servicesService.searchTechnologies(query);
 
       return res.status(200).json({
         success: true,
-
-        message: "Service status updated successfully",
-
-        data: service,
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* ============================
-      Reorder Services
-  ============================ */
-
-  async reorderServices(req, res, next) {
-    try {
-      const services = await servicesService.reorderServices(req.body);
-
-      return res.status(200).json({
-        success: true,
-
-        message: "Services reordered successfully",
-
-        data: services,
+        data,
       });
     } catch (error) {
       next(error);

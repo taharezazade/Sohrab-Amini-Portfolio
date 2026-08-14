@@ -28,13 +28,32 @@ export const ABOUT_ENDPOINTS = {
   GET: "/about",
 };
 
+/** @format */
+
 /* =========================================================
    SERVICES
 ========================================================= */
 
 export const SERVICES_ENDPOINTS = {
-  GET: "/services",
+  GET_ALL: "/services",
+
+  GET_ACTIVE: "/services/active",
+
+  STATS: "/services/stats",
+
   GET_BY_ID: (id) => `/services/${id}`,
+
+  CREATE: "/services",
+
+  UPDATE: (id) => `/services/${id}`,
+
+  DELETE: (id) => `/services/${id}`,
+
+  TOGGLE_STATUS: (id) => `/services/${id}/status`,
+
+  REORDER: "/services/reorder",
+
+  SEARCH_TECHNOLOGIES: "/services/technologies/search",
 };
 
 /* =========================================================

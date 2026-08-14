@@ -9,7 +9,7 @@ import ServicesGrid from "./ServicesGrid";
 import ServiceCTA from "./ServiceCTA";
 import ServicesDrawer from "./ServicesDrawer";
 
-import { useServices } from "@/hooks/useServices";
+import useServices from "@/hooks/useServices";
 
 function Services() {
   const { services, loading } = useServices();

@@ -1,43 +1,50 @@
 /** @format */
 
-import api from "@/api/axios";
-import { SERVICES_ENDPOINTS } from "@/api/endpoints";
+import servicesApi from "@/api/services.api";
 
 const servicesService = {
+  /* =========================================================
+     PUBLIC
+  ========================================================= */
+
   async getServices() {
-    return await api.get(SERVICES_ENDPOINTS.GET);
+    return await servicesApi.getAll();
+  },
+
+  async getActiveServices() {
+    return await servicesApi.getActive();
   },
 
   async getServiceById(id) {
-    return await api.get(SERVICES_ENDPOINTS.GET_BY_ID(id));
+    return await servicesApi.getById(id);
   },
 
-  async exists() {
-    return await api.get(SERVICES_ENDPOINTS.EXISTS);
-  },
+  /* =========================================================
+     ADMIN
+  ========================================================= */
 
-  async count() {
-    return await api.get(SERVICES_ENDPOINTS.COUNT);
+  async getStats() {
+    return await servicesApi.getStats();
   },
 
   async createService(payload) {
-    return await api.post(SERVICES_ENDPOINTS.CREATE, payload);
+    return await servicesApi.create(payload);
   },
 
   async updateService(id, payload) {
-    return await api.put(SERVICES_ENDPOINTS.UPDATE(id), payload);
+    return await servicesApi.update(id, payload);
+  },
+
+  async toggleServiceStatus(id) {
+    return await servicesApi.toggleStatus(id);
   },
 
   async deleteService(id) {
-    return await api.delete(SERVICES_ENDPOINTS.DELETE(id));
+    return await servicesApi.delete(id);
   },
 
-  async updateImage(id, payload) {
-    return await api.put(SERVICES_ENDPOINTS.UPDATE_IMAGE(id), payload);
-  },
-
-  async clearImage(id) {
-    return await api.delete(SERVICES_ENDPOINTS.CLEAR_IMAGE(id));
+  async reorderServices(items) {
+    return await servicesApi.reorder(items);
   },
 };
 

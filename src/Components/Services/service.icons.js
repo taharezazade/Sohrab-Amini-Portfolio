@@ -1,52 +1,52 @@
 /** @format */
 
-import {
-  Code,
-  ProgrammingArrow,
-  Flash,
-  ShieldSecurity,
-  Driver2,
-  Setting4,
-  Cpu,
-  Setting2,
-} from "iconsax-reactjs";
+import * as Iconsax from "iconsax-reactjs";
 
-/**
- * =========================================================
- * Service Icons
- * =========================================================
- *
- * Maps API icon names to Iconsax React components.
- */
+/* =========================================================
+   ICON MAP
+========================================================= */
 
-const SERVICE_ICONS = {
-  Code,
-  ProgrammingArrow,
-  Flash,
-  ShieldSecurity,
-  Driver2,
-  Setting4,
-  Cpu,
+const iconMap = new Map();
 
-  // Fallback / optional icons
-  Setting2,
-};
-
-/**
- * =========================================================
- * Get Service Icon
- * =========================================================
- *
- * @param {string} iconName
- * @returns {React.Component}
- */
-
-export function getServiceIcon(iconName) {
-  if (!iconName || typeof iconName !== "string") {
-    return Setting2;
+Object.entries(Iconsax).forEach(([name, component]) => {
+  if (typeof component === "function" || typeof component === "object") {
+    iconMap.set(name.toLowerCase(), component);
   }
+});
 
-  return SERVICE_ICONS[iconName] || Setting2;
+/* =========================================================
+   NORMALIZE
+========================================================= */
+
+function normalizeIconName(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[\s_-]+/g, "")
+    .toLowerCase();
 }
 
-export default SERVICE_ICONS;
+/* =========================================================
+   GET ICON
+========================================================= */
+
+export function getServiceIcon(iconName) {
+  const normalized = normalizeIconName(iconName);
+
+  if (!normalized) {
+    return Iconsax.Global;
+  }
+
+  return iconMap.get(normalized) || Iconsax.Global;
+}
+
+/* =========================================================
+   CHECK ICON
+========================================================= */
+
+export function hasServiceIcon(iconName) {
+  const normalized = normalizeIconName(iconName);
+
+  return iconMap.has(normalized);
+}
+
+export default getServiceIcon;

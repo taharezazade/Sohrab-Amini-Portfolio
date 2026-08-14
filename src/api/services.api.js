@@ -4,65 +4,46 @@ import api from "@/api/axios";
 import { SERVICES_ENDPOINTS } from "@/api/endpoints";
 
 const servicesApi = {
-  /**
-   * Get all services
-   */
+  /* =========================================================
+     PUBLIC
+  ========================================================= */
+
   getAll() {
     return api.get(SERVICES_ENDPOINTS.GET_ALL);
   },
 
-  /**
-   * Get active services
-   */
   getActive() {
     return api.get(SERVICES_ENDPOINTS.GET_ACTIVE);
   },
 
-  /**
-   * Get services statistics
-   */
-  getStats() {
-    return api.get(SERVICES_ENDPOINTS.STATS);
-  },
-
-  /**
-   * Get service by ID
-   */
   getById(id) {
     return api.get(SERVICES_ENDPOINTS.GET_BY_ID(id));
   },
 
-  /**
-   * Create service
-   */
+  /* =========================================================
+     ADMIN
+  ========================================================= */
+
+  getStats() {
+    return api.get(SERVICES_ENDPOINTS.STATS);
+  },
+
   create(payload) {
     return api.post(SERVICES_ENDPOINTS.CREATE, payload);
   },
 
-  /**
-   * Update service
-   */
   update(id, payload) {
     return api.put(SERVICES_ENDPOINTS.UPDATE(id), payload);
   },
 
-  /**
-   * Toggle service status
-   */
   toggleStatus(id) {
     return api.patch(SERVICES_ENDPOINTS.TOGGLE_STATUS(id));
   },
 
-  /**
-   * Delete service
-   */
   delete(id) {
     return api.delete(SERVICES_ENDPOINTS.DELETE(id));
   },
 
-  /**
-   * Reorder services
-   */
   reorder(items) {
     return api.patch(SERVICES_ENDPOINTS.REORDER, {
       items,

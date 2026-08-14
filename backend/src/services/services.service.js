@@ -1,165 +1,195 @@
 /** @format */
 
+import prisma from "../config/prisma.js";
+
 import servicesRepository from "../repositories/services.repository.js";
 
-class ServicesService {
-  constructor() {
-    this.servicesRepository = servicesRepository;
-  }
+import {
+  createServiceSchema,
+  updateServiceSchema,
+  reorderServicesSchema,
+} from "../validations/service.validation.js";
 
-  /* ============================
-      Create Service
-  ============================ */
+import { searchGithubTechnologies } from "../utils/githubTechnologies.js";
+
+class ServicesService {
+  /* =========================================================
+     CREATE
+  ========================================================= */
 
   async createService(data) {
-    const { title, description, icon, features, order, isActive } = data;
+    const validatedData = createServiceSchema.parse(data);
 
-    if (!title || !description) {
-      throw new Error("Title and description are required");
-    }
+    return servicesRepository.create({
+      title: validatedData.title,
 
-    const serviceData = {
-      title,
-      description,
-      icon: icon || null,
-      features: features || [],
-      order: order || 0,
-      isActive: isActive ?? true,
-    };
+      shortDescription: validatedData.shortDescription ?? null,
 
-    return await this.servicesRepository.create(serviceData);
+      description: validatedData.description,
+
+      icon: validatedData.icon?.trim() || null,
+
+      features: validatedData.features ?? [],
+
+      category: validatedData.category?.trim() || null,
+
+      technologies: validatedData.technologies ?? [],
+
+      color: validatedData.color?.trim() || null,
+
+      order: validatedData.order ?? 0,
+
+      isActive: validatedData.isActive ?? true,
+    });
   }
 
-  /* ============================
-      Get All Services
-  ============================ */
+  /* =========================================================
+     GET ALL
+  ========================================================= */
 
   async getAllServices() {
-    const services = await this.servicesRepository.findAll();
-
-    return services;
+    return servicesRepository.findAll();
   }
 
-  /* ============================
-      Get Active Services
-  ============================ */
+  /* =========================================================
+     GET ACTIVE
+  ========================================================= */
 
   async getActiveServices() {
-    const services = await this.servicesRepository.findActive();
-
-    return services;
+    return servicesRepository.findActive();
   }
 
-  /* ============================
-      Get Single Service
-  ============================ */
+  /* =========================================================
+     GET BY ID
+  ========================================================= */
 
   async getServiceById(id) {
     if (!id) {
-      throw new Error("Service id is required");
+      const error = new Error("شناسه سرویس الزامی است.");
+
+      error.statusCode = 400;
+
+      throw error;
     }
 
-    const service = await this.servicesRepository.findById(id);
+    const service = await servicesRepository.findById(id);
 
     if (!service) {
-      throw new Error("Service not found");
+      const error = new Error("سرویس موردنظر پیدا نشد.");
+
+      error.statusCode = 404;
+
+      throw error;
     }
 
     return service;
   }
 
-  /* ============================
-      Update Service
-  ============================ */
+  /* =========================================================
+     UPDATE
+  ========================================================= */
 
   async updateService(id, data) {
     if (!id) {
-      throw new Error("Service id is required");
+      const error = new Error("شناسه سرویس الزامی است.");
+
+      error.statusCode = 400;
+
+      throw error;
     }
 
-    const existingService = await this.servicesRepository.findById(id);
+    await this.getServiceById(id);
 
-    if (!existingService) {
-      throw new Error("Service not found");
-    }
+    const validatedData = updateServiceSchema.parse(data);
 
-    const updateData = {
-      ...(data.title && {
-        title: data.title,
-      }),
+    return servicesRepository.update(id, {
+      ...validatedData,
 
-      ...(data.description && {
-        description: data.description,
-      }),
+      shortDescription:
+        validatedData.shortDescription !== undefined ?
+          validatedData.shortDescription || null
+        : undefined,
 
-      ...(data.icon && {
-        icon: data.icon,
-      }),
+      icon:
+        validatedData.icon !== undefined ?
+          validatedData.icon?.trim() || null
+        : undefined,
 
-      ...(data.features && {
-        features: data.features,
-      }),
+      category:
+        validatedData.category !== undefined ?
+          validatedData.category?.trim() || null
+        : undefined,
 
-      ...(data.order !== undefined && {
-        order: data.order,
-      }),
-
-      ...(data.isActive !== undefined && {
-        isActive: data.isActive,
-      }),
-    };
-
-    return await this.servicesRepository.update(id, updateData);
+      color:
+        validatedData.color !== undefined ?
+          validatedData.color?.trim() || null
+        : undefined,
+    });
   }
 
-  /* ============================
-      Delete Service
-  ============================ */
+  /* =========================================================
+     DELETE
+  ========================================================= */
 
   async deleteService(id) {
-    if (!id) {
-      throw new Error("Service id is required");
-    }
+    await this.getServiceById(id);
 
-    const service = await this.servicesRepository.findById(id);
+    await servicesRepository.delete(id);
 
-    if (!service) {
-      throw new Error("Service not found");
-    }
-
-    return await this.servicesRepository.delete(id);
+    return {
+      id,
+      deleted: true,
+    };
   }
 
-  /* ============================
-      Toggle Status
-  ============================ */
+  /* =========================================================
+     TOGGLE STATUS
+  ========================================================= */
 
   async toggleServiceStatus(id) {
-    if (!id) {
-      throw new Error("Service id is required");
-    }
+    const service = await this.getServiceById(id);
 
-    const service = await this.servicesRepository.findById(id);
-
-    if (!service) {
-      throw new Error("Service not found");
-    }
-
-    return await this.servicesRepository.update(id, {
+    return servicesRepository.update(id, {
       isActive: !service.isActive,
     });
   }
 
-  /* ============================
-      Reorder Services
-  ============================ */
+  /* =========================================================
+     REORDER
+  ========================================================= */
 
-  async reorderServices(items) {
-    if (!Array.isArray(items)) {
-      throw new Error("Invalid reorder data");
-    }
+  async reorderServices(data) {
+    const { items } = reorderServicesSchema.parse(data);
 
-    return await this.servicesRepository.updateOrder(items);
+    return prisma.$transaction(
+      items.map((item) => servicesRepository.updateOrder(item.id, item.order)),
+    );
+  }
+
+  /* =========================================================
+     STATS
+  ========================================================= */
+
+  async getStats() {
+    const [total, active, inactive] = await Promise.all([
+      servicesRepository.count(),
+      servicesRepository.countActive(),
+      servicesRepository.countInactive(),
+    ]);
+
+    return {
+      total,
+      active,
+      inactive,
+    };
+  }
+
+  /* =========================================================
+     TECHNOLOGY SEARCH
+  ========================================================= */
+
+  async searchTechnologies(query) {
+    return searchGithubTechnologies(query);
   }
 }
 

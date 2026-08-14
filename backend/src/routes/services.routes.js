@@ -6,50 +6,32 @@ import servicesController from "../controllers/services.controller.js";
 
 const router = Router();
 
-/* ============================
-    Public Routes
-============================ */
+/* =========================================================
+   PUBLIC
+========================================================= */
 
-/*
-    Get All Services
-*/
-router.get("/", servicesController.getAllServices);
+router.get("/active", servicesController.getActive);
 
-/*
-    Get Active Services
-*/
-router.get("/active", servicesController.getActiveServices);
+router.get("/technologies/search", servicesController.searchTechnologies);
 
-/*
-    Get Single Service
-*/
-router.get("/:id", servicesController.getServiceById);
-/* ============================
-    Admin Routes
-============================ */
+/* =========================================================
+   ADMIN / CMS
+========================================================= */
 
-/*
-    Create Service
-*/
-router.post("/", servicesController.createService);
+router.get("/", servicesController.getAll);
 
-/*
-    Update Service
-*/
-router.put("/:id", servicesController.updateService);
+router.get("/stats", servicesController.stats);
 
-/*
-    Delete Service
-*/
-router.delete("/:id", servicesController.deleteService);
+router.get("/:id", servicesController.getById);
 
-/*
-    Toggle Active Status
-*/
-router.patch("/reorder", servicesController.reorderServices);
-/*
-    Reorder Services
-*/
-router.patch("/reorder", servicesController.reorderServices);
+router.post("/", servicesController.create);
+
+router.put("/:id", servicesController.update);
+
+router.delete("/:id", servicesController.delete);
+
+router.patch("/:id/status", servicesController.toggleStatus);
+
+router.patch("/reorder", servicesController.reorder);
 
 export default router;

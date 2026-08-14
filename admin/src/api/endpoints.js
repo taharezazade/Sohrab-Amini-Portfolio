@@ -46,17 +46,20 @@ export const ABOUT_ENDPOINTS = {
 
 export const SERVICES_ENDPOINTS = {
   GET_ALL: "/services",
+
+  GET_ACTIVE: "/services/active",
+
+  STATS: "/services/stats",
+
   GET_BY_ID: (id) => `/services/${id}`,
 
-  EXISTS: "/services/exists",
-  COUNT: "/services/count",
-
   CREATE: "/services",
-  UPDATE: (id) => `/services/${id}`,
-  DELETE: (id) => `/services/${id}`,
 
-  UPDATE_IMAGE: (id) => `/services/${id}/image`,
-  CLEAR_IMAGE: (id) => `/services/${id}/image`,
+  UPDATE: (id) => `/services/${id}`,
+
+  TOGGLE_STATUS: (id) => `/services/${id}/status`,
+
+  DELETE: (id) => `/services/${id}`,
 
   REORDER: "/services/reorder",
 };

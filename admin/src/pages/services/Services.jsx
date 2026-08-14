@@ -1,6 +1,10 @@
 /** @format */
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+
+// import servicesApi from "@/api/services.api";
+import servicesApi from "../../api/services.api";
 
 import ServicesHeader from "../../components/services/ServicesHeader";
 import ServicesStats from "../../components/services/ServicesStats";
@@ -8,21 +12,27 @@ import ServicesToolbar from "../../components/services/ServicesToolbar";
 import ServicesTable from "../../components/tables/ServicesTable";
 import ServicesModal from "../../components/services/ServicesModal";
 import ServiceForm from "../../components/services/ServiceForm";
-
 import ServiceDrawer from "../../components/services/ServiceDrawer";
 import ServiceDeleteModal from "../../components/services/ServiceDeleteModal";
-
 import ServiceSkeleton from "../../components/services/ServiceSkeleton";
 import EmptyState from "../../components/ui/EmptyState";
 
 const Services = () => {
-  /* ============================
-      States
-  ============================ */
+  /* =========================================================
+     STATES
+  ========================================================= */
 
   const [services, setServices] = useState([]);
 
   const [selectedService, setSelectedService] = useState(null);
+
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const [isStatusUpdating, setIsStatusUpdating] = useState(false);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -30,129 +40,297 @@ const Services = () => {
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-
   const [search, setSearch] = useState("");
 
   const [filter, setFilter] = useState("all");
 
-  /* ============================
-      Handlers
-  ============================ */
+  /* =========================================================
+     RESPONSE HELPERS
+  ========================================================= */
+
+  const extractData = (response) => {
+    return response?.data?.data ?? response?.data ?? null;
+  };
+
+  /* =========================================================
+     GET SERVICES
+  ========================================================= */
+
+  const fetchServices = useCallback(async () => {
+    try {
+      setIsInitialLoading(true);
+
+      const response = await servicesApi.getAll();
+
+      const data = extractData(response);
+
+      setServices(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("GET SERVICES ERROR:", error);
+
+      setServices([]);
+
+      toast.error(
+        error?.response?.data?.message || "دریافت سرویس‌ها انجام نشد.",
+      );
+    } finally {
+      setIsInitialLoading(false);
+    }
+  }, []);
+
+  /* =========================================================
+     INITIAL LOAD
+  ========================================================= */
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
+
+  /* =========================================================
+     CREATE
+  ========================================================= */
 
   const handleCreate = () => {
     setSelectedService(null);
-
     setIsFormOpen(true);
   };
+
+  /* =========================================================
+     EDIT
+  ========================================================= */
 
   const handleEdit = (service) => {
-    setSelectedService(service);
+    if (!service?.id) {
+      return;
+    }
 
+    setSelectedService(service);
     setIsFormOpen(true);
   };
 
-  const handleView = (service) => {
-    setSelectedService(service);
+  /* =========================================================
+     VIEW
+  ========================================================= */
 
+  const handleView = (service) => {
+    if (!service?.id) {
+      return;
+    }
+
+    setSelectedService(service);
     setIsDrawerOpen(true);
   };
 
-  const handleDelete = (service) => {
-    setSelectedService(service);
+  /* =========================================================
+     DELETE OPEN
+  ========================================================= */
 
+  const handleDelete = (service) => {
+    if (!service?.id) {
+      return;
+    }
+
+    setSelectedService(service);
     setIsDeleteOpen(true);
   };
 
-  const closeForm = () => {
-    setIsFormOpen(false);
+  /* =========================================================
+     CLOSE FORM
+  ========================================================= */
 
+  const closeForm = () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsFormOpen(false);
     setSelectedService(null);
   };
+
+  /* =========================================================
+     CLOSE DRAWER
+  ========================================================= */
 
   const closeDrawer = () => {
     setIsDrawerOpen(false);
-
     setSelectedService(null);
   };
 
+  /* =========================================================
+     SAVE SERVICE
+  ========================================================= */
+
   const handleSave = async (data) => {
     try {
-      setLoading(true);
+      setIsSubmitting(true);
 
-      /**
-       * TODO:
-       * Create / Update API
-       */
+      let response;
 
-      console.log("SAVE:", data);
+      if (selectedService?.id) {
+        response = await servicesApi.update(selectedService.id, data);
+      } else {
+        response = await servicesApi.create(data);
+      }
+
+      const savedService = response?.data?.data;
+
+      if (!savedService?.id) {
+        throw new Error("اطلاعات سرویس از سرور دریافت نشد.");
+      }
+
+      if (selectedService?.id) {
+        setServices((prev) =>
+          prev.map((item) =>
+            item.id === savedService.id ? savedService : item,
+          ),
+        );
+
+        toast.success("سرویس با موفقیت بروزرسانی شد.");
+      } else {
+        setServices((prev) => [...prev, savedService]);
+
+        toast.success("سرویس با موفقیت ایجاد شد.");
+      }
 
       closeForm();
+    } catch (error) {
+      console.error("SAVE SERVICE ERROR:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "ذخیره سرویس انجام نشد.";
+
+      toast.error(message);
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
+
+  /* =========================================================
+     DELETE SERVICE
+  ========================================================= */
 
   const handleConfirmDelete = async () => {
+    if (!selectedService?.id) {
+      return;
+    }
+
     try {
-      setLoading(true);
+      setIsDeleting(true);
 
-      /**
-       * TODO:
-       * Delete API
-       */
+      await servicesApi.delete(selectedService.id);
 
-      console.log("DELETE:", selectedService);
+      setServices((prev) =>
+        prev.filter((item) => item.id !== selectedService.id),
+      );
 
       setIsDeleteOpen(false);
-
       setSelectedService(null);
+
+      toast.success("سرویس با موفقیت حذف شد.");
+    } catch (error) {
+      console.error("DELETE SERVICE ERROR:", error);
+
+      toast.error(error?.response?.data?.message || "حذف سرویس انجام نشد.");
     } finally {
-      setLoading(false);
+      setIsDeleting(false);
     }
   };
 
-  const handleToggleStatus = (service) => {
-    console.log("TOGGLE STATUS:", service);
+  /* =========================================================
+     TOGGLE STATUS
+  ========================================================= */
 
-    /**
-     * TODO:
-     * Update API
-     */
+  const handleToggleStatus = async (service) => {
+    if (!service?.id) {
+      return;
+    }
+
+    try {
+      setIsStatusUpdating(true);
+
+      const response = await servicesApi.toggleStatus(service.id);
+
+      const updatedService = response?.data?.data;
+
+      if (!updatedService?.id) {
+        throw new Error("Invalid service response.");
+      }
+
+      setServices((prev) =>
+        prev.map((item) =>
+          item.id === updatedService.id ? updatedService : item,
+        ),
+      );
+
+      setSelectedService((prev) =>
+        prev?.id === updatedService.id ? updatedService : prev,
+      );
+
+      toast.success(
+        updatedService.isActive ? "سرویس فعال شد." : "سرویس غیرفعال شد.",
+      );
+    } catch (error) {
+      console.error("TOGGLE SERVICE STATUS ERROR:", error);
+
+      toast.error(
+        error?.response?.data?.message || "تغییر وضعیت سرویس انجام نشد.",
+      );
+    } finally {
+      setIsStatusUpdating(false);
+    }
   };
 
-  /* ============================
-      Filter
-  ============================ */
+  /* =========================================================
+     FILTER
+  ========================================================= */
+
+  const normalizedSearch = search.trim().toLowerCase();
 
   const filteredServices = services.filter((service) => {
-    const matchSearch = service.title
-      ?.toLowerCase()
-      .includes(search.toLowerCase());
+    const title = service?.title?.toLowerCase() || "";
 
-    const matchStatus =
-      filter === "all" ? true : service.isActive === (filter === "active");
+    const shortDescription = service?.shortDescription?.toLowerCase() || "";
 
-    return matchSearch && matchStatus;
+    const category = service?.category?.toLowerCase() || "";
+
+    const matchesSearch =
+      !normalizedSearch ||
+      title.includes(normalizedSearch) ||
+      shortDescription.includes(normalizedSearch) ||
+      category.includes(normalizedSearch);
+
+    const matchesStatus =
+      filter === "all" ? true : service?.isActive === (filter === "active");
+
+    return matchesSearch && matchesStatus;
   });
 
-  /* ============================
-      Loading
-  ============================ */
+  /* =========================================================
+     INITIAL LOADING
+  ========================================================= */
 
-  if (loading) {
+  if (isInitialLoading) {
     return (
-      <div
+      <section
         className='
-        min-h-screen
-        bg-base-200
-        p-4
-        md:p-6
-      '>
-        <ServiceSkeleton />
-      </div>
+          min-h-screen
+          bg-base-200
+          p-4
+          md:p-6
+        '>
+        <div className='container mx-auto'>
+          <ServiceSkeleton />
+        </div>
+      </section>
     );
   }
+
+  /* =========================================================
+     RENDER
+  ========================================================= */
 
   return (
     <section
@@ -168,19 +346,32 @@ const Services = () => {
           mx-auto
           space-y-6
         '>
+        {/* ===================================================
+            HEADER
+        =================================================== */}
+
         <ServicesHeader onCreate={handleCreate} />
+
+        {/* ===================================================
+            STATS
+        =================================================== */}
 
         <ServicesStats services={services} />
 
+        {/* ===================================================
+            TOOLBAR
+        =================================================== */}
+
         <ServicesToolbar
           search={search}
-
           setSearch={setSearch}
-
           filter={filter}
-
           setFilter={setFilter}
         />
+
+        {/* ===================================================
+            TABLE / EMPTY STATE
+        =================================================== */}
 
         {filteredServices.length > 0 ?
           <ServicesTable
@@ -189,6 +380,7 @@ const Services = () => {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}
+            loading={isStatusUpdating}
           />
         : <EmptyState
             title={
@@ -196,66 +388,60 @@ const Services = () => {
                 "سرویسی پیدا نشد"
               : "هنوز سرویسی ایجاد نشده است"
             }
-
             description={
               search || filter !== "all" ?
                 "فیلترها یا عبارت جستجو را تغییر دهید."
               : "اولین سرویس خود را ایجاد کنید تا در سایت نمایش داده شود."
             }
-
             actionText={search || filter !== "all" ? null : "ایجاد سرویس جدید"}
-
             onAction={handleCreate}
           />
         }
       </div>
 
-      {/* Create / Edit Modal */}
+      {/* =====================================================
+          CREATE / EDIT MODAL
+      ===================================================== */}
 
       <ServicesModal
         open={isFormOpen}
-
         onClose={closeForm}
-
         title={selectedService ? "ویرایش سرویس" : "افزودن سرویس"}>
         <ServiceForm
           initialValues={selectedService}
-
-          loading={loading}
-
+          loading={isSubmitting}
           onSubmit={handleSave}
-
           onCancel={closeForm}
         />
       </ServicesModal>
 
-      {/* Details Drawer */}
+      {/* =====================================================
+          DETAILS DRAWER
+      ===================================================== */}
 
       <ServiceDrawer
         open={isDrawerOpen}
-
         service={selectedService}
-
         onClose={closeDrawer}
-
         onEdit={handleEdit}
-
         onDelete={handleDelete}
-
         onToggleStatus={handleToggleStatus}
+        loading={isStatusUpdating}
       />
 
-      {/* Delete Modal */}
+      {/* =====================================================
+          DELETE MODAL
+      ===================================================== */}
 
       <ServiceDeleteModal
         open={isDeleteOpen}
-
         service={selectedService}
-
-        loading={loading}
-
-        onClose={() => setIsDeleteOpen(false)}
-
+        loading={isDeleting}
+        onClose={() => {
+          if (!isDeleting) {
+            setIsDeleteOpen(false);
+          }
+        }}
         onConfirm={handleConfirmDelete}
       />
     </section>

@@ -7,15 +7,22 @@ import {
   MonitorMobbile,
 } from "iconsax-reactjs";
 
-function ServicesDrawer({ service, isOpen, onClose }) {
-  if (!service || !isOpen) return null;
+import { getServiceIcon } from "./service.icons";
 
-  const Icon = service.icon;
+function ServicesDrawer({ service, isOpen, onClose }) {
+  if (!service || !isOpen) {
+    return null;
+  }
+
+  const Icon = getServiceIcon(service.icon);
+
+  const features = Array.isArray(service.features) ? service.features : [];
+
+  const technologies =
+    Array.isArray(service.technologies) ? service.technologies : [];
 
   return (
     <>
-      {/* Overlay */}
-
       <div
         onClick={onClose}
         className='
@@ -27,27 +34,21 @@ function ServicesDrawer({ service, isOpen, onClose }) {
         '
       />
 
-      {/* Drawer */}
-
       <aside
         className='
           fixed
-          top-0
           right-0
+          top-0
           z-[9999]
-
           h-screen
           w-full
-          sm:w-[540px]
-          lg:w-[620px]
-
           overflow-y-auto
-
           border-l
           border-base-300
-
           bg-base-100
           shadow-2xl
+          sm:w-[540px]
+          lg:w-[620px]
         '>
         {/* Header */}
 
@@ -56,18 +57,14 @@ function ServicesDrawer({ service, isOpen, onClose }) {
             sticky
             top-0
             z-20
-
             flex
             items-center
             justify-between
-
             border-b
             border-base-300
-
             bg-base-100/90
             px-7
             py-5
-
             backdrop-blur-xl
           '>
           <div className='flex items-center gap-4'>
@@ -76,24 +73,26 @@ function ServicesDrawer({ service, isOpen, onClose }) {
                 rounded-2xl
                 bg-primary/10
                 p-3
+                text-primary
               '>
-              <Icon size={32} variant='Bulk' className='text-primary' />
+              <Icon size={32} variant='Bulk' />
             </div>
 
             <div>
               <h2 className='text-xl font-black'>{service.title}</h2>
 
-              <p className='text-sm text-base-content/60'>{service.category}</p>
+              {service.category && (
+                <p className='text-sm text-base-content/60'>
+                  {service.category}
+                </p>
+              )}
             </div>
           </div>
 
           <button
+            type='button'
             onClick={onClose}
-            className='
-              btn
-              btn-circle
-              btn-ghost
-            '>
+            className='btn btn-circle btn-ghost'>
             <CloseCircle variant='Bulk' />
           </button>
         </div>
@@ -101,6 +100,8 @@ function ServicesDrawer({ service, isOpen, onClose }) {
         {/* Content */}
 
         <div className='space-y-10 p-7'>
+          {/* Description */}
+
           <section>
             <h3 className='mb-4 text-lg font-bold'>معرفی سرویس</h3>
 
@@ -109,42 +110,56 @@ function ServicesDrawer({ service, isOpen, onClose }) {
             </p>
           </section>
 
-          <section>
-            <h3 className='mb-5 text-lg font-bold'>امکانات این سرویس</h3>
+          {/* Features */}
 
-            <div className='space-y-4'>
-              {service.features.map((item) => (
-                <div key={item} className='flex items-start gap-3'>
-                  <TickCircle
-                    size={22}
-                    variant='Bold'
-                    className='mt-1 text-success'
-                  />
+          {features.length > 0 && (
+            <section>
+              <h3 className='mb-5 text-lg font-bold'>امکانات این سرویس</h3>
 
-                  <span className='leading-7'>{item}</span>
-                </div>
-              ))}
-            </div>
-          </section>
+              <div className='space-y-4'>
+                {features.map((item, index) => (
+                  <div
+                    key={`${service.id}-feature-${index}`}
+                    className='flex items-start gap-3'>
+                    <TickCircle
+                      size={22}
+                      variant='Bold'
+                      className='mt-1 text-success'
+                    />
 
-          <section>
-            <h3 className='mb-5 text-lg font-bold'>تکنولوژی‌های استفاده شده</h3>
+                    <span className='leading-7'>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
-            <div className='flex flex-wrap gap-3'>
-              {service.technologies.map((tech) => (
-                <span
-                  key={tech}
-                  className='
-                    badge
-                    badge-primary
-                    badge-outline
-                    badge-lg
-                  '>
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </section>
+          {/* Technologies */}
+
+          {technologies.length > 0 && (
+            <section>
+              <h3 className='mb-5 text-lg font-bold'>
+                تکنولوژی‌های استفاده شده
+              </h3>
+
+              <div className='flex flex-wrap gap-3'>
+                {technologies.map((technology) => (
+                  <span
+                    key={technology}
+                    className='
+                        badge
+                        badge-primary
+                        badge-outline
+                        badge-lg
+                      '>
+                    {technology}
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Benefits */}
 
           <section>
             <h3 className='mb-5 text-lg font-bold'>مزایای همکاری</h3>
@@ -161,9 +176,8 @@ function ServicesDrawer({ service, isOpen, onClose }) {
 
                 <h4 className='font-bold'>کدنویسی استاندارد</h4>
 
-                <p className='mt-2 text-sm text-base-content/70'>
-                  ساختار تمیز، قابل توسعه و مطابق استانداردهای روز PHP و
-                  WordPress.
+                <p className='mt-2 text-sm leading-7 text-base-content/70'>
+                  ساختار تمیز، قابل توسعه و مطابق استانداردهای روز.
                 </p>
               </div>
 
@@ -178,12 +192,14 @@ function ServicesDrawer({ service, isOpen, onClose }) {
 
                 <h4 className='font-bold'>کاملاً ریسپانسیو</h4>
 
-                <p className='mt-2 text-sm text-base-content/70'>
+                <p className='mt-2 text-sm leading-7 text-base-content/70'>
                   سازگار با موبایل، تبلت و نمایشگرهای بزرگ.
                 </p>
               </div>
             </div>
           </section>
+
+          {/* CTA */}
 
           <section
             className='
@@ -199,6 +215,7 @@ function ServicesDrawer({ service, isOpen, onClose }) {
             </p>
 
             <button
+              type='button'
               className='
                 btn
                 btn-primary

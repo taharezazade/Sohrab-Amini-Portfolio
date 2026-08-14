@@ -2,35 +2,40 @@
 
 import prisma from "../config/prisma.js";
 
-class ServiceRepository {
-  /* ============================
-      Create
-  ============================ */
+class ServicesRepository {
+  /* =========================================================
+     CREATE
+  ========================================================= */
 
   async create(data) {
-    return await prisma.service.create({
+    return prisma.service.create({
       data,
     });
   }
 
-  /* ============================
-      Get All
-  ============================ */
+  /* =========================================================
+     FIND ALL
+  ========================================================= */
 
   async findAll() {
-    return await prisma.service.findMany({
-      orderBy: {
-        order: "asc",
-      },
+    return prisma.service.findMany({
+      orderBy: [
+        {
+          order: "asc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
     });
   }
 
-  /* ============================
-      Get Active
-  ============================ */
+  /* =========================================================
+     FIND ACTIVE
+  ========================================================= */
 
   async findActive() {
-    return await prisma.service.findMany({
+    return prisma.service.findMany({
       where: {
         isActive: true,
       },
@@ -40,36 +45,24 @@ class ServiceRepository {
     });
   }
 
-  /* ============================
-      Get By ID
-  ============================ */
+  /* =========================================================
+     FIND BY ID
+  ========================================================= */
 
   async findById(id) {
-    return await prisma.service.findUnique({
+    return prisma.service.findUnique({
       where: {
         id,
       },
     });
   }
 
-  /* ============================
-      Get By Slug
-  ============================ */
-
-  async findBySlug(slug) {
-    return await prisma.service.findUnique({
-      where: {
-        slug,
-      },
-    });
-  }
-
-  /* ============================
-      Update
-  ============================ */
+  /* =========================================================
+     UPDATE
+  ========================================================= */
 
   async update(id, data) {
-    return await prisma.service.update({
+    return prisma.service.update({
       where: {
         id,
       },
@@ -77,39 +70,12 @@ class ServiceRepository {
     });
   }
 
-  /* ============================
-      Delete
-  ============================ */
-
-  async delete(id) {
-    return await prisma.service.delete({
-      where: {
-        id,
-      },
-    });
-  }
-
-  /* ============================
-      Toggle Active
-  ============================ */
-
-  async toggleStatus(id, isActive) {
-    return await prisma.service.update({
-      where: {
-        id,
-      },
-      data: {
-        isActive,
-      },
-    });
-  }
-
-  /* ============================
-      Change Order
-  ============================ */
+  /* =========================================================
+     UPDATE ORDER
+  ========================================================= */
 
   async updateOrder(id, order) {
-    return await prisma.service.update({
+    return prisma.service.update({
       where: {
         id,
       },
@@ -119,47 +85,41 @@ class ServiceRepository {
     });
   }
 
-  /* ============================
-      Count
-  ============================ */
+  /* =========================================================
+     DELETE
+  ========================================================= */
 
-  async count() {
-    return await prisma.service.count();
-  }
-
-  /* ============================
-      Exists By Slug
-  ============================ */
-
-  async existsBySlug(slug) {
-    const service = await prisma.service.findUnique({
-      where: {
-        slug,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    return !!service;
-  }
-
-  /* ============================
-      Exists By ID
-  ============================ */
-
-  async existsById(id) {
-    const service = await prisma.service.findUnique({
+  async delete(id) {
+    return prisma.service.delete({
       where: {
         id,
       },
-      select: {
-        id: true,
+    });
+  }
+
+  /* =========================================================
+     COUNT
+  ========================================================= */
+
+  async count() {
+    return prisma.service.count();
+  }
+
+  async countActive() {
+    return prisma.service.count({
+      where: {
+        isActive: true,
       },
     });
+  }
 
-    return !!service;
+  async countInactive() {
+    return prisma.service.count({
+      where: {
+        isActive: false,
+      },
+    });
   }
 }
 
-export default new ServiceRepository();
+export default new ServicesRepository();

@@ -90,8 +90,8 @@ model About {
   title       String
   description String
 
-  birthYear Int?
-  location  String?
+  birthYear  Int?
+  location   String?
   experience Int?
 
   createdAt DateTime @default(now())
@@ -107,7 +107,7 @@ model Service {
 
   title String
 
-  shortDescription String
+  shortDescription String?
 
   description String
 
@@ -115,7 +115,7 @@ model Service {
 
   features Json
 
-  category String
+  category String?
 
   technologies Json
 

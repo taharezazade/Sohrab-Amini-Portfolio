@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import servicesService from "@/services/services.service";
+import servicesApi from "@/api/services.api";
 
-const useServices = () => {
+export const useServices = () => {
   const [services, setServices] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ const useServices = () => {
       setLoading(true);
       setError(null);
 
-      const response = await servicesService.getServices();
+      const response = await servicesApi.getAll();
 
       const data = response?.data?.data;
 
@@ -44,5 +44,3 @@ const useServices = () => {
 };
 
 export default useServices;
-
-export { useServices };

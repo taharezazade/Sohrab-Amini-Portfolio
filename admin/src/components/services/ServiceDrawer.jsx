@@ -2,9 +2,10 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { CloseCircle, Category, Calendar2 } from "iconsax-reactjs";
+import { getServiceIcon } from "../../utils/serviceIcons";
 
 import ServiceActions from "./ServiceActions";
-
+const ServiceIcon = getServiceIcon(service.icon);
 const ServiceDrawer = ({
   open = false,
   service = null,
@@ -61,14 +62,19 @@ const ServiceDrawer = ({
               {/* Service Identity */}
               <div className='bg-base-200 rounded-3xl p-6'>
                 <div className='flex items-start gap-4'>
-                  <div className='bg-primary/10 text-primary flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl'>
-                    {service.icon ?
-                      <img
-                        src={service.icon}
-                        alt={service.title}
-                        className='h-10 w-10 object-contain'
-                      />
-                    : <Category size={32} variant='Bold' />}
+                  <div
+                    className='
+                    flex
+                    h-16
+                    w-16
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-2xl
+                    bg-primary/10
+                    text-primary
+                  '>
+                    <ServiceIcon size={32} variant='Bulk' />
                   </div>
 
                   <div>
