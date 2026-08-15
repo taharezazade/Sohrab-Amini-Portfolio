@@ -10,6 +10,7 @@ import portfolioRoutes from "./portfolio.routes.js";
 import contactRoutes from "./contact.routes.js";
 import settingsRoutes from "./settings.routes.js";
 import uploadRoutes from "./upload.routes.js";
+import searchRoutes from "./search.routes.js";
 
 const router = Router();
 
@@ -68,5 +69,10 @@ router.use("/settings", settingsRoutes);
 ========================================================= */
 
 router.use("/upload", uploadRoutes);
+
+/* =========================================================
+   SEARCH HEADER DASHBOARD
+========================================================= */
+router.use("/search", searchRoutes);
 
 export default router;

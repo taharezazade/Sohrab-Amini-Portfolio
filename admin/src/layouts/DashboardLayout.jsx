@@ -12,20 +12,21 @@ const DashboardLayout = () => {
   if (loading) {
     return (
       <div
+        dir='rtl'
         className='
-        flex
-        min-h-screen
-        items-center
-        justify-center
-        bg-base-200
-      '>
+          flex
+          min-h-screen
+          items-center
+          justify-center
+          bg-base-200
+        '>
         <span
           className='
-          loading
-          loading-spinner
-          loading-lg
-          text-primary
-        '
+            loading
+            loading-spinner
+            loading-lg
+            text-primary
+          '
         />
       </div>
     );
@@ -39,30 +40,20 @@ const DashboardLayout = () => {
         overflow-x-hidden
         bg-base-200
       '>
-      {/* Sidebar */}
-
       <Sidebar />
 
-      {/* Main */}
-
-      <div
-        className='
-          lg:mr-56
-        '>
-        {/* Header */}
-
+      <div className='lg:mr-56'>
         <Header />
-
-        {/* Content */}
 
         <main
           className='
+            px-4
+            pb-8
             pt-24
-            p-4
-            md:pt-24
-            md:p-6
-            lg:pt-24
-            lg:p-8
+
+            md:px-6
+
+            lg:px-8
           '>
           <Outlet />
         </main>

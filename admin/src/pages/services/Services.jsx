@@ -1,9 +1,8 @@
 /** @format */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 
-// import servicesApi from "@/api/services.api";
 import servicesApi from "../../api/services.api";
 
 import ServicesHeader from "../../components/services/ServicesHeader";
@@ -44,39 +43,50 @@ const Services = () => {
 
   const [filter, setFilter] = useState("all");
 
+  const [sort, setSort] = useState("newest");
+
   /* =========================================================
      RESPONSE HELPERS
   ========================================================= */
 
-  const extractData = (response) => {
+  const extractData = useCallback((response) => {
     return response?.data?.data ?? response?.data ?? null;
-  };
+  }, []);
 
   /* =========================================================
      GET SERVICES
   ========================================================= */
 
-  const fetchServices = useCallback(async () => {
-    try {
-      setIsInitialLoading(true);
+  const fetchServices = useCallback(
+    async (showToast = false) => {
+      try {
+        setIsInitialLoading(true);
 
-      const response = await servicesApi.getAll();
+        const response = await servicesApi.getAll();
 
-      const data = extractData(response);
+        const data = extractData(response);
 
-      setServices(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("GET SERVICES ERROR:", error);
+        setServices(Array.isArray(data) ? data : []);
 
-      setServices([]);
+        if (showToast) {
+          toast.success("لیست سرویس‌ها بروزرسانی شد.");
+        }
+      } catch (error) {
+        console.error("GET SERVICES ERROR:", error);
 
-      toast.error(
-        error?.response?.data?.message || "دریافت سرویس‌ها انجام نشد.",
-      );
-    } finally {
-      setIsInitialLoading(false);
-    }
-  }, []);
+        setServices([]);
+
+        toast.error(
+          error?.response?.data?.message ||
+            error?.response?.data?.error ||
+            "دریافت سرویس‌ها انجام نشد.",
+        );
+      } finally {
+        setIsInitialLoading(false);
+      }
+    },
+    [extractData],
+  );
 
   /* =========================================================
      INITIAL LOAD
@@ -90,77 +100,81 @@ const Services = () => {
      CREATE
   ========================================================= */
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     setSelectedService(null);
     setIsFormOpen(true);
-  };
+  }, []);
 
   /* =========================================================
      EDIT
   ========================================================= */
 
-  const handleEdit = (service) => {
+  const handleEdit = useCallback((service) => {
     if (!service?.id) {
       return;
     }
 
     setSelectedService(service);
     setIsFormOpen(true);
-  };
+  }, []);
 
   /* =========================================================
      VIEW
   ========================================================= */
 
-  const handleView = (service) => {
+  const handleView = useCallback((service) => {
     if (!service?.id) {
       return;
     }
 
     setSelectedService(service);
     setIsDrawerOpen(true);
-  };
+  }, []);
 
   /* =========================================================
      DELETE OPEN
   ========================================================= */
 
-  const handleDelete = (service) => {
+  const handleDelete = useCallback((service) => {
     if (!service?.id) {
       return;
     }
 
     setSelectedService(service);
     setIsDeleteOpen(true);
-  };
+  }, []);
 
   /* =========================================================
      CLOSE FORM
   ========================================================= */
 
-  const closeForm = () => {
+  const closeForm = useCallback(() => {
     if (isSubmitting) {
       return;
     }
 
     setIsFormOpen(false);
     setSelectedService(null);
-  };
+  }, [isSubmitting]);
 
   /* =========================================================
      CLOSE DRAWER
   ========================================================= */
 
-  const closeDrawer = () => {
+  const closeDrawer = useCallback(() => {
     setIsDrawerOpen(false);
     setSelectedService(null);
-  };
+  }, []);
 
   /* =========================================================
      SAVE SERVICE
   ========================================================= */
 
   const handleSave = async (data) => {
+    if (isSubmitting) {
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
@@ -192,7 +206,8 @@ const Services = () => {
         toast.success("سرویس با موفقیت ایجاد شد.");
       }
 
-      closeForm();
+      setIsFormOpen(false);
+      setSelectedService(null);
     } catch (error) {
       console.error("SAVE SERVICE ERROR:", error);
 
@@ -213,7 +228,7 @@ const Services = () => {
   ========================================================= */
 
   const handleConfirmDelete = async () => {
-    if (!selectedService?.id) {
+    if (!selectedService?.id || isDeleting) {
       return;
     }
 
@@ -233,7 +248,11 @@ const Services = () => {
     } catch (error) {
       console.error("DELETE SERVICE ERROR:", error);
 
-      toast.error(error?.response?.data?.message || "حذف سرویس انجام نشد.");
+      toast.error(
+        error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          "حذف سرویس انجام نشد.",
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -244,7 +263,7 @@ const Services = () => {
   ========================================================= */
 
   const handleToggleStatus = async (service) => {
-    if (!service?.id) {
+    if (!service?.id || isStatusUpdating) {
       return;
     }
 
@@ -256,7 +275,7 @@ const Services = () => {
       const updatedService = response?.data?.data;
 
       if (!updatedService?.id) {
-        throw new Error("Invalid service response.");
+        throw new Error("پاسخ نامعتبر از سرور دریافت شد.");
       }
 
       setServices((prev) =>
@@ -276,7 +295,9 @@ const Services = () => {
       console.error("TOGGLE SERVICE STATUS ERROR:", error);
 
       toast.error(
-        error?.response?.data?.message || "تغییر وضعیت سرویس انجام نشد.",
+        error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          "تغییر وضعیت سرویس انجام نشد.",
       );
     } finally {
       setIsStatusUpdating(false);
@@ -284,43 +305,79 @@ const Services = () => {
   };
 
   /* =========================================================
-     FILTER
+     FILTER + SORT
   ========================================================= */
 
-  const normalizedSearch = search.trim().toLowerCase();
+  const filteredServices = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
 
-  const filteredServices = services.filter((service) => {
-    const title = service?.title?.toLowerCase() || "";
+    const result = services.filter((service) => {
+      const title = service?.title?.toLowerCase() || "";
 
-    const shortDescription = service?.shortDescription?.toLowerCase() || "";
+      const shortDescription = service?.shortDescription?.toLowerCase() || "";
 
-    const category = service?.category?.toLowerCase() || "";
+      const description = service?.description?.toLowerCase() || "";
 
-    const matchesSearch =
-      !normalizedSearch ||
-      title.includes(normalizedSearch) ||
-      shortDescription.includes(normalizedSearch) ||
-      category.includes(normalizedSearch);
+      const category = service?.category?.toLowerCase() || "";
 
-    const matchesStatus =
-      filter === "all" ? true : service?.isActive === (filter === "active");
+      const technologies =
+        Array.isArray(service?.technologies) ?
+          service.technologies.join(" ").toLowerCase()
+        : "";
 
-    return matchesSearch && matchesStatus;
-  });
+      const features =
+        Array.isArray(service?.features) ?
+          service.features.join(" ").toLowerCase()
+        : "";
+
+      const matchesSearch =
+        !normalizedSearch ||
+        title.includes(normalizedSearch) ||
+        shortDescription.includes(normalizedSearch) ||
+        description.includes(normalizedSearch) ||
+        category.includes(normalizedSearch) ||
+        technologies.includes(normalizedSearch) ||
+        features.includes(normalizedSearch);
+
+      const matchesStatus =
+        filter === "all" ? true
+        : filter === "active" ? service?.isActive === true
+        : service?.isActive === false;
+
+      return matchesSearch && matchesStatus;
+    });
+
+    return [...result].sort((a, b) => {
+      switch (sort) {
+        case "oldest":
+          return (
+            new Date(a?.createdAt || 0).getTime() -
+            new Date(b?.createdAt || 0).getTime()
+          );
+
+        case "title":
+          return (a?.title || "").localeCompare(b?.title || "", "fa");
+
+        case "order":
+          return Number(a?.order || 0) - Number(b?.order || 0);
+
+        case "newest":
+        default:
+          return (
+            new Date(b?.createdAt || 0).getTime() -
+            new Date(a?.createdAt || 0).getTime()
+          );
+      }
+    });
+  }, [services, search, filter, sort]);
 
   /* =========================================================
-     INITIAL LOADING
+     LOADING
   ========================================================= */
 
   if (isInitialLoading) {
     return (
-      <section
-        className='
-          min-h-screen
-          bg-base-200
-          p-4
-          md:p-6
-        '>
+      <section className='min-h-screen bg-base-200 p-4 md:p-6'>
         <div className='container mx-auto'>
           <ServiceSkeleton />
         </div>
@@ -333,45 +390,30 @@ const Services = () => {
   ========================================================= */
 
   return (
-    <section
-      className='
-        min-h-screen
-        bg-base-200
-        p-4
-        md:p-6
-      '>
-      <div
-        className='
-          container
-          mx-auto
-          space-y-6
-        '>
-        {/* ===================================================
-            HEADER
-        =================================================== */}
+    <section className='min-h-screen bg-base-200 p-4 md:p-6'>
+      <div className='container mx-auto space-y-6'>
+        {/* HEADER */}
 
         <ServicesHeader onCreate={handleCreate} />
 
-        {/* ===================================================
-            STATS
-        =================================================== */}
+        {/* STATS */}
 
         <ServicesStats services={services} />
 
-        {/* ===================================================
-            TOOLBAR
-        =================================================== */}
+        {/* TOOLBAR */}
 
         <ServicesToolbar
           search={search}
           setSearch={setSearch}
           filter={filter}
           setFilter={setFilter}
+          sort={sort}
+          setSort={setSort}
+          onRefresh={() => fetchServices(true)}
+          onCreate={handleCreate}
         />
 
-        {/* ===================================================
-            TABLE / EMPTY STATE
-        =================================================== */}
+        {/* TABLE */}
 
         {filteredServices.length > 0 ?
           <ServicesTable
@@ -399,9 +441,7 @@ const Services = () => {
         }
       </div>
 
-      {/* =====================================================
-          CREATE / EDIT MODAL
-      ===================================================== */}
+      {/* CREATE / EDIT */}
 
       <ServicesModal
         open={isFormOpen}
@@ -415,9 +455,7 @@ const Services = () => {
         />
       </ServicesModal>
 
-      {/* =====================================================
-          DETAILS DRAWER
-      ===================================================== */}
+      {/* DETAILS */}
 
       <ServiceDrawer
         open={isDrawerOpen}
@@ -429,9 +467,7 @@ const Services = () => {
         loading={isStatusUpdating}
       />
 
-      {/* =====================================================
-          DELETE MODAL
-      ===================================================== */}
+      {/* DELETE */}
 
       <ServiceDeleteModal
         open={isDeleteOpen}
@@ -440,6 +476,7 @@ const Services = () => {
         onClose={() => {
           if (!isDeleting) {
             setIsDeleteOpen(false);
+            setSelectedService(null);
           }
         }}
         onConfirm={handleConfirmDelete}

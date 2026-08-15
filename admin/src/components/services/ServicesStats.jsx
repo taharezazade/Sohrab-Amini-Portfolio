@@ -1,6 +1,7 @@
 /** @format */
 
 import { motion } from "framer-motion";
+
 import {
   Briefcase,
   TickCircle,
@@ -8,12 +9,28 @@ import {
   ArrangeHorizontal,
 } from "iconsax-reactjs";
 
-const ServicesStats = ({
-  total = 0,
-  active = 0,
-  inactive = 0,
-  featured = 0,
-}) => {
+const ServicesStats = ({ services = [] }) => {
+  const total = services.length;
+
+  const active = services.filter(
+    (service) => service?.isActive === true,
+  ).length;
+
+  const inactive = services.filter(
+    (service) => service?.isActive === false,
+  ).length;
+
+  /*
+   * Since Service model does not have a `featured` field,
+   * we use order as the display priority.
+   *
+   * If later `featured Boolean` is added to Prisma,
+   * this calculation should be changed.
+   */
+  const featured = services.filter(
+    (service) => Number(service?.order) > 0,
+  ).length;
+
   const stats = [
     {
       title: "کل سرویس‌ها",
@@ -37,10 +54,10 @@ const ServicesStats = ({
       className: "text-error bg-error/10",
     },
     {
-      title: "سرویس‌های ویژه",
+      title: "دارای اولویت نمایش",
       value: featured,
       icon: ArrangeHorizontal,
-      description: "سرویس‌های دارای اولویت نمایش",
+      description: "سرویس‌هایی که ترتیب نمایش دارند",
       className: "text-warning bg-warning/10",
     },
   ];
@@ -65,7 +82,7 @@ const ServicesStats = ({
               duration: 0.3,
               delay: index * 0.08,
             }}
-            className='card bg-base-100 border-base-300 border shadow-sm'>
+            className='card border-base-300 bg-base-100 border shadow-sm'>
             <div className='card-body'>
               <div className='flex items-start justify-between'>
                 <div>
