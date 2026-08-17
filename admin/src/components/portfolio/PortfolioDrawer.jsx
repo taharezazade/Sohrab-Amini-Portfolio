@@ -1,298 +1,177 @@
 /** @format */
 
-import { motion, AnimatePresence } from "framer-motion";
-import { CloseCircle, Gallery, Link, Star1, TickCircle } from "iconsax-reactjs";
-import { LuGithub } from "react-icons/lu";
+import { AnimatePresence, motion } from "framer-motion";
+import { CloseCircle, Gallery, Hierarchy, Link1, Star1 } from "iconsax-reactjs";
+
+const API_ORIGIN =
+  import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, "") ||
+  "http://localhost:5000";
+
+const getImageUrl = (value) => {
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith("/")) return `${API_ORIGIN}${value}`;
+  return `${API_ORIGIN}/uploads/${value.replace(/^\/+/, "")}`;
+};
+
 const PortfolioDrawer = ({ open = false, portfolio = null, onClose }) => {
-  if (!portfolio) return null;
+  const images = [
+    ...(portfolio?.thumbnail ? [portfolio.thumbnail] : []),
+    ...(portfolio?.images || []).map((item) => item.image || item.url),
+  ]
+    .map(getImageUrl)
+    .filter(Boolean)
+    .filter((value, index, array) => array.indexOf(value) === index);
 
   return (
     <AnimatePresence>
-      {open && (
-        <>
-          {/* Overlay */}
-
-          <motion.div
-            initial={{
-              opacity: 0,
-            }}
-
-            animate={{
-              opacity: 1,
-            }}
-
-            exit={{
-              opacity: 0,
-            }}
-
+      {open && portfolio && (
+        <div className='fixed inset-0 z-[90]' dir='rtl'>
+          <motion.button
+            type='button'
+            aria-label='بستن'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={onClose}
-
-            className='
-                fixed
-                inset-0
-                z-40
-                bg-black/40
-                backdrop-blur-sm
-              '
+            className='absolute inset-0 h-full w-full bg-black/40 backdrop-blur-sm'
           />
 
-          {/* Drawer */}
-
           <motion.aside
-            initial={{
-              x: "100%",
-            }}
-
-            animate={{
-              x: 0,
-            }}
-
-            exit={{
-              x: "100%",
-            }}
-
-            transition={{
-              duration: 0.3,
-            }}
-
-            className='
-                fixed
-                right-0
-                top-0
-                z-50
-
-                h-screen
-                w-full
-
-                overflow-y-auto
-
-                bg-base-100
-
-                shadow-xl
-
-
-                sm:max-w-xl
-              '>
-            {/* Header */}
-
-            <div
-              className='
-                  border-base-300
-                  flex
-                  items-center
-                  justify-between
-                  border-b
-                  p-5
-                '>
-              <h2
-                className='
-                    text-lg
-                    font-black
-                  '>
-                جزئیات نمونه‌کار
-              </h2>
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.25 }}
+            className='absolute right-0 top-0 h-full w-full max-w-2xl overflow-y-auto bg-base-100 shadow-2xl'>
+            <header className='sticky top-0 z-10 flex items-center justify-between border-b border-base-200 bg-base-100/95 px-5 py-4 backdrop-blur'>
+              <div>
+                <h2 className='font-black'>{portfolio.title}</h2>
+                <p className='mt-1 text-xs text-base-content/50'>
+                  جزئیات نمونه‌کار
+                </p>
+              </div>
 
               <button
+                type='button'
                 onClick={onClose}
-
-                className='
-                    btn
-                    btn-ghost
-                    btn-sm
-                    btn-square
-                  '>
-                <CloseCircle size={22} />
+                className='btn btn-ghost btn-square btn-sm'>
+                <CloseCircle size={23} />
               </button>
-            </div>
+            </header>
 
-            {/* Content */}
-
-            <div
-              className='
-                  space-y-6
-                  p-5
-                '>
-              {/* Images */}
-
-              <div>
-                <h3
-                  className='
-                      mb-3
-                      flex
-                      items-center
-                      gap-2
-                      font-bold
-                    '>
-                  <Gallery size={18} />
-                  تصاویر پروژه
-                </h3>
-
-                {portfolio.images?.length > 0 ?
-                  <div
-                    className='
-                        grid
-                        grid-cols-2
-                        gap-3
-                      '>
-                    {portfolio.images.map((image, index) => (
-                      <img
-                        key={image.id || index}
-
-                        src={image.url}
-
-                        alt={portfolio.title}
-
-                        className='
-                                aspect-video
-                                w-full
-                                rounded-xl
-                                object-cover
-                              '
-                      />
-                    ))}
-                  </div>
-                : <div
-                    className='
-                        bg-base-200
-                        text-base-content/50
-                        flex
-                        h-40
-                        items-center
-                        justify-center
-                        rounded-xl
-                      '>
-                    تصویری وجود ندارد
-                  </div>
-                }
-              </div>
-
-              {/* Title */}
+            <div className='space-y-6 p-5'>
+              {images.length > 0 ?
+                <div className='grid gap-3 sm:grid-cols-2'>
+                  {images.map((image, index) => (
+                    <img
+                      key={`${image}-${index}`}
+                      src={image}
+                      alt={portfolio.title}
+                      className='aspect-video w-full rounded-2xl object-cover'
+                    />
+                  ))}
+                </div>
+              : <div className='flex h-48 flex-col items-center justify-center gap-2 rounded-2xl bg-base-200 text-base-content/40'>
+                  <Gallery size={40} />
+                  <span className='text-sm'>تصویری ثبت نشده است.</span>
+                </div>
+              }
 
               <div>
-                <h3
-                  className='
-                      text-base-content/60
-                      text-sm
-                    '>
-                  عنوان
-                </h3>
-
-                <p
-                  className='
-                      mt-1
-                      font-bold
-                    '>
-                  {portfolio.title}
+                <h3 className='text-lg font-black'>{portfolio.title}</h3>
+                <p className='mt-2 whitespace-pre-line text-sm leading-7 text-base-content/65'>
+                  {portfolio.description}
                 </p>
               </div>
 
-              {/* Description */}
-
-              <div>
-                <h3
-                  className='
-                      text-base-content/60
-                      text-sm
-                    '>
-                  توضیحات
-                </h3>
-
-                <p
-                  className='
-                      mt-2
-                      leading-7
-                    '>
-                  {portfolio.description || "-"}
-                </p>
+              <div className='grid gap-3 sm:grid-cols-2'>
+                <Info label='دسته‌بندی' value={portfolio.category} />
+                <Info label='مشتری' value={portfolio.client} />
+                <Info label='مدت زمان' value={portfolio.duration} />
+                <Info label='نقش' value={portfolio.role} />
+                <Info label='وضعیت' value={portfolio.status} />
+                <Info label='ترتیب' value={portfolio.order} />
               </div>
 
-              {/* Status */}
+              <div>
+                <h4 className='font-black'>تکنولوژی‌ها</h4>
+                <div className='mt-3 flex flex-wrap gap-2'>
+                  {(portfolio.technologies || []).map((item) => (
+                    <span key={item} className='badge badge-outline'>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
 
-              <div
-                className='
-                    flex
-                    flex-wrap
-                    gap-3
-                  '>
-                <span
-                  className={`
-                      badge
-                      gap-1
-
-                      ${
-                        portfolio.status === "PUBLISHED" ?
-                          "badge-success"
-                        : "badge-warning"
-                      }
-                    `}>
-                  <TickCircle size={14} />
-
-                  {portfolio.status === "PUBLISHED" ? "منتشر شده" : "غیر منتشر"}
-                </span>
-
+              <div className='flex flex-wrap gap-2'>
                 {portfolio.featured && (
-                  <span
-                    className='
-                          badge
-                          badge-warning
-                          gap-1
-                        '>
+                  <span className='badge badge-warning gap-1'>
                     <Star1 size={14} />
-                    پروژه ویژه
+                    ویژه
                   </span>
                 )}
+
+                {portfolio.projectUrl && (
+                  <a
+                    href={portfolio.projectUrl}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='btn btn-sm btn-outline gap-2'>
+                    <Link1 size={16} />
+                    پروژه
+                  </a>
+                )}
+
+                {portfolio.githubUrl && (
+                  <a
+                    href={portfolio.githubUrl}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='btn btn-sm btn-outline gap-2'>
+                    <Hierarchy size={16} />
+                    GitHub
+                  </a>
+                )}
               </div>
 
-              {/* Links */}
+              <InfoBlock title='چالش' value={portfolio.challenge} />
+              <InfoBlock title='راهکار' value={portfolio.solution} />
 
-              <div
-                className='
-                    space-y-3
-                  '>
-                {portfolio.link && (
-                  <a
-                    href={portfolio.link}
-
-                    target='_blank'
-
-                    rel='noreferrer'
-
-                    className='
-                          btn
-                          btn-outline
-                          w-full
-                          gap-2
-                        '>
-                    <Link size={18} />
-                    مشاهده سایت
-                  </a>
-                )}
-
-                {portfolio.github && (
-                  <a
-                    href={portfolio.github}
-
-                    target='_blank'
-
-                    rel='noreferrer'
-
-                    className='
-                          btn
-                          btn-outline
-                          w-full
-                          gap-2
-                        '>
-                    <LuGithub size={18} />
-                    گیت‌هاب پروژه
-                  </a>
-                )}
+              <div>
+                <h4 className='font-black'>امکانات</h4>
+                <ul className='mt-3 space-y-2'>
+                  {(portfolio.features || []).map((item) => (
+                    <li
+                      key={item}
+                      className='rounded-xl bg-base-200 px-3 py-2 text-sm'>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </motion.aside>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
 };
+
+const Info = ({ label, value }) => (
+  <div className='rounded-2xl bg-base-200 p-3'>
+    <p className='text-xs text-base-content/50'>{label}</p>
+    <p className='mt-1 font-bold'>{value || "-"}</p>
+  </div>
+);
+
+const InfoBlock = ({ title, value }) => (
+  <div>
+    <h4 className='font-black'>{title}</h4>
+    <p className='mt-2 whitespace-pre-line text-sm leading-7 text-base-content/65'>
+      {value || "-"}
+    </p>
+  </div>
+);
 
 export default PortfolioDrawer;

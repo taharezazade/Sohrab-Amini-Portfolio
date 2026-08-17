@@ -1,62 +1,51 @@
 /** @format */
 
+import fs from "fs";
+import path from "path";
+
 import multer from "multer";
 
-/* =========================================================
-   Constants
-========================================================= */
+const UPLOAD_ROOT = path.join(process.cwd(), "uploads");
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const PORTFOLIO_UPLOAD_PATH = path.join(UPLOAD_ROOT, "portfolio");
 
-export const IMAGE_MIME_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/svg+xml",
-];
+fs.mkdirSync(PORTFOLIO_UPLOAD_PATH, {
+  recursive: true,
+});
 
-export const DOCUMENT_MIME_TYPES = [
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-];
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, PORTFOLIO_UPLOAD_PATH);
+  },
 
-export const ALLOWED_MIME_TYPES = [...IMAGE_MIME_TYPES, ...DOCUMENT_MIME_TYPES];
+  filename: (req, file, cb) => {
+    const extension = path.extname(file.originalname);
 
-/* =========================================================
-   Storage
-========================================================= */
+    const filename =
+      `${Date.now()}-${Math.round(Math.random() * 1e9)}` + extension;
 
-const storage = multer.memoryStorage();
+    cb(null, filename);
+  },
+});
 
-/* =========================================================
-   File Filter
-========================================================= */
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/svg+xml",
+  ];
 
-const fileFilter = (req, file, callback) => {
-  if (!file) {
-    const error = new Error("File is required.");
-    error.code = "FILE_REQUIRED";
-
-    return callback(error, false);
+  if (allowedTypes.includes(file.mimetype)) {
+    return cb(null, true);
   }
 
-  if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-    const error = new Error(
-      "Invalid file type. Supported files are JPG, PNG, WEBP, SVG, PDF, DOC and DOCX.",
-    );
+  const error = new Error("نوع فایل تصویر مجاز نیست.");
 
-    error.code = "INVALID_FILE_TYPE";
+  error.code = "INVALID_FILE_TYPE";
 
-    return callback(error, false);
-  }
-
-  callback(null, true);
+  return cb(error, false);
 };
-
-/* =========================================================
-   Multer Instance
-========================================================= */
 
 const multerConfig = multer({
   storage,
@@ -64,13 +53,12 @@ const multerConfig = multer({
   fileFilter,
 
   limits: {
-    fileSize: MAX_FILE_SIZE,
+    fileSize: 5 * 1024 * 1024,
+
     files: 20,
   },
 });
 
-/* =========================================================
-   Export
-========================================================= */
+export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export default multerConfig;

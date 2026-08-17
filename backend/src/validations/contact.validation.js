@@ -3,7 +3,25 @@
 import { z } from "zod";
 
 /* =========================================================
-   Normalize Iranian Phone Number
+   Normalize Digits
+========================================================= */
+
+const normalizeDigits = (value) => {
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  return value
+    .replace(/[۰-۹]/g, (digit) => {
+      return String(digit.charCodeAt(0) - 1776);
+    })
+    .replace(/[٠-٩]/g, (digit) => {
+      return String(digit.charCodeAt(0) - 1632);
+    });
+};
+
+/* =========================================================
+   Normalize Phone
 ========================================================= */
 
 const normalizePhone = (value) => {
@@ -11,22 +29,18 @@ const normalizePhone = (value) => {
     return value;
   }
 
-  let phone = value.trim();
+  let phone = normalizeDigits(value)
+    .trim()
+    .replace(/[\s\-()]/g, "");
 
-  // Remove spaces, dashes and parentheses
-  phone = phone.replace(/[\s\-()]/g, "");
-
-  // Convert +98XXXXXXXXXX to 0XXXXXXXXXX
   if (phone.startsWith("+98")) {
     phone = `0${phone.slice(3)}`;
   }
 
-  // Convert 0098XXXXXXXXXX to 0XXXXXXXXXX
   if (phone.startsWith("0098")) {
     phone = `0${phone.slice(4)}`;
   }
 
-  // Convert 9XXXXXXXXX to 09XXXXXXXXX
   if (/^9\d{9}$/.test(phone)) {
     phone = `0${phone}`;
   }
@@ -45,21 +59,7 @@ const phoneSchema = z
   .trim()
   .transform(normalizePhone)
   .refine((value) => /^09\d{9}$/.test(value), {
-    message: "Invalid phone number.",
-  });
-
-/* =========================================================
-   WhatsApp Schema
-========================================================= */
-
-const whatsappSchema = z
-  .string({
-    required_error: "WhatsApp number is required.",
-  })
-  .trim()
-  .transform(normalizePhone)
-  .refine((value) => /^09\d{9}$/.test(value), {
-    message: "Invalid WhatsApp number.",
+    message: "Invalid Iranian mobile phone number.",
   });
 
 /* =========================================================
@@ -75,10 +75,12 @@ const imageSchema = z
   .or(z.literal(""));
 
 /* =========================================================
-   Contact ID
+   ID Schema
 ========================================================= */
 
-const idSchema = z.string().cuid("Invalid Contact ID.");
+const idSchema = z.string({
+  required_error: "Contact ID is required.",
+});
 
 /* =========================================================
    Create Contact
@@ -87,7 +89,7 @@ const idSchema = z.string().cuid("Invalid Contact ID.");
 export const createContactSchema = z.object({
   phone: phoneSchema,
 
-  whatsapp: whatsappSchema,
+  whatsapp: phoneSchema,
 
   image: imageSchema,
 });
@@ -96,13 +98,23 @@ export const createContactSchema = z.object({
    Update Contact
 ========================================================= */
 
-export const updateContactSchema = z.object({
-  phone: phoneSchema.optional(),
+export const updateContactSchema = z
+  .object({
+    phone: phoneSchema.optional(),
 
-  whatsapp: whatsappSchema.optional(),
+    whatsapp: phoneSchema.optional(),
 
-  image: imageSchema,
-});
+    image: imageSchema,
+  })
+  .refine(
+    (data) =>
+      data.phone !== undefined ||
+      data.whatsapp !== undefined ||
+      data.image !== undefined,
+    {
+      message: "At least one contact field must be provided.",
+    },
+  );
 
 /* =========================================================
    Contact Params
@@ -118,4 +130,20 @@ export const contactParamsSchema = z.object({
 
 export const contactImageSchema = z.object({
   image: imageSchema,
+});
+
+/* =========================================================
+   Contact Phone
+========================================================= */
+
+export const contactPhoneSchema = z.object({
+  phone: phoneSchema,
+});
+
+/* =========================================================
+   Contact WhatsApp
+========================================================= */
+
+export const contactWhatsappSchema = z.object({
+  whatsapp: phoneSchema,
 });

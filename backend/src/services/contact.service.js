@@ -7,33 +7,33 @@ import {
   updateContactSchema,
   contactParamsSchema,
   contactImageSchema,
+  contactPhoneSchema,
+  contactWhatsappSchema,
 } from "../validations/contact.validation.js";
 
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 class ContactService {
-  /* =========================================================
-     Get Contact
-  ========================================================= */
-
   async getContact() {
     const contact = await contactRepository.find();
+
+    console.log("🔎 REPOSITORY CONTACT:", contact);
 
     if (!contact) {
       throw new ApiError(404, "Contact information not found.");
     }
 
-    return new ApiResponse(
+    const response = new ApiResponse(
       200,
       contact,
       "Contact information fetched successfully.",
     );
-  }
 
-  /* =========================================================
-     Get Contact By ID
-  ========================================================= */
+    console.log("📤 CONTACT API RESPONSE:", response);
+
+    return response;
+  }
 
   async getContactById(id) {
     contactParamsSchema.parse({
@@ -53,10 +53,6 @@ class ContactService {
     );
   }
 
-  /* =========================================================
-     Create Contact
-  ========================================================= */
-
   async createContact(payload) {
     const data = createContactSchema.parse(payload);
 
@@ -69,7 +65,7 @@ class ContactService {
     const contact = await contactRepository.create({
       phone: data.phone,
       whatsapp: data.whatsapp,
-      image: data.image || null,
+      image: data.image ?? null,
     });
 
     return new ApiResponse(
@@ -78,10 +74,6 @@ class ContactService {
       "Contact information created successfully.",
     );
   }
-
-  /* =========================================================
-     Update Contact
-  ========================================================= */
 
   async updateContact(id, payload) {
     contactParamsSchema.parse({
@@ -96,52 +88,70 @@ class ContactService {
       throw new ApiError(404, "Contact information not found.");
     }
 
-    const updateData = {};
-
-    if (data.phone !== undefined) {
-      updateData.phone = data.phone;
-    }
-
-    if (data.whatsapp !== undefined) {
-      updateData.whatsapp = data.whatsapp;
-    }
-
-    if (data.image !== undefined) {
-      updateData.image = data.image || null;
-    }
-
-    const updatedContact = await contactRepository.update(id, updateData);
+    const updated = await contactRepository.update(id, data);
 
     return new ApiResponse(
       200,
-      updatedContact,
+      updated,
       "Contact information updated successfully.",
     );
   }
 
-  /* =========================================================
-     Upsert Contact
-  ========================================================= */
+  /*
+   * THIS IS THE IMPORTANT METHOD
+   *
+   * PUT /api/contact
+   *
+   * If a Contact exists:
+   *   UPDATE
+   *
+   * If no Contact exists:
+   *   CREATE
+   */
 
   async upsertContact(payload) {
     const data = updateContactSchema.parse(payload);
 
-    const existingContact = await contactRepository.find();
+    let contact = await contactRepository.find();
 
-    if (existingContact) {
-      const updated = await contactRepository.update(existingContact.id, data);
+    if (contact) {
+      contact = await contactRepository.update(contact.id, {
+        ...(data.phone !== undefined && {
+          phone: data.phone,
+        }),
 
-      return new ApiResponse(
-        200,
-        updated,
-        "Contact information updated successfully.",
+        ...(data.whatsapp !== undefined && {
+          whatsapp: data.whatsapp,
+        }),
+
+        ...(data.image !== undefined && {
+          image: data.image,
+        }),
+      });
+
+      return new ApiResponse({
+        statusCode: 200,
+        data: contact,
+        message: "Contact information fetched successfully.",
+      });
+    }
+
+    /*
+     * No Contact exists.
+     * First save must create it.
+     */
+
+    if (!data.phone || !data.whatsapp) {
+      throw new ApiError(
+        400,
+        "Phone and WhatsApp are required when creating contact information.",
       );
     }
 
-    const contact = await contactRepository.create({
+    contact = await contactRepository.create({
       phone: data.phone,
       whatsapp: data.whatsapp,
-      image: data.image || null,
+      image: data.image ?? null,
     });
 
     return new ApiResponse(
@@ -150,10 +160,6 @@ class ContactService {
       "Contact information created successfully.",
     );
   }
-
-  /* =========================================================
-     Delete Contact
-  ========================================================= */
 
   async deleteContact(id) {
     contactParamsSchema.parse({
@@ -175,10 +181,6 @@ class ContactService {
     );
   }
 
-  /* =========================================================
-     Exists
-  ========================================================= */
-
   async exists() {
     const exists = await contactRepository.exists();
 
@@ -191,10 +193,6 @@ class ContactService {
     );
   }
 
-  /* =========================================================
-     Count
-  ========================================================= */
-
   async count() {
     const total = await contactRepository.count();
 
@@ -206,10 +204,6 @@ class ContactService {
       "Contact count fetched successfully.",
     );
   }
-
-  /* =========================================================
-     Update Image
-  ========================================================= */
 
   async updateImage(id, payload) {
     contactParamsSchema.parse({
@@ -224,15 +218,64 @@ class ContactService {
       throw new ApiError(404, "Contact information not found.");
     }
 
-    const updatedContact = await contactRepository.updateImage(
+    const updated = await contactRepository.updateImage(id, data.image ?? null);
+
+    return new ApiResponse(200, updated, "Contact image updated successfully.");
+  }
+
+  async clearImage(id) {
+    contactParamsSchema.parse({
       id,
-      data.image || null,
-    );
+    });
+
+    const contact = await contactRepository.findById(id);
+
+    if (!contact) {
+      throw new ApiError(404, "Contact information not found.");
+    }
+
+    const updated = await contactRepository.clearImage(id);
+
+    return new ApiResponse(200, updated, "Contact image cleared successfully.");
+  }
+
+  async updatePhone(id, payload) {
+    contactParamsSchema.parse({
+      id,
+    });
+
+    const { phone } = contactPhoneSchema.parse(payload);
+
+    const contact = await contactRepository.findById(id);
+
+    if (!contact) {
+      throw new ApiError(404, "Contact information not found.");
+    }
+
+    const updated = await contactRepository.updatePhone(id, phone);
+
+    return new ApiResponse(200, updated, "Contact phone updated successfully.");
+  }
+
+  async updateWhatsapp(id, payload) {
+    contactParamsSchema.parse({
+      id,
+    });
+
+    const { whatsapp } = contactWhatsappSchema.parse(payload);
+
+    const contact = await contactRepository.findById(id);
+
+    if (!contact) {
+      throw new ApiError(404, "Contact information not found.");
+    }
+
+    const updated = await contactRepository.updateWhatsapp(id, whatsapp);
 
     return new ApiResponse(
       200,
-      updatedContact,
-      "Contact image updated successfully.",
+      updated,
+      "Contact WhatsApp updated successfully.",
     );
   }
 }

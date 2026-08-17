@@ -1,3 +1,5 @@
+/** @format */
+
 import { motion } from "framer-motion";
 
 import { portfolioSection } from "./portfolio.data";
@@ -30,9 +32,8 @@ function PortfolioHeader() {
           text-4xl
           font-black
           leading-tight
-            text-primary
+          text-primary
           md:text-5xl
-
           lg:text-6xl
         "
       >
@@ -48,7 +49,6 @@ function PortfolioHeader() {
           max-w-3xl
           leading-9
           text-base-content/70
-
           lg:text-lg
         "
       >

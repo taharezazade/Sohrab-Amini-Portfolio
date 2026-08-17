@@ -27,75 +27,98 @@ function PortfolioCard({ project, onOpen }) {
       whileHover={{
         y: -10,
       }}
-      className='
+      className="
         flex flex-col overflow-hidden
         h-full
         bg-base-100
         rounded-[32px] border border-base-300
         shadow-xl transition-all duration-500
         group
-      '>
+      "
+    >
       <PortfolioBrowser project={project} />
 
       <div
-        className='
+        className="
           flex flex-1 flex-col
           p-6
-        '>
+        "
+      >
         <div>
           <span
-            className='
+            className="
               badge badge-outline
-            '>
-            {project.category}
+            "
+          >
+            {project.category || "عمومی"}
           </span>
 
           <h3
-            className='
+            className="
               mt-4
               text-2xl font-black
-            '>
+            "
+          >
             {project.title}
           </h3>
 
           <p
-            className='
+            className="
               mt-4
               leading-8 text-base-content/70
-            '>
+            "
+          >
             {project.description}
           </p>
         </div>
 
         <PortfolioTags technologies={project.technologies} />
 
-        {/* این قسمت باعث می‌شود دکمه‌ها همیشه پایین کارت قرار بگیرند */}
         <div
-          className='
+          className="
             mt-auto pt-8
-          '>
+          "
+        >
           <div
-            className='
+            className="
               flex items-center justify-between
               gap-3
-            '>
-            <a
-              href={project.liveUrl}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='
-                flex-1
-                rounded-full
-                btn btn-primary
-                shadow-none
-              '>
-              <Global size={18} variant='Bulk' />
-              مشاهده
-            </a>
+            "
+          >
+            {project.liveUrl ? (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  flex-1
+                  rounded-full btn btn-primary
+                  shadow-none
+                "
+              >
+                <Global size={18} variant="Bulk" />
+                مشاهده
+              </a>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="
+                  flex-1
+                  rounded-full btn btn-primary
+                  shadow-none
+                  opacity-50
+                "
+              >
+                <Global size={18} variant="Bulk" />
+                مشاهده
+              </button>
+            )}
 
             <button
+              type="button"
               onClick={() => onOpen(project)}
-              className='
+              className="
                 btn
                 btn-outline
                 outline-none
@@ -103,7 +126,8 @@ function PortfolioCard({ project, onOpen }) {
                 rounded-full
                 shadow-none
                 flex-1
-              '>
+              "
+            >
               جزئیات پروژه
             </button>
           </div>

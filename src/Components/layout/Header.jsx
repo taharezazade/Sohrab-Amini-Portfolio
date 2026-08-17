@@ -107,7 +107,7 @@ function Header() {
   return (
     <>
       {/* Desktop */}
-      <header className='fixed top-6 left-1/2 -translate-x-1/2 z-50 hidden md:block'>
+      <header className='fixed top-6 left-1/2 -translate-x-1/2 z-40 hidden md:block'>
         <LiquidGlass
           displace={2}
           distortionScale={-180}

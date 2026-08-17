@@ -8,7 +8,6 @@ import ContactPreview from "./ContactPreview";
 const ContactSettings = ({
   values,
   loading = false,
-
   onChange,
   onImageChange,
   onSubmit,
@@ -33,7 +32,7 @@ const ContactSettings = ({
       '>
       {/* Form */}
 
-      <div className='xl:col-span-3'>
+      <div className='space-y-6 xl:col-span-3'>
         <ContactForm
           values={values}
           loading={loading}

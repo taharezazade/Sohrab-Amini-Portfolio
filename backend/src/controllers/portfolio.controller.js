@@ -1,173 +1,192 @@
 /** @format */
 
 import portfolioService from "../services/portfolio.service.js";
+import {
+  createPortfolioSchema,
+  updatePortfolioSchema,
+  updatePortfolioOrderSchema,
+  updatePortfolioStatusSchema,
+} from "../validations/portfolio.validation.js";
+
+import ApiResponse from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
+
+const parseArray = (value) => {
+  if (Array.isArray(value)) return value;
+
+  if (typeof value !== "string") return [];
+
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+};
+
+const parseBoolean = (value) => value === true || value === "true";
+
+const normalizeBody = (body = {}, file = null) => ({
+  ...body,
+  thumbnail: file?.publicPath || body.thumbnail || "",
+  technologies: parseArray(body.technologies),
+  features: parseArray(body.features),
+  featured: parseBoolean(body.featured),
+  order: Number(body.order || 0),
+});
+
+const validate = (schema, data) => {
+  const result = schema.safeParse(data);
+
+  if (!result.success) {
+    throw new ApiError(
+      400,
+      result.error.issues?.[0]?.message || "اطلاعات ارسالی معتبر نیست.",
+    );
+  }
+
+  return result.data;
+};
 
 class PortfolioController {
-  /* =========================================
-      Create Portfolio
-  ========================================= */
-
-  async create(req, res, next) {
-    try {
-      const response = await portfolioService.create(req.body);
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* =========================================
-      Get All Portfolios
-  ========================================= */
-
   async getAll(req, res, next) {
     try {
-      const response = await portfolioService.getAll();
-
-      return res.status(response.statusCode).json(response);
+      const result = await portfolioService.getAll(req.query);
+      return res
+        .status(200)
+        .json(ApiResponse.ok(result, "نمونه‌کارها با موفقیت دریافت شدند."));
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
-
-  /* =========================================
-      Get Published Portfolios
-  ========================================= */
 
   async getPublished(req, res, next) {
     try {
-      const response = await portfolioService.getPublished();
-
-      return res.status(response.statusCode).json(response);
+      const result = await portfolioService.getPublished();
+      return res
+        .status(200)
+        .json(ApiResponse.ok(result, "نمونه‌کارهای منتشرشده دریافت شدند."));
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
-
-  /* =========================================
-      Get Featured Portfolios
-  ========================================= */
 
   async getFeatured(req, res, next) {
     try {
-      const response = await portfolioService.getFeatured();
-
-      return res.status(response.statusCode).json(response);
+      const result = await portfolioService.getFeatured();
+      return res
+        .status(200)
+        .json(ApiResponse.ok(result, "نمونه‌کارهای ویژه دریافت شدند."));
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
-
-  /* =========================================
-      Get Portfolio By ID
-  ========================================= */
 
   async getById(req, res, next) {
     try {
-      const { id } = req.params;
-
-      const response = await portfolioService.getById(id);
-
-      return res.status(response.statusCode).json(response);
+      const result = await portfolioService.getById(req.params.id);
+      return res
+        .status(200)
+        .json(ApiResponse.ok(result, "نمونه‌کار با موفقیت دریافت شد."));
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
-
-  /* =========================================
-      Get Portfolio By Slug
-  ========================================= */
 
   async getBySlug(req, res, next) {
     try {
-      const { slug } = req.params;
-
-      const response = await portfolioService.getBySlug(slug);
-
-      return res.status(response.statusCode).json(response);
+      const result = await portfolioService.getBySlug(req.params.slug);
+      return res
+        .status(200)
+        .json(ApiResponse.ok(result, "نمونه‌کار با موفقیت دریافت شد."));
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 
-  /* =========================================
-      Update Portfolio
-  ========================================= */
+  async create(req, res, next) {
+    try {
+      const body = normalizeBody(req.body, req.file);
+      const data = validate(createPortfolioSchema, body);
+
+      const result = await portfolioService.create(data);
+
+      return res
+        .status(201)
+        .json(ApiResponse.created(result, "نمونه‌کار با موفقیت ایجاد شد."));
+    } catch (error) {
+      return next(error);
+    }
+  }
 
   async update(req, res, next) {
     try {
-      const { id } = req.params;
+      const body = normalizeBody(req.body, req.file);
+      const data = validate(updatePortfolioSchema, body);
 
-      const response = await portfolioService.update(id, req.body);
+      const result = await portfolioService.update(req.params.id, data);
 
-      return res.status(response.statusCode).json(response);
+      return res
+        .status(200)
+        .json(
+          ApiResponse.updated(
+            result,
+            "نمونه‌کار با موفقیت به‌روزرسانی شد.",
+          ),
+        );
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
-
-  /* =========================================
-      Delete Portfolio
-  ========================================= */
 
   async delete(req, res, next) {
     try {
-      const { id } = req.params;
-
-      const response = await portfolioService.delete(id);
-
-      return res.status(response.statusCode).json(response);
+      await portfolioService.delete(req.params.id);
+      return res
+        .status(200)
+        .json(ApiResponse.deleted("نمونه‌کار با موفقیت حذف شد."));
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
-
-  /* =========================================
-      Update Status
-  ========================================= */
 
   async updateStatus(req, res, next) {
     try {
-      const { id } = req.params;
+      const data = validate(updatePortfolioStatusSchema, req.body);
+      const result = await portfolioService.updateStatus(
+        req.params.id,
+        data.status,
+      );
 
-      const response = await portfolioService.updateStatus(id, req.body);
-
-      return res.status(response.statusCode).json(response);
+      return res
+        .status(200)
+        .json(ApiResponse.updated(result, "وضعیت نمونه‌کار با موفقیت تغییر کرد."));
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
-
-  /* =========================================
-      Toggle Featured
-  ========================================= */
-
-  async toggleFeatured(req, res, next) {
-    try {
-      const { id } = req.params;
-
-      const response = await portfolioService.toggleFeatured(id, req.body);
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* =========================================
-      Update Order
-  ========================================= */
 
   async updateOrder(req, res, next) {
     try {
-      const { id } = req.params;
+      const data = validate(updatePortfolioOrderSchema, req.body);
+      const result = await portfolioService.updateOrder(
+        req.params.id,
+        data.order,
+      );
 
-      const response = await portfolioService.updateOrder(id, req.body);
-
-      return res.status(response.statusCode).json(response);
+      return res
+        .status(200)
+        .json(
+          ApiResponse.updated(
+            result,
+            "ترتیب نمونه‌کار با موفقیت تغییر کرد.",
+          ),
+        );
     } catch (error) {
-      next(error);
+      return next(error);
     }
   }
 }

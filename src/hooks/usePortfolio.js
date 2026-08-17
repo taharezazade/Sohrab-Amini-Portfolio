@@ -3,12 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 
 import portfolioService from "@/services/portfolio.service";
+import { normalizePortfolio } from "@/utils/portfolio.mapper";
 
 export default function usePortfolio() {
   const [portfolio, setPortfolio] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState(null);
 
   const fetchPortfolio = useCallback(async () => {
@@ -16,13 +15,19 @@ export default function usePortfolio() {
       setLoading(true);
       setError(null);
 
-      const response = await portfolioService.getPortfolio();
+      const response = await portfolioService.getPublishedPortfolio();
 
-      const data = response.data?.data;
+      const data =
+        response?.data?.data ??
+        response?.data?.portfolio ??
+        response?.data ??
+        [];
 
-      setPortfolio(Array.isArray(data) ? data : []);
+      const items = Array.isArray(data) ? data : [];
+
+      setPortfolio(items.map(normalizePortfolio).filter(Boolean));
     } catch (err) {
-      console.error("Failed to fetch portfolio:", err);
+      console.error("Failed to fetch published portfolio:", err);
 
       setError(err);
       setPortfolio([]);

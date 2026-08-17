@@ -42,27 +42,19 @@ const errorMiddleware = (error, req, res, next) => {
 
   const response = {
     success: false,
-
     statusCode: err.statusCode,
-
     message: err.message,
-
     errors: err.errors || [],
-
     timestamp: err.timestamp,
   };
 
   /* =======================================================
-     DEVELOPMENT STACK
+     DEVELOPMENT
   ======================================================= */
 
   if (env.NODE_ENV === "development") {
     response.stack = err.stack;
   }
-
-  /* =======================================================
-     SEND RESPONSE
-  ======================================================= */
 
   return res.status(err.statusCode).json(response);
 };

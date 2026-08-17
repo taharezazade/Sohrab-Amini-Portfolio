@@ -8,6 +8,8 @@ import ContactMethods from "./ContactMethods";
 import ContactFeatures from "./ContactFeatures";
 import ContactCTA from "./ContactCTA";
 
+import useContact from "@/hooks/useContact";
+
 import {
   containerVariants,
   fadeLeftVariants,
@@ -15,55 +17,15 @@ import {
 } from "./contact.animations";
 
 function Contact() {
+  const { contact } = useContact();
+
   return (
-    <section
-      id='contact'
-      className='
-        relative
-        overflow-hidden
-        pt-28
-      '>
-      {/* Background Glow */}
+    <section id='contact' className='relative overflow-hidden'>
+      <div className='pointer-events-none absolute left-1/2 top-0 h-[550px] w-[550px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-[160px]' />
 
-      <div
-        className='
-          pointer-events-none
-          absolute
-          top-0
-          left-1/2
-          h-[550px]
-          w-[550px]
-          -translate-x-1/2
-          rounded-full
-          bg-primary/5
-          blur-[160px]
-        '
-      />
+      <div className='pointer-events-none absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full bg-secondary/10 blur-[140px]' />
 
-      <div
-        className='
-          pointer-events-none
-          absolute
-          -bottom-32
-          -left-32
-          h-[400px]
-          w-[400px]
-          rounded-full
-          bg-secondary/10
-          blur-[140px]
-        '
-      />
-
-      <div
-        className='
-          container
-          relative
-          z-10
-          mx-auto
-          px-4
-        '>
-        {/* ================= Hero ================= */}
-
+      <div className='container relative z-10 mx-auto px-4'>
         <motion.div
           variants={containerVariants}
           initial='hidden'
@@ -72,42 +34,33 @@ function Contact() {
             once: true,
             amount: 0.2,
           }}
-          className='
-            grid
-            items-center
-            gap-16
-            lg:grid-cols-2
-          '>
+          className='grid items-center gap-16 lg:grid-cols-2'>
+          {/* Contact Information - API */}
           <motion.div variants={fadeLeftVariants}>
-            <ContactHero />
+            <ContactHero contact={contact} />
           </motion.div>
 
+          {/* Sohrab Image - STATIC */}
           <motion.div
             variants={fadeRightVariants}
-            className='
-              order-first
-              lg:order-last
-            '>
+            className='order-first lg:order-last'>
             <ContactImage />
           </motion.div>
         </motion.div>
 
-        {/* ================= Contact Methods ================= */}
-
-        <div className='mt-24'>
-          <ContactMethods />
+        {/* Contact Methods - API */}
+        <div className='mt-10'>
+          <ContactMethods contact={contact} />
         </div>
 
-        {/* ================= Features ================= */}
-
+        {/* Features - Static */}
         <div className='mt-28'>
           <ContactFeatures />
         </div>
 
-        {/* ================= CTA ================= */}
-
-        <div className='mt-28'>
-          <ContactCTA />
+        {/* CTA */}
+        <div className=''>
+          <ContactCTA contact={contact} />
         </div>
       </div>
     </section>

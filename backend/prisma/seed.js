@@ -7,48 +7,55 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+/* =========================================================
+   MAIN
+========================================================= */
+
 async function main() {
-  console.log("🌱 Seeding database...");
+  console.log("");
+  console.log("========================================");
+  console.log("🌱 Starting database seed...");
+  console.log("========================================");
+  console.log("");
 
-  ////////////////////////////////////////////////////////////
-  // ADMIN
-  ////////////////////////////////////////////////////////////
+  /* =========================================================
+     ADMIN
+  ========================================================= */
 
-  const hashedPassword = await bcrypt.hash(
-    process.env.ADMIN_PASSWORD || "Admin123456",
-    12,
-  );
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@sohrabamini.dev";
+
+  const adminUsername = process.env.ADMIN_USERNAME || "sohrabadmin";
+
+  const adminPassword = process.env.ADMIN_PASSWORD || "Admin123456";
+
+  const hashedPassword = await bcrypt.hash(adminPassword, 12);
 
   await prisma.admin.upsert({
     where: {
-      email: process.env.ADMIN_EMAIL || "admin@sohrabamini.dev",
+      email: adminEmail,
     },
 
     update: {
-      username: process.env.ADMIN_USERNAME || "sohrabadmin",
-
+      username: adminUsername,
       password: hashedPassword,
 
       displayName: "سهراب امینی",
 
       firstName: "سهراب",
-
       lastName: "امینی",
 
-      bio: "توسعه دهنده حرفه‌ای وردپرس و PHP Backend Developer",
+      bio: "توسعه دهنده حرفه‌ای وردپرس، PHP و سیستم‌های اختصاصی وب",
     },
 
     create: {
-      username: process.env.ADMIN_USERNAME || "sohrabadmin",
-
-      email: process.env.ADMIN_EMAIL || "admin@sohrabamini.dev",
+      username: adminUsername,
+      email: adminEmail,
 
       password: hashedPassword,
 
       displayName: "سهراب امینی",
 
       firstName: "سهراب",
-
       lastName: "امینی",
 
       bio: "توسعه دهنده حرفه‌ای وردپرس، PHP و سیستم‌های اختصاصی وب",
@@ -59,13 +66,13 @@ async function main() {
 
   console.log("✅ Admin seeded");
 
-  ////////////////////////////////////////////////////////////
-  // HERO
-  ////////////////////////////////////////////////////////////
+  /* =========================================================
+     HERO
+  ========================================================= */
 
-  const hero = await prisma.hero.findFirst();
+  const existingHero = await prisma.hero.findFirst();
 
-  if (!hero) {
+  if (!existingHero) {
     await prisma.hero.create({
       data: {
         title: "توسعه دهنده حرفه‌ای وردپرس",
@@ -99,13 +106,13 @@ async function main() {
 
   console.log("✅ Hero seeded");
 
-  ////////////////////////////////////////////////////////////
-  // ABOUT
-  ////////////////////////////////////////////////////////////
+  /* =========================================================
+     ABOUT
+  ========================================================= */
 
-  const about = await prisma.about.findFirst();
+  const existingAbout = await prisma.about.findFirst();
 
-  if (!about) {
+  if (!existingAbout) {
     await prisma.about.create({
       data: {
         title: "درباره من",
@@ -118,20 +125,19 @@ async function main() {
         location: "تهران، ایران",
 
         experience: 5,
-
-        image: "/uploads/about/about.webp",
       },
     });
   }
 
   console.log("✅ About seeded");
-  ////////////////////////////////////////////////////////////
-  // SERVICES
-  ////////////////////////////////////////////////////////////
+
+  /* =========================================================
+     SERVICES
+  ========================================================= */
 
   const servicesCount = await prisma.service.count();
 
-  if (!servicesCount) {
+  if (servicesCount === 0) {
     await prisma.service.createMany({
       data: [
         {
@@ -353,78 +359,343 @@ async function main() {
   }
 
   console.log("✅ Services seeded");
-  ////////////////////////////////////////////////////////////
-  // PORTFOLIO
-  ////////////////////////////////////////////////////////////
 
-  const portfolioCount = await prisma.portfolio.count();
+  /* =========================================================
+     PORTFOLIO
+  ========================================================= */
 
-  if (!portfolioCount) {
-    await prisma.portfolio.create({
-      data: {
-        title: "وب سایت شرکتی وردپرس",
+  const portfolioProjects = [
+    {
+      title: "ندای مهر امید",
 
-        slug: "corporate-wordpress-website",
+      slug: "nedayemehromid",
 
-        description:
-          "طراحی و توسعه وب سایت شرکتی اختصاصی وردپرس شامل توسعه قالب، برنامه نویسی PHP، بهینه سازی MySQL، افزایش امنیت، REST API و بهبود عملکرد.",
+      description:
+        "وب‌سایت شرکتی با طراحی مدرن، ساختار اختصاصی و پنل مدیریت ساده برای معرفی خدمات و ارتباط با مشتریان.",
 
-        thumbnail: "/uploads/portfolio/corporate-wordpress.webp",
+      thumbnail: "/uploads/portfolio/nedayemehromid.webp",
 
-        projectUrl: "",
+      projectUrl: "https://nedayemehromid.ir",
 
-        githubUrl: "",
+      githubUrl: null,
 
-        category: "WordPress",
+      category: "شرکتی",
 
-        technologies: [
-          "PHP",
-          "WordPress",
-          "MySQL",
-          "JavaScript",
-          "HTML5",
-          "CSS3",
-          "REST API",
-        ],
+      features: [
+        "طراحی اختصاصی",
+        "پنل مدیریت",
+        "طراحی ریسپانسیو",
+        "بهینه سازی سرعت",
+      ],
 
-        featured: true,
+      technologies: [
+        "WordPress",
+        "PHP",
+        "MySQL",
+        "HTML5",
+        "CSS3",
+        "JavaScript",
+      ],
 
-        order: 1,
+      featured: true,
 
-        status: "PUBLISHED",
+      order: 1,
 
-        images: {
-          create: [
-            {
-              image: "/uploads/portfolio/corporate-home.webp",
+      status: "PUBLISHED",
 
-              alt: "صفحه اصلی",
+      images: [
+        {
+          image: "/uploads/portfolio/nedayemehromid.webp",
 
-              order: 0,
-            },
+          alt: "وب‌سایت ندای مهر امید",
 
-            {
-              image: "/uploads/portfolio/corporate-dashboard.webp",
-
-              alt: "پنل مدیریت",
-
-              order: 1,
-            },
-          ],
+          order: 0,
         },
+      ],
+    },
+
+    {
+      title: "ایران توتون",
+
+      slug: "irantobaccoex",
+
+      description:
+        "طراحی وب‌سایت شرکتی با تمرکز بر معرفی محصولات، خدمات و ایجاد پنل مدیریت قابل توسعه.",
+
+      thumbnail: "/uploads/portfolio/irantobaccoex.webp",
+
+      projectUrl: "https://irantobaccoex.com",
+
+      githubUrl: null,
+
+      category: "تجاری",
+
+      features: ["معرفی محصولات", "پنل مدیریت", "طراحی ریسپانسیو"],
+
+      technologies: ["WordPress", "PHP", "MySQL", "REST API"],
+
+      featured: false,
+
+      order: 2,
+
+      status: "PUBLISHED",
+
+      images: [
+        {
+          image: "/uploads/portfolio/irantobaccoex.webp",
+
+          alt: "وب‌سایت ایران توتون",
+
+          order: 0,
+        },
+      ],
+    },
+
+    {
+      title: "بلک کلوز",
+
+      slug: "blackclothes",
+
+      description:
+        "طراحی فروشگاه اینترنتی با تمرکز بر رابط کاربری مدرن، سرعت بالا و فرآیند خرید آسان.",
+
+      thumbnail: "/uploads/portfolio/blackclothes.webp",
+
+      projectUrl: "https://blackclothes.ir",
+
+      githubUrl: null,
+
+      category: "فروشگاهی",
+
+      features: [
+        "فروشگاه اینترنتی",
+        "سبد خرید",
+        "طراحی ریسپانسیو",
+        "بهینه سازی سرعت",
+      ],
+
+      technologies: ["WooCommerce", "WordPress", "PHP", "CSS3"],
+
+      featured: false,
+
+      order: 3,
+
+      status: "PUBLISHED",
+
+      images: [
+        {
+          image: "/uploads/portfolio/blackclothes.webp",
+
+          alt: "فروشگاه بلک کلوز",
+
+          order: 0,
+        },
+      ],
+    },
+
+    {
+      title: "سهند برش",
+
+      slug: "sahandboresh",
+
+      description: "وب‌سایت شرکتی برای معرفی خدمات، تجهیزات و پروژه‌های صنعتی.",
+
+      thumbnail: "/uploads/portfolio/sahandboresh.webp",
+
+      projectUrl: "https://sahandboresh.com",
+
+      githubUrl: null,
+
+      category: "صنعتی",
+
+      features: ["معرفی خدمات", "معرفی تجهیزات", "نمونه پروژه‌ها"],
+
+      technologies: ["WordPress", "PHP", "MySQL"],
+
+      featured: false,
+
+      order: 4,
+
+      status: "PUBLISHED",
+
+      images: [
+        {
+          image: "/uploads/portfolio/sahandboresh.webp",
+
+          alt: "وب‌سایت سهند برش",
+
+          order: 0,
+        },
+      ],
+    },
+
+    {
+      title: "جهان چرم",
+
+      slug: "jahan-charm",
+
+      description:
+        "طراحی فروشگاه اینترنتی با تمرکز بر نمایش حرفه‌ای محصولات و افزایش نرخ تبدیل.",
+
+      thumbnail: "/uploads/portfolio/jahancharm.webp",
+
+      projectUrl: "https://jahan-charm.ir",
+
+      githubUrl: null,
+
+      category: "فروشگاهی",
+
+      features: [
+        "فروشگاه اینترنتی",
+        "نمایش حرفه‌ای محصولات",
+        "طراحی ریسپانسیو",
+      ],
+
+      technologies: ["WooCommerce", "WordPress", "PHP"],
+
+      featured: false,
+
+      order: 5,
+
+      status: "PUBLISHED",
+
+      images: [
+        {
+          image: "/uploads/portfolio/jahancharm.webp",
+
+          alt: "فروشگاه جهان چرم",
+
+          order: 0,
+        },
+      ],
+    },
+
+    {
+      title: "آهنگری منتظری",
+
+      slug: "ahangarimontazeri",
+
+      description:
+        "طراحی وب‌سایت اختصاصی برای معرفی خدمات و نمونه پروژه‌های صنعتی.",
+
+      thumbnail: "/uploads/portfolio/ahangarimontazeri.webp",
+
+      projectUrl: "https://ahangarimontazeri.ir",
+
+      githubUrl: null,
+
+      category: "شرکتی",
+
+      features: ["معرفی خدمات", "نمونه پروژه‌های صنعتی", "طراحی اختصاصی"],
+
+      technologies: ["WordPress", "PHP", "MySQL"],
+
+      featured: false,
+
+      order: 6,
+
+      status: "PUBLISHED",
+
+      images: [
+        {
+          image: "/uploads/portfolio/ahangarimontazeri.webp",
+
+          alt: "وب‌سایت آهنگری منتظری",
+
+          order: 0,
+        },
+      ],
+    },
+
+    {
+      title: "کیمیا پژوهان",
+
+      slug: "kimiapajoohan",
+
+      description:
+        "طراحی وب‌سایت مدرن جهت معرفی خدمات، تجهیزات و فعالیت‌های پژوهشی.",
+
+      thumbnail: "/uploads/portfolio/kimiapajoohan.webp",
+
+      projectUrl: "https://kimiapajoohan.com",
+
+      githubUrl: null,
+
+      category: "آزمایشگاهی",
+
+      features: ["معرفی خدمات", "معرفی تجهیزات", "طراحی مدرن"],
+
+      technologies: ["WordPress", "PHP", "JavaScript"],
+
+      featured: false,
+
+      order: 7,
+
+      status: "PUBLISHED",
+
+      images: [
+        {
+          image: "/uploads/portfolio/kimiapajoohan.webp",
+
+          alt: "وب‌سایت کیمیا پژوهان",
+
+          order: 0,
+        },
+      ],
+    },
+  ];
+
+  for (const project of portfolioProjects) {
+    const existingPortfolio = await prisma.portfolio.findUnique({
+      where: {
+        slug: project.slug,
       },
     });
+
+    if (!existingPortfolio) {
+      await prisma.portfolio.create({
+        data: {
+          title: project.title,
+
+          slug: project.slug,
+
+          description: project.description,
+
+          thumbnail: project.thumbnail,
+
+          projectUrl: project.projectUrl,
+
+          githubUrl: project.githubUrl,
+
+          category: project.category,
+
+          features: project.features,
+
+          technologies: project.technologies,
+
+          featured: project.featured,
+
+          order: project.order,
+
+          status: project.status,
+
+          images: {
+            create: project.images,
+          },
+        },
+      });
+    }
   }
 
   console.log("✅ Portfolio seeded");
 
-  ////////////////////////////////////////////////////////////
-  // CONTACT
-  ////////////////////////////////////////////////////////////
+  /* =========================================================
+     CONTACT
+  ========================================================= */
 
-  const contact = await prisma.contact.findFirst();
+  const existingContact = await prisma.contact.findFirst();
 
-  if (!contact) {
+  if (!existingContact) {
     await prisma.contact.create({
       data: {
         phone: "+98xxxxxxxxxx",
@@ -437,19 +708,16 @@ async function main() {
   }
 
   console.log("✅ Contact seeded");
-  ////////////////////////////////////////////////////////////
-  // SETTINGS
-  ////////////////////////////////////////////////////////////
 
-  const setting = await prisma.setting.findFirst();
+  /* =========================================================
+     SETTINGS
+  ========================================================= */
 
-  if (!setting) {
+  const existingSetting = await prisma.setting.findFirst();
+
+  if (!existingSetting) {
     await prisma.setting.create({
       data: {
-        //////////////////////////////////////////////////////
-        // GENERAL
-        //////////////////////////////////////////////////////
-
         siteName: "سهراب امینی",
 
         siteTitle: "سهراب امینی | توسعه دهنده حرفه‌ای وردپرس و PHP",
@@ -457,25 +725,13 @@ async function main() {
         description:
           "سهراب امینی، توسعه دهنده حرفه‌ای وردپرس و PHP با تخصص در طراحی قالب اختصاصی وردپرس، توسعه افزونه، برنامه نویسی بک‌اند، بهینه سازی سرعت و امنیت وب سایت.",
 
-        //////////////////////////////////////////////////////
-        // CONTACT
-        //////////////////////////////////////////////////////
-
         phone: "+98xxxxxxxxxx",
 
         email: "sohrabamini@example.com",
 
-        //////////////////////////////////////////////////////
-        // BRANDING
-        //////////////////////////////////////////////////////
-
         logo: "/uploads/settings/logo.webp",
 
         favicon: "/uploads/settings/favicon.ico",
-
-        //////////////////////////////////////////////////////
-        // SEO
-        //////////////////////////////////////////////////////
 
         metaTitle: "توسعه دهنده حرفه‌ای وردپرس | سهراب امینی",
 
@@ -487,25 +743,12 @@ async function main() {
 
         canonicalUrl: "https://sohrabamini.dev",
 
-        //////////////////////////////////////////////////////
-        // SOCIAL
-        //////////////////////////////////////////////////////
-
         instagram: "",
-
         linkedin: "",
-
         github: "",
-
         telegram: "",
-
         twitter: "",
-
         whatsapp: "",
-
-        //////////////////////////////////////////////////////
-        // SECURITY
-        //////////////////////////////////////////////////////
 
         maintenanceMode: false,
 
@@ -518,22 +761,33 @@ async function main() {
 
   console.log("✅ Settings seeded");
 
-  ////////////////////////////////////////////////////////////
-  // FINAL MESSAGE
-  ////////////////////////////////////////////////////////////
+  /* =========================================================
+     FINAL
+  ========================================================= */
 
-  console.log("🎉 Database seeded successfully.");
+  console.log("");
+  console.log("========================================");
+  console.log("🎉 Database seeded successfully!");
+  console.log("========================================");
+  console.log("");
 }
+
+/* =========================================================
+   EXECUTE
+========================================================= */
 
 main()
   .catch((error) => {
+    console.error("");
+    console.error("========================================");
     console.error("❌ Seed failed");
+    console.error("========================================");
+    console.error("");
 
     console.error(error);
 
     process.exit(1);
   })
-
   .finally(async () => {
     await prisma.$disconnect();
   });

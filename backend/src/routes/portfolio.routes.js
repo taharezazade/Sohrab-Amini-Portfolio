@@ -3,132 +3,68 @@
 import { Router } from "express";
 
 import portfolioController from "../controllers/portfolio.controller.js";
+import {
+  uploadSingle,
+  handleUploadError,
+} from "../middlewares/upload.middleware.js";
 
 const router = Router();
 
-/* ============================
-   Public Routes
-============================ */
+/* =========================================================
+   PUBLIC
+========================================================= */
 
-/*
-    Get All Portfolios
+router.get("/", portfolioController.getAll.bind(portfolioController));
 
-    GET
-    /api/portfolio
-*/
+router.get(
+  "/published",
+  portfolioController.getPublished.bind(portfolioController),
+);
 
-router.get("/", portfolioController.getAll);
+router.get(
+  "/featured",
+  portfolioController.getFeatured.bind(portfolioController),
+);
 
-/*
-    Get Published Portfolios
+router.get(
+  "/slug/:slug",
+  portfolioController.getBySlug.bind(portfolioController),
+);
 
-    GET
-    /api/portfolio/published
-*/
+router.get("/:id", portfolioController.getById.bind(portfolioController));
 
-router.get("/published", portfolioController.getPublished);
+/* =========================================================
+   ADMIN / CREATE
+========================================================= */
 
-/*
-    Get Featured Portfolios
+router.post(
+  "/",
+  uploadSingle("thumbnail"),
+  handleUploadError,
+  portfolioController.create.bind(portfolioController),
+);
 
-    GET
-    /api/portfolio/featured
-*/
+/* =========================================================
+   ADMIN / UPDATE
+========================================================= */
 
-router.get("/featured", portfolioController.getFeatured);
+router.put(
+  "/:id",
+  uploadSingle("thumbnail"),
+  handleUploadError,
+  portfolioController.update.bind(portfolioController),
+);
 
-/*
-    Get Portfolio By Slug
+router.patch(
+  "/:id/status",
+  portfolioController.updateStatus.bind(portfolioController),
+);
 
-    GET
-    /api/portfolio/slug/:slug
-*/
+router.patch(
+  "/:id/order",
+  portfolioController.updateOrder.bind(portfolioController),
+);
 
-router.get("/slug/:slug", portfolioController.getBySlug);
-
-/*
-    Get Portfolio By ID
-
-    GET
-    /api/portfolio/:id
-*/
-
-router.get("/:id", portfolioController.getById);
-
-/* ============================
-   Admin Routes
-============================ */
-
-/*
-    Create Portfolio
-
-    POST
-    /api/portfolio
-*/
-
-router.post("/", portfolioController.create);
-
-/*
-    Update Portfolio
-
-    PUT
-    /api/portfolio/:id
-*/
-
-router.put("/:id", portfolioController.update);
-
-/*
-    Delete Portfolio
-
-    DELETE
-    /api/portfolio/:id
-*/
-
-router.delete("/:id", portfolioController.delete);
-
-/*
-    Update Portfolio Status
-
-    PATCH
-    /api/portfolio/:id/status
-
-    Body:
-
-    {
-      "status": "PUBLISHED"
-    }
-*/
-
-router.patch("/:id/status", portfolioController.updateStatus);
-
-/*
-    Toggle Featured
-
-    PATCH
-    /api/portfolio/:id/featured
-
-    Body:
-
-    {
-      "featured": true
-    }
-*/
-
-router.patch("/:id/featured", portfolioController.toggleFeatured);
-
-/*
-    Update Portfolio Order
-
-    PATCH
-    /api/portfolio/:id/order
-
-    Body:
-
-    {
-      "order": 1
-    }
-*/
-
-router.patch("/:id/order", portfolioController.updateOrder);
+router.delete("/:id", portfolioController.delete.bind(portfolioController));
 
 export default router;

@@ -1,141 +1,17 @@
-/** @format */
-
 import contactService from "../services/contact.service.js";
 
 class ContactController {
-  /* =========================================================
-     Get Contact
-  ========================================================= */
-
-  async getContact(req, res, next) {
-    try {
-      const response = await contactService.getContact();
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* =========================================================
-     Get Contact By ID
-  ========================================================= */
-
-  async getById(req, res, next) {
-    try {
-      const { id } = req.params;
-
-      const response = await contactService.getContactById(id);
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* =========================================================
-     Create Contact
-  ========================================================= */
-
-  async create(req, res, next) {
-    try {
-      const response = await contactService.createContact(req.body);
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* =========================================================
-     Update Contact
-  ========================================================= */
-
-  async update(req, res, next) {
-    try {
-      const { id } = req.params;
-
-      const response = await contactService.updateContact(id, req.body);
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* =========================================================
-     Upsert Contact
-  ========================================================= */
-
-  async upsert(req, res, next) {
-    try {
-      const response = await contactService.upsertContact(req.body);
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* =========================================================
-     Delete Contact
-  ========================================================= */
-
-  async delete(req, res, next) {
-    try {
-      const { id } = req.params;
-
-      const response = await contactService.deleteContact(id);
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* =========================================================
-     Exists
-  ========================================================= */
-
-  async exists(req, res, next) {
-    try {
-      const response = await contactService.exists();
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* =========================================================
-     Count
-  ========================================================= */
-
-  async count(req, res, next) {
-    try {
-      const response = await contactService.count();
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  /* =========================================================
-     Update Image
-  ========================================================= */
-
-  async updateImage(req, res, next) {
-    try {
-      const { id } = req.params;
-
-      const response = await contactService.updateImage(id, req.body);
-
-      return res.status(response.statusCode).json(response);
-    } catch (error) {
-      next(error);
-    }
-  }
+  async getContact(req,res,next){try{const r=await contactService.getContact();return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async getById(req,res,next){try{const r=await contactService.getContactById(req.params.id);return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async create(req,res,next){try{const r=await contactService.createContact(req.body);return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async update(req,res,next){try{const r=await contactService.updateContact(req.params.id,req.body);return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async upsert(req,res,next){try{const r=await contactService.upsertContact(req.body);return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async delete(req,res,next){try{const r=await contactService.deleteContact(req.params.id);return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async exists(req,res,next){try{const r=await contactService.exists();return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async count(req,res,next){try{const r=await contactService.count();return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async updateImage(req,res,next){try{const r=await contactService.updateImage(req.params.id,req.file);return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async clearImage(req,res,next){try{const r=await contactService.clearImage(req.params.id);return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async updatePhone(req,res,next){try{const r=await contactService.updatePhone(req.params.id,req.body);return res.status(r.statusCode).json(r)}catch(e){next(e)}}
+  async updateWhatsapp(req,res,next){try{const r=await contactService.updateWhatsapp(req.params.id,req.body);return res.status(r.statusCode).json(r)}catch(e){next(e)}}
 }
-
 export default new ContactController();

@@ -2,7 +2,7 @@
 
 import { Global, Lock1 } from "iconsax-reactjs";
 import { motion } from "framer-motion";
-import imageClassName from "../common/ImageWithSkeleton";
+
 function PortfolioBrowser({ project }) {
   return (
     <motion.div
@@ -12,7 +12,7 @@ function PortfolioBrowser({ project }) {
       transition={{
         duration: 0.1,
       }}
-      className='
+      className="
         group
         mockup-browser
         border
@@ -21,40 +21,42 @@ function PortfolioBrowser({ project }) {
         overflow-hidden
         rounded-t-3xl
         rounded-b-none
-      '>
+      "
+    >
       {/* Browser Header */}
-      <div className='mockup-browser-toolbar px-4'>
-        <div className='flex items-center gap-3 w-full'>
+      <div className="mockup-browser-toolbar px-4">
+        <div className="flex items-center gap-3 w-full">
           {/* Address Bar */}
           <div
-            className='
-              flex
-              flex-1
-              items-center
+            className="
+              flex flex-1 items-center
               gap-2
               rounded-full
               bg-base-200
-              px-4
-              py-2
+              px-4 py-2
               text-sm
               text-base-content/70
-            '>
-            <Lock1 size={15} variant='Bulk' />
-            <Global size={15} variant='Bulk' />
+            "
+          >
+            <Lock1 size={15} variant="Bulk" />
+            <Global size={15} variant="Bulk" />
 
-            <span className='truncate'>{project.domain}</span>
+            <span className="truncate">
+              {project.domain || project.slug || "portfolio"}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Screenshot */}
       <div
-        className='
+        className="
           relative
           h-[12.5rem] md:h-[16rem]
           overflow-hidden
           bg-base-200
-        '>
+        "
+      >
         <motion.img
           src={project.image}
           alt={project.title}
@@ -69,21 +71,25 @@ function PortfolioBrowser({ project }) {
             duration: 4,
             ease: "linear",
           }}
-          className={`w-full
+          className="
+            w-full
             select-none
-            ${imageClassName}
-            `}
+            block
+          "
         />
 
         {/* Gradient */}
         <div
-          className='
+          className="
             absolute
             inset-x-0
             bottom-0
             h-24
             pointer-events-none
-          '
+            bg-gradient-to-t
+            from-base-200
+            to-transparent
+          "
         />
       </div>
     </motion.div>

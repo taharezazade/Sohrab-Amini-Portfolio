@@ -96,13 +96,18 @@ app.use(
 
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
-      res.setHeader("Cache-Control", "public, max-age=0");
+      res.setHeader(
+        "Cache-Control",
+        env.NODE_ENV === "production" ?
+          "public, max-age=604800, immutable"
+        : "public, max-age=0, must-revalidate",
+      );
     },
   }),
 );
 
 /* =========================================================
-   DEVELOPMENT LOG
+   DEVELOPMENT UPLOAD LOG
 ========================================================= */
 
 if (env.NODE_ENV === "development") {
@@ -150,28 +155,13 @@ app.get("/api/upload/health", (req, res) => {
       uploadDirectory: uploadsPath,
       publicPath: "/uploads",
     },
+    timestamp: new Date().toISOString(),
   });
 });
 
 /* =========================================================
    API ROUTES
 ========================================================= */
-
-/*
-  All application routes are registered here.
-
-  Example:
-
-  /api/auth
-  /api/about
-  /api/hero
-  /api/services
-  /api/portfolio
-  /api/contact
-  /api/settings
-  /api/profile
-  /api/upload
-*/
 
 app.use("/api", routes);
 

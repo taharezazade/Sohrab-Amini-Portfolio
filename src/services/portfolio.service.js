@@ -3,41 +3,28 @@
 import api from "@/api/axios";
 import { PORTFOLIO_ENDPOINTS } from "@/api/endpoints";
 
+/*
+ * Public frontend service.
+ *
+ * The public site is READ-ONLY.
+ * Create/update/delete operations stay in Admin.
+ */
+
 const portfolioService = {
-  async getPortfolio() {
-    return await api.get(PORTFOLIO_ENDPOINTS.GET);
+  async getPublishedPortfolio() {
+    return await api.get(PORTFOLIO_ENDPOINTS.GET_PUBLISHED);
   },
 
   async getPortfolioById(id) {
     return await api.get(PORTFOLIO_ENDPOINTS.GET_BY_ID(id));
   },
 
-  async exists() {
-    return await api.get(PORTFOLIO_ENDPOINTS.EXISTS);
+  async getPortfolioBySlug(slug) {
+    return await api.get(PORTFOLIO_ENDPOINTS.GET_BY_SLUG(slug));
   },
 
-  async count() {
-    return await api.get(PORTFOLIO_ENDPOINTS.COUNT);
-  },
-
-  async createPortfolio(payload) {
-    return await api.post(PORTFOLIO_ENDPOINTS.CREATE, payload);
-  },
-
-  async updatePortfolio(id, payload) {
-    return await api.put(PORTFOLIO_ENDPOINTS.UPDATE(id), payload);
-  },
-
-  async deletePortfolio(id) {
-    return await api.delete(PORTFOLIO_ENDPOINTS.DELETE(id));
-  },
-
-  async updateImage(id, payload) {
-    return await api.put(PORTFOLIO_ENDPOINTS.UPDATE_IMAGE(id), payload);
-  },
-
-  async clearImage(id) {
-    return await api.delete(PORTFOLIO_ENDPOINTS.CLEAR_IMAGE(id));
+  async getFeaturedPortfolio() {
+    return await api.get(PORTFOLIO_ENDPOINTS.GET_FEATURED);
   },
 };
 

@@ -6,20 +6,36 @@ import PortfolioFilter from "./PortfolioFilter";
 import PortfolioGrid from "./PortfolioGrid";
 import PortfolioDrawer from "./PortfolioDrawer";
 
-import { portfolioItems, portfolioCategories } from "./portfolio.data";
+import usePortfolio from "@/hooks/usePortfolio";
 
 function Portfolio() {
+  const { portfolio, loading, error } = usePortfolio();
+
   const [selectedCategory, setSelectedCategory] = useState("همه");
   const [selectedProject, setSelectedProject] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const portfolioCategories = useMemo(() => {
+    const categories = portfolio
+      .map((item) => item.category)
+      .filter(Boolean);
+
+    return ["همه", ...new Set(categories)];
+  }, [portfolio]);
+
   const filteredProjects = useMemo(() => {
     if (selectedCategory === "همه") {
-      return portfolioItems;
+      return portfolio;
     }
 
-    return portfolioItems.filter((item) => item.category === selectedCategory);
-  }, [selectedCategory]);
+    return portfolio.filter(
+      (item) => item.category === selectedCategory,
+    );
+  }, [portfolio, selectedCategory]);
+
+  const handleChangeCategory = (category) => {
+    setSelectedCategory(category);
+  };
 
   const handleOpenProject = (project) => {
     setSelectedProject(project);
@@ -29,7 +45,7 @@ function Portfolio() {
   const handleCloseProject = () => {
     setDrawerOpen(false);
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       setSelectedProject(null);
     }, 250);
   };
@@ -42,10 +58,15 @@ function Portfolio() {
         <PortfolioFilter
           categories={portfolioCategories}
           selectedCategory={selectedCategory}
-          onChangeCategory={setSelectedCategory}
+          onChangeCategory={handleChangeCategory}
         />
 
-        <PortfolioGrid projects={filteredProjects} onOpen={handleOpenProject} />
+        <PortfolioGrid
+          projects={filteredProjects}
+          loading={loading}
+          error={error}
+          onOpen={handleOpenProject}
+        />
       </section>
 
       <PortfolioDrawer

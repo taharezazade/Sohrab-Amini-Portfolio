@@ -3,124 +3,37 @@
 import { motion } from "framer-motion";
 import { Add, Gallery } from "iconsax-reactjs";
 
-const PortfolioHeader = ({ total = 0, onCreate }) => {
-  return (
-    <motion.div
-      initial={{
-        opacity: 0,
-        y: 15,
-      }}
-
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-
-      transition={{
-        duration: 0.3,
-      }}
-
-      className='
-        card
-        bg-base-100
-        border-base-300
-        border
-        shadow-sm
-      '>
-      <div
-        className='
-          card-body
-          flex
-          flex-col
-          gap-5
-
-          md:flex-row
-          md:items-center
-          md:justify-between
-        '>
-        {/* Content */}
-
-        <div
-          className='
-            flex
-            items-center
-            gap-4
-          '>
-          <div
-            className='
-              bg-primary/10
-              text-primary
-              flex
-              h-14
-              w-14
-              items-center
-              justify-center
-              rounded-2xl
-            '>
-            <Gallery size={30} variant='Bulk' />
-          </div>
-
-          <div>
-            <h1
-              className='
-                text-xl
-                font-black
-
-                md:text-2xl
-              '>
-              مدیریت نمونه‌کارها
-            </h1>
-
-            <p
-              className='
-                text-base-content/60
-                mt-1
-                text-sm
-              '>
-              مدیریت، ایجاد و ویرایش پروژه‌های ثبت شده
-            </p>
-          </div>
+const PortfolioHeader = ({ total = 0, onCreate }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 15 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="card border border-base-300 bg-base-100 shadow-sm"
+  >
+    <div className="card-body gap-5 p-5 md:flex-row md:items-center md:justify-between">
+      <div className="flex items-center gap-4">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <Gallery size={30} variant="Bulk" />
         </div>
 
-        {/* Actions */}
-
-        <div
-          className='
-            flex
-            items-center
-            gap-3
-          '>
-          <div
-            className='
-              badge
-              badge-ghost
-              hidden
-              h-10
-              px-4
-
-              sm:flex
-            '>
-            <Gallery size={16} />
-
-            <span>{total} پروژه</span>
-          </div>
-
-          <button
-            onClick={onCreate}
-
-            className='
-              btn
-              btn-primary
-              rounded-xl
-              gap-2
-            '>
-            <Add size={20} />
-            افزودن نمونه‌کار
-          </button>
+        <div>
+          <h1 className="text-xl font-black md:text-2xl">مدیریت نمونه‌کارها</h1>
+          <p className="mt-1 text-sm text-base-content/60">
+            ایجاد، ویرایش، انتشار و مدیریت تصاویر پروژه‌ها
+          </p>
         </div>
       </div>
-    </motion.div>
-  );
-};
+
+      <button
+        type="button"
+        onClick={onCreate}
+        className="btn btn-primary rounded-xl gap-2"
+      >
+        <Add size={19} />
+        افزودن نمونه‌کار
+        <span className="badge badge-primary-content badge-sm">{total}</span>
+      </button>
+    </div>
+  </motion.div>
+);
 
 export default PortfolioHeader;

@@ -1,37 +1,34 @@
 /** @format */
 
+/**
+ * =========================================================
+ * ApiError
+ * =========================================================
+ *
+ * Standard application error used across the backend.
+ *
+ * Usage:
+ *
+ * throw new ApiError(404, "Portfolio not found");
+ *
+ * =========================================================
+ */
+
 class ApiError extends Error {
-  constructor(statusCode = 500, message = "خطای داخلی سرور.", errors = []) {
+  constructor(
+    statusCode = 500,
+    message = "Internal Server Error",
+    errors = null,
+  ) {
     super(message);
 
     this.name = "ApiError";
-
-    this.success = false;
-
-    this.statusCode = Number.isInteger(statusCode) ? statusCode : 500;
-
-    this.message = message;
-
+    this.statusCode = statusCode;
     this.errors = errors;
-
-    this.timestamp = new Date().toISOString();
 
     Error.captureStackTrace(this, this.constructor);
   }
-
-  toJSON() {
-    return {
-      success: false,
-
-      statusCode: this.statusCode,
-
-      message: this.message,
-
-      errors: this.errors,
-
-      timestamp: this.timestamp,
-    };
-  }
 }
 
+export { ApiError };
 export default ApiError;

@@ -1,55 +1,89 @@
 /** @format */
 
-/* =========================================================
-   AUTHENTICATION
-========================================================= */
+/**
+ * API Endpoints
+ *
+ * Base URL is provided by Axios.
+ *
+ * Example:
+ * API_CONFIG.BASE_URL = http://localhost:5000/api
+ *
+ * Therefore:
+ * AUTH.LOGIN -> /auth/login
+ */
+
+////////////////////////////////////////////////////////////
+// AUTH
+////////////////////////////////////////////////////////////
 
 export const AUTH_ENDPOINTS = {
+  REGISTER: "/auth/register",
+
   LOGIN: "/auth/login",
-  LOGOUT: "/auth/logout",
+
+  REFRESH_TOKEN: "/auth/refresh-token",
+
   ME: "/auth/me",
+
   PROFILE: "/auth/profile",
+
   CHANGE_PASSWORD: "/auth/change-password",
+
+  LOGOUT: "/auth/logout",
 };
 
-/* =========================================================
-   HERO
-========================================================= */
+////////////////////////////////////////////////////////////
+// PROFILE
+////////////////////////////////////////////////////////////
+
+export const PROFILE_ENDPOINTS = {
+  GET: "/profile",
+
+  UPDATE: "/profile",
+
+  CHANGE_PASSWORD: "/profile/change-password",
+};
+
+////////////////////////////////////////////////////////////
+// HERO
+////////////////////////////////////////////////////////////
 
 export const HERO_ENDPOINTS = {
   GET: "/hero",
+
   GET_BY_ID: (id) => `/hero/${id}`,
 
   CREATE: "/hero",
-  UPDATE: "/hero",
 
-  UPSERT: "/hero/upsert",
+  UPDATE: (id) => `/hero/${id}`,
 
-  STATUS: "/hero/status",
+  DELETE: (id) => `/hero/${id}`,
 
-  DELETE: "/hero",
+  TOGGLE_ACTIVE: (id) => `/hero/${id}/active`,
 };
 
-/* =========================================================
-   ABOUT
-   About is a single record.
-   Admin updates the existing record.
-========================================================= */
+////////////////////////////////////////////////////////////
+// ABOUT
+////////////////////////////////////////////////////////////
 
 export const ABOUT_ENDPOINTS = {
-  BASE: "/about",
+  GET: "/about",
+
+  GET_BY_ID: (id) => `/about/${id}`,
+
+  CREATE: "/about",
+
+  UPDATE: (id) => `/about/${id}`,
+
+  DELETE: (id) => `/about/${id}`,
 };
 
-/* =========================================================
-   SERVICES
-========================================================= */
+////////////////////////////////////////////////////////////
+// SERVICES
+////////////////////////////////////////////////////////////
 
 export const SERVICES_ENDPOINTS = {
-  GET_ALL: "/services",
-
-  GET_ACTIVE: "/services/active",
-
-  STATS: "/services/stats",
+  GET: "/services",
 
   GET_BY_ID: (id) => `/services/${id}`,
 
@@ -57,16 +91,20 @@ export const SERVICES_ENDPOINTS = {
 
   UPDATE: (id) => `/services/${id}`,
 
-  TOGGLE_STATUS: (id) => `/services/${id}/status`,
-
   DELETE: (id) => `/services/${id}`,
+
+  EXISTS: "/services/exists",
+
+  COUNT: "/services/count",
+
+  ACTIVE: "/services/active",
 
   REORDER: "/services/reorder",
 };
 
-/* =========================================================
-   PORTFOLIO
-========================================================= */
+////////////////////////////////////////////////////////////
+// PORTFOLIO
+////////////////////////////////////////////////////////////
 
 export const PORTFOLIO_ENDPOINTS = {
   GET_ALL: "/portfolio",
@@ -76,76 +114,151 @@ export const PORTFOLIO_ENDPOINTS = {
   GET_BY_ID: (id) => `/portfolio/${id}`,
   GET_BY_SLUG: (slug) => `/portfolio/slug/${slug}`,
 
-  EXISTS: "/portfolio/exists",
-  COUNT: "/portfolio/count",
-
   CREATE: "/portfolio",
+
   UPDATE: (id) => `/portfolio/${id}`,
   DELETE: (id) => `/portfolio/${id}`,
 
   UPDATE_STATUS: (id) => `/portfolio/${id}/status`,
-
-  UPDATE_IMAGE: (id) => `/portfolio/${id}/image`,
-  CLEAR_IMAGE: (id) => `/portfolio/${id}/image`,
-
-  UPLOAD_IMAGES: (id) => `/portfolio/${id}/images`,
-  DELETE_IMAGE: (id) => `/portfolio/images/${id}`,
-
-  REORDER: "/portfolio/reorder",
+  UPDATE_ORDER: (id) => `/portfolio/${id}/order`,
+  UPDATE_FEATURED: (id) => `/portfolio/${id}/featured`,
 };
 
-/* =========================================================
-   SEARCH
-========================================================= */
+////////////////////////////////////////////////////////////
+// PORTFOLIO IMAGES
+////////////////////////////////////////////////////////////
 
-export const SEARCH_ENDPOINTS = {
-  SEARCH: "/search",
+export const PORTFOLIO_IMAGE_ENDPOINTS = {
+  GET_ALL: (portfolioId) => `/portfolio/${portfolioId}/images`,
+
+  GET_BY_ID: (portfolioId, imageId) =>
+    `/portfolio/${portfolioId}/images/${imageId}`,
+
+  CREATE: (portfolioId) => `/portfolio/${portfolioId}/images`,
+
+  UPDATE: (portfolioId, imageId) =>
+    `/portfolio/${portfolioId}/images/${imageId}`,
+
+  UPDATE_ORDER: (portfolioId, imageId) =>
+    `/portfolio/${portfolioId}/images/${imageId}/order`,
+
+  DELETE: (portfolioId, imageId) =>
+    `/portfolio/${portfolioId}/images/${imageId}`,
+
+  DELETE_ALL: (portfolioId) => `/portfolio/${portfolioId}/images`,
 };
 
-/* =========================================================
-   CONTACT
-========================================================= */
+////////////////////////////////////////////////////////////
+// CONTACT
+////////////////////////////////////////////////////////////
 
 export const CONTACT_ENDPOINTS = {
   GET: "/contact",
+
   GET_BY_ID: (id) => `/contact/${id}`,
 
-  EXISTS: "/contact/exists",
-  COUNT: "/contact/count",
-
   CREATE: "/contact",
-  UPDATE: (id) => `/contact/${id}`,
 
-  UPSERT: "/contact/upsert",
+  UPDATE: "/contact",
 
   DELETE: (id) => `/contact/${id}`,
 
-  PHONE: (id) => `/contact/${id}/phone`,
-  WHATSAPP: (id) => `/contact/${id}/whatsapp`,
-
   UPDATE_IMAGE: (id) => `/contact/${id}/image`,
+
   CLEAR_IMAGE: (id) => `/contact/${id}/image`,
 };
-
-/* =========================================================
-   SETTINGS
-========================================================= */
+////////////////////////////////////////////////////////////
+// SETTINGS
+////////////////////////////////////////////////////////////
 
 export const SETTINGS_ENDPOINTS = {
   GET: "/settings",
 
+  GET_BY_ID: (id) => `/settings/${id}`,
+
   CREATE: "/settings",
-  UPDATE: "/settings",
-  DELETE: "/settings",
+
+  UPDATE: (id) => `/settings/${id}`,
+
+  DELETE: (id) => `/settings/${id}`,
 };
 
-/* =========================================================
-   UPLOAD
-========================================================= */
+////////////////////////////////////////////////////////////
+// SEARCH
+////////////////////////////////////////////////////////////
+
+export const SEARCH_ENDPOINTS = {
+  /**
+   * Global admin search.
+   *
+   * Example:
+   * GET /api/search?q=portfolio
+   */
+  SEARCH: "/search",
+
+  /**
+   * Search portfolios.
+   *
+   * Example:
+   * GET /api/search/portfolio?q=wordpress
+   */
+  PORTFOLIO: "/search/portfolio",
+
+  /**
+   * Search services.
+   *
+   * Example:
+   * GET /api/search/services?q=wordpress
+   */
+  SERVICES: "/search/services",
+
+  /**
+   * Search all content.
+   *
+   * Example:
+   * GET /api/search/all?q=wordpress
+   */
+  ALL: "/search/all",
+};
+
+////////////////////////////////////////////////////////////
+// UPLOAD
+////////////////////////////////////////////////////////////
 
 export const UPLOAD_ENDPOINTS = {
   SINGLE: "/upload",
+
   MULTIPLE: "/upload/multiple",
-  REPLACE: "/upload/replace",
-  DELETE: "/upload",
+
+  DELETE: (filename) => `/upload/${filename}`,
 };
+
+////////////////////////////////////////////////////////////
+// API ENDPOINTS OBJECT
+////////////////////////////////////////////////////////////
+
+const ENDPOINTS = {
+  AUTH: AUTH_ENDPOINTS,
+
+  PROFILE: PROFILE_ENDPOINTS,
+
+  HERO: HERO_ENDPOINTS,
+
+  ABOUT: ABOUT_ENDPOINTS,
+
+  SERVICES: SERVICES_ENDPOINTS,
+
+  PORTFOLIO: PORTFOLIO_ENDPOINTS,
+
+  PORTFOLIO_IMAGE: PORTFOLIO_IMAGE_ENDPOINTS,
+
+  CONTACT: CONTACT_ENDPOINTS,
+
+  SETTINGS: SETTINGS_ENDPOINTS,
+
+  SEARCH: SEARCH_ENDPOINTS,
+
+  UPLOAD: UPLOAD_ENDPOINTS,
+};
+
+export default ENDPOINTS;

@@ -1,21 +1,16 @@
 /** @format */
 
 import api from "@/api/axios";
-import API from "@/constants/api";
+import { CONTACT_ENDPOINTS } from "@/api/endpoints";
 
 const contactService = {
   /**
-   * Get Contact Information
+   * Get public contact information
+   *
+   * GET /api/contact
    */
-  get() {
-    return api.get(API.GET);
-  },
-
-  /**
-   * Update Contact Information
-   */
-  update(payload) {
-    return api.put(API.UPDATE, payload);
+  async get() {
+    return await api.get(CONTACT_ENDPOINTS.GET);
   },
 };
 

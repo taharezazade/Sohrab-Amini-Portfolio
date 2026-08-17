@@ -7,7 +7,7 @@ import crypto from "crypto";
 import env from "../config/env.js";
 
 /* =========================================================
-   Constants
+   CONSTANTS
 ========================================================= */
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -20,7 +20,7 @@ const ALLOWED_MIME_TYPES = [
 ];
 
 /* =========================================================
-   Upload Service
+   UPLOAD SERVICE
 ========================================================= */
 
 class UploadService {
@@ -43,7 +43,7 @@ class UploadService {
   }
 
   /* =======================================================
-     Validate File
+     VALIDATE FILE
   ======================================================= */
 
   validateFile(file) {
@@ -76,7 +76,7 @@ class UploadService {
   }
 
   /* =======================================================
-     Validate Folder
+     VALIDATE FOLDER
   ======================================================= */
 
   validateFolder(folder) {
@@ -100,7 +100,7 @@ class UploadService {
   }
 
   /* =======================================================
-     Generate File Name
+     GENERATE FILE NAME
   ======================================================= */
 
   generateFileName(originalName) {
@@ -112,7 +112,7 @@ class UploadService {
   }
 
   /* =======================================================
-     Get Folder Path
+     GET FOLDER PATH
   ======================================================= */
 
   getFolderPath(folder) {
@@ -122,7 +122,7 @@ class UploadService {
   }
 
   /* =======================================================
-     Get Public URL
+     PUBLIC URL
   ======================================================= */
 
   getPublicUrl(folder, fileName) {
@@ -130,11 +130,14 @@ class UploadService {
 
     const baseUrl = env.API_URL || `http://localhost:${env.PORT || 5000}`;
 
-    return `${baseUrl.replace(/\/$/, "")}/uploads/${normalizedFolder}/${fileName}`;
+    return `${baseUrl.replace(
+      /\/$/,
+      "",
+    )}/uploads/${normalizedFolder}/${fileName}`;
   }
 
   /* =======================================================
-     Upload Single
+     UPLOAD
   ======================================================= */
 
   async upload(file, folder = "temp") {
@@ -161,21 +164,16 @@ class UploadService {
     return {
       fileName,
       originalName: file.originalname,
-
       path: relativePath,
-
       url,
-
       size: file.size,
-
       type: file.mimetype,
-
       folder: normalizedFolder,
     };
   }
 
   /* =======================================================
-     Upload Multiple
+     UPLOAD MULTIPLE
   ======================================================= */
 
   async uploadMultiple(files, folder = "temp") {
@@ -192,25 +190,21 @@ class UploadService {
     const uploadedFiles = [];
 
     for (const file of files) {
-      const uploadedFile = await this.upload(file, normalizedFolder);
+      const uploaded = await this.upload(file, normalizedFolder);
 
-      uploadedFiles.push(uploadedFile);
+      uploadedFiles.push(uploaded);
     }
 
     return uploadedFiles;
   }
 
   /* =======================================================
-     Delete
+     DELETE
   ======================================================= */
 
   async delete(filePath) {
     if (!filePath) {
-      const error = new Error("File path is required.");
-
-      error.statusCode = 400;
-
-      throw error;
+      return false;
     }
 
     let normalizedPath = String(filePath).trim();
@@ -220,7 +214,7 @@ class UploadService {
 
       normalizedPath = parsedUrl.pathname;
     } catch {
-      // Path is already relative.
+      // Relative path.
     }
 
     normalizedPath = normalizedPath
@@ -235,9 +229,9 @@ class UploadService {
       throw error;
     }
 
-    const fullPath = path.resolve(process.cwd(), normalizedPath);
-
     const uploadsRoot = path.resolve(process.cwd(), "uploads");
+
+    const fullPath = path.resolve(process.cwd(), normalizedPath);
 
     if (!fullPath.startsWith(`${uploadsRoot}${path.sep}`)) {
       const error = new Error("Invalid file path.");
@@ -261,7 +255,7 @@ class UploadService {
   }
 
   /* =======================================================
-     Replace
+     REPLACE
   ======================================================= */
 
   async replace(oldFilePath, newFile, folder = "temp") {
@@ -275,8 +269,14 @@ class UploadService {
 
     const uploadedFile = await this.upload(newFile, folder);
 
-    if (oldFilePath) {
-      await this.delete(oldFilePath);
+    try {
+      if (oldFilePath) {
+        await this.delete(oldFilePath);
+      }
+    } catch (error) {
+      await this.delete(uploadedFile.path);
+
+      throw error;
     }
 
     return uploadedFile;

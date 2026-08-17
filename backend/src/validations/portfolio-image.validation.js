@@ -2,36 +2,19 @@
 
 import { z } from "zod";
 
-/* ============================
-   Params
-============================ */
-
-export const portfolioImageParamsSchema = z.object({
-  id: z.string().min(1),
-});
-
-/* ============================
-   Create Image
-============================ */
-
 export const createPortfolioImageSchema = z.object({
-  image: z.string().trim().min(1, "Image path is required."),
-
-  alt: z.string().trim().max(255).optional().nullable(),
-
-  order: z.number().int().nonnegative().optional(),
+  portfolioId: z.string().trim().min(1, "شناسه نمونه‌کار الزامی است."),
+  image: z.string().trim().min(1, "تصویر الزامی است."),
+  alt: z.string().trim().optional().nullable(),
+  order: z.coerce.number().int().min(0).default(0),
 });
 
-/* ============================
-   Update Image
-============================ */
+export const updatePortfolioImageSchema = z.object({
+  image: z.string().trim().min(1, "تصویر الزامی است.").optional(),
+  alt: z.string().trim().optional().nullable(),
+  order: z.coerce.number().int().min(0).optional(),
+});
 
-export const updatePortfolioImageSchema = createPortfolioImageSchema.partial();
-
-/* ============================
-   Update Order
-============================ */
-
-export const portfolioImageOrderSchema = z.object({
-  order: z.number().int().nonnegative(),
+export const updatePortfolioImageOrderSchema = z.object({
+  order: z.coerce.number().int().min(0),
 });

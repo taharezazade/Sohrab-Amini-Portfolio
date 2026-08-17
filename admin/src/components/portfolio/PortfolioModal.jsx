@@ -7,182 +7,66 @@ import PortfolioForm from "./PortfolioForm";
 
 const PortfolioModal = ({
   open = false,
-
   portfolio = null,
-
   loading = false,
-
   onClose,
-
   onSubmit,
-}) => {
-  return (
-    <AnimatePresence>
-      {open && (
-        <>
-          {/* Overlay */}
+}) => (
+  <AnimatePresence>
+    {open && (
+      <div className="fixed inset-0 z-[100]">
+        <motion.button
+          type="button"
+          aria-label="بستن"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={loading ? undefined : onClose}
+          className="absolute inset-0 h-full w-full cursor-default bg-black/50 backdrop-blur-sm"
+        />
 
-          <motion.div
-            initial={{
-              opacity: 0,
-            }}
-
-            animate={{
-              opacity: 1,
-            }}
-
-            exit={{
-              opacity: 0,
-            }}
-
-            onClick={onClose}
-
-            className='
-                fixed
-                inset-0
-                z-40
-
-                bg-black/40
-
-                backdrop-blur-sm
-              '
-          />
-
-          {/* Modal */}
-
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 30,
-              scale: 0.95,
-            }}
-
-            animate={{
-              opacity: 1,
-              y: 0,
-              scale: 1,
-            }}
-
-            exit={{
-              opacity: 0,
-              y: 30,
-              scale: 0.95,
-            }}
-
-            transition={{
-              duration: 0.25,
-            }}
-
-            className='
-                fixed
-
-                left-1/2
-                top-1/2
-
-                z-50
-
-                flex
-
-                h-[90vh]
-
-                w-[calc(100%-2rem)]
-
-                max-w-3xl
-
-                -translate-x-1/2
-                -translate-y-1/2
-
-                flex-col
-
-                overflow-hidden
-
-                rounded-3xl
-
-                bg-base-100
-
-                shadow-xl
-              '>
-            {/* Header */}
-
-            <div
-              className='
-                  border-base-300
-
-                  flex
-
-                  items-center
-
-                  justify-between
-
-                  border-b
-
-                  px-6
-
-                  py-4
-                '>
-              <div>
-                <h2
-                  className='
-                      text-lg
-                      font-black
-                    '>
-                  {portfolio?.id ? "ویرایش نمونه‌کار" : "افزودن نمونه‌کار"}
-                </h2>
-
-                <p
-                  className='
-                      text-base-content/60
-
-                      mt-1
-
-                      text-sm
-                    '>
-                  اطلاعات پروژه را وارد کنید.
-                </p>
-              </div>
-
-              <button
-                type='button'
-
-                onClick={onClose}
-
-                className='
-                    btn
-                    btn-ghost
-
-                    btn-sm
-
-                    btn-square
-                  '>
-                <CloseCircle size={22} />
-              </button>
+        <motion.div
+          initial={{ opacity: 0, y: 24, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 24, scale: 0.97 }}
+          transition={{ duration: 0.22 }}
+          role="dialog"
+          aria-modal="true"
+          className="absolute left-1/2 top-1/2 flex h-[min(92vh,900px)] w-[calc(100%-1.5rem)] max-w-5xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-3xl border border-base-300 bg-base-100 shadow-2xl"
+          dir="rtl"
+        >
+          <header className="flex shrink-0 items-center justify-between border-b border-base-200 px-5 py-4 md:px-6">
+            <div>
+              <h2 className="text-lg font-black md:text-xl">
+                {portfolio?.id ? "ویرایش نمونه‌کار" : "افزودن نمونه‌کار"}
+              </h2>
+              <p className="mt-1 text-xs text-base-content/50">
+                اطلاعات پروژه و تصویر اصلی را ثبت کنید.
+              </p>
             </div>
 
-            {/* Body */}
+            <button
+              type="button"
+              onClick={loading ? undefined : onClose}
+              disabled={loading}
+              className="btn btn-ghost btn-square btn-sm"
+            >
+              <CloseCircle size={23} />
+            </button>
+          </header>
 
-            <div
-              className='
-                  flex-1
-
-                  overflow-y-auto
-
-                  p-6
-                '>
-              <PortfolioForm
-                initialValues={portfolio}
-
-                loading={loading}
-
-                onSubmit={onSubmit}
-
-                onCancel={onClose}
-              />
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  );
-};
+          <div className="min-h-0 flex-1 overflow-y-auto p-4 md:p-6">
+            <PortfolioForm
+              initialValues={portfolio}
+              loading={loading}
+              onSubmit={onSubmit}
+              onCancel={onClose}
+            />
+          </div>
+        </motion.div>
+      </div>
+    )}
+  </AnimatePresence>
+);
 
 export default PortfolioModal;

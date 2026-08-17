@@ -1,156 +1,146 @@
 /** @format */
 
+/* =========================================================
+   Contact Section Animations
+========================================================= */
+
+/* Container */
+
 export const containerVariants = {
   hidden: {},
-
   show: {
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.15,
+      staggerChildren: 0.12,
     },
   },
 };
 
-export const fadeUpVariants = {
-  hidden: {
-    opacity: 0,
-    y: 60,
-  },
-
-  show: {
-    opacity: 1,
-    y: 0,
-
-    transition: {
-      duration: 0.8,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
-};
+/* Fade Left */
 
 export const fadeLeftVariants = {
   hidden: {
     opacity: 0,
-    x: -80,
+    x: -50,
   },
 
   show: {
     opacity: 1,
     x: 0,
-
     transition: {
-      duration: 0.9,
-      ease: [0.22, 1, 0.36, 1],
+      duration: 0.7,
+      ease: "easeOut",
     },
   },
 };
+
+/* Fade Right */
 
 export const fadeRightVariants = {
   hidden: {
     opacity: 0,
-    x: 80,
+    x: 50,
   },
 
   show: {
     opacity: 1,
     x: 0,
-
     transition: {
-      duration: 0.9,
-      ease: [0.22, 1, 0.36, 1],
+      duration: 0.7,
+      ease: "easeOut",
     },
   },
 };
 
-export const imageVariants = {
+/* Fade Up */
+
+export const fadeUpVariants = {
   hidden: {
     opacity: 0,
-    scale: 0.9,
-    y: 40,
+    y: 30,
   },
 
   show: {
     opacity: 1,
-    scale: 1,
     y: 0,
-
     transition: {
-      duration: 1,
-      ease: [0.22, 1, 0.36, 1],
+      duration: 0.6,
+      ease: "easeOut",
     },
   },
 };
+
+/* Card */
 
 export const cardVariants = {
   hidden: {
     opacity: 0,
-    y: 40,
-  },
-
-  show: {
-    opacity: 1,
-    y: 0,
-
-    transition: {
-      duration: 0.65,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
-};
-
-export const featureVariants = {
-  hidden: {
-    opacity: 0,
-    x: -30,
-  },
-
-  show: {
-    opacity: 1,
-    x: 0,
-
-    transition: {
-      duration: 0.55,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
-};
-
-export const ctaVariants = {
-  hidden: {
-    opacity: 0,
-    y: 50,
-    scale: 0.96,
+    y: 30,
+    scale: 0.98,
   },
 
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
-
     transition: {
-      duration: 0.8,
-      ease: [0.22, 1, 0.36, 1],
+      duration: 0.55,
+      ease: "easeOut",
     },
   },
 };
 
-export const floatingAnimation = {
-  y: [0, -12, 0],
+/* Feature */
 
-  transition: {
-    duration: 4,
-    repeat: Infinity,
-    ease: "easeInOut",
+export const featureVariants = {
+  hidden: {
+    opacity: 0,
+    y: 35,
+  },
+
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
   },
 };
 
-export const glowAnimation = {
-  opacity: [0.45, 0.9, 0.45],
-  scale: [1, 1.08, 1],
+/* CTA */
 
-  transition: {
-    duration: 5,
-    repeat: Infinity,
-    ease: "easeInOut",
+export const ctaVariants = {
+  hidden: {
+    opacity: 0,
+    y: 40,
+    scale: 0.98,
+  },
+
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.7,
+      ease: "easeOut",
+    },
+  },
+};
+
+/* Image */
+
+export const imageVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.94,
+  },
+
+  show: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      ease: "easeOut",
+    },
   },
 };

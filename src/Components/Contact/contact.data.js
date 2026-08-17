@@ -11,6 +11,10 @@ import {
   Messages3,
 } from "iconsax-reactjs";
 
+/* =========================================================
+   Default Contact Data
+========================================================= */
+
 export const contactData = {
   title: "آماده شروع پروژه بعدی شما هستم.",
 
@@ -20,25 +24,25 @@ export const contactData = {
   description:
     "هر پروژه قبل از شروع نیازمند بررسی دقیق، شناخت نیازها و انتخاب بهترین راهکار است. به همین دلیل پیش از شروع همکاری، زمان کافی برای بررسی پروژه شما اختصاص داده می‌شود تا بهترین نتیجه ممکن با توجه به اهداف، بودجه و زمان‌بندی ارائه شود.",
 
-  image: CallImage,
+  fallbackImage: CallImage,
+
+  /*
+   * IMPORTANT:
+   * These are the initial fallback values.
+   * API values will replace them when available.
+   */
 
   phone: {
     label: "تماس مستقیم",
-
-    number: "0912-388-4766",
-
+    number: "09123884766",
     href: "tel:+989123884766",
-
     icon: CallCalling,
   },
 
   whatsapp: {
     label: "واتساپ",
-
-    number: "0912-388-4766",
-
+    number: "09123884766",
     href: "https://wa.me/989123884766",
-
     icon: Whatsapp,
   },
 
@@ -82,4 +86,113 @@ export const contactData = {
     description:
       "اگر برای کسب‌وکار یا برند خود به یک وب‌سایت سریع، مدرن و قابل توسعه نیاز دارید، همین حالا از طریق تماس یا واتساپ ارتباط برقرار کنید تا درباره جزئیات پروژه صحبت کنیم.",
   },
+};
+
+/* =========================================================
+   Normalize Digits
+========================================================= */
+
+const normalizeDigits = (value) => {
+  if (!value) {
+    return "";
+  }
+
+  return String(value)
+    .replace(/[۰-۹]/g, (digit) => String(digit.charCodeAt(0) - 1776))
+    .replace(/[٠-٩]/g, (digit) => String(digit.charCodeAt(0) - 1632));
+};
+
+/* =========================================================
+   Normalize Phone
+========================================================= */
+
+const normalizePhone = (value) => {
+  if (!value) {
+    return "";
+  }
+
+  let phone = normalizeDigits(value)
+    .trim()
+    .replace(/[\s\-()]/g, "");
+
+  if (phone.startsWith("+98")) {
+    phone = `0${phone.slice(3)}`;
+  }
+
+  if (phone.startsWith("0098")) {
+    phone = `0${phone.slice(4)}`;
+  }
+
+  if (/^9\d{9}$/.test(phone)) {
+    phone = `0${phone}`;
+  }
+
+  return phone;
+};
+
+/* =========================================================
+   Phone URL
+========================================================= */
+
+const createPhoneHref = (phone) => {
+  const normalized = normalizePhone(phone);
+
+  if (!normalized) {
+    return "";
+  }
+
+  return `tel:+98${normalized.replace(/^0/, "")}`;
+};
+
+/* =========================================================
+   WhatsApp URL
+========================================================= */
+
+const createWhatsappHref = (whatsapp) => {
+  const normalized = normalizePhone(whatsapp);
+
+  if (!normalized) {
+    return "";
+  }
+
+  return `https://wa.me/98${normalized.replace(/^0/, "")}`;
+};
+
+/* =========================================================
+   Contact View Model
+========================================================= */
+
+export const createContactViewModel = (contact) => {
+  /*
+   * Start with fallback values.
+   */
+
+  const phone = normalizePhone(contact?.phone) || contactData.phone.number;
+
+  const whatsapp =
+    normalizePhone(contact?.whatsapp) || contactData.whatsapp.number;
+
+  return {
+    ...contactData,
+
+    id: contact?.id ?? null,
+
+    image: contact?.image || contactData.fallbackImage,
+
+    phone: {
+      ...contactData.phone,
+
+      number: phone,
+
+      href: createPhoneHref(phone),
+    },
+
+    whatsapp: {
+      ...contactData.whatsapp,
+
+      number: whatsapp,
+
+      href: createWhatsappHref(whatsapp),
+    },
+  };
 };

@@ -1,98 +1,164 @@
 /** @format */
 
 import multer from "multer";
-
-import { IMAGE_MIME_TYPES, DOCUMENT_MIME_TYPES } from "../config/multer.js";
-
-/* =========================================================
-   Constants
-========================================================= */
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+import fs from "fs";
+import path from "path";
 
 /* =========================================================
-   Allowed Types
+   Upload Configuration
 ========================================================= */
 
-const ALLOWED_MIME_TYPES = [...IMAGE_MIME_TYPES, ...DOCUMENT_MIME_TYPES];
+const UPLOAD_ROOT = path.join(process.cwd(), "uploads");
+
+/* =========================================================
+   Ensure Directory
+========================================================= */
+
+const ensureDirectory = (directory) => {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory, {
+      recursive: true,
+    });
+  }
+};
+
+/* =========================================================
+   Allowed Image Types
+========================================================= */
+
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "image/svg+xml",
+];
 
 /* =========================================================
    Storage
 ========================================================= */
 
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const folder = req.uploadFolder || "temp";
+
+    const destination = path.join(UPLOAD_ROOT, folder);
+
+    ensureDirectory(destination);
+
+    cb(null, destination);
+  },
+
+  filename: (req, file, cb) => {
+    const extension = path.extname(file.originalname);
+
+    const basename = path
+      .basename(file.originalname, extension)
+      .replace(/[^a-zA-Z0-9-_]/g, "-")
+      .replace(/-+/g, "-")
+      .toLowerCase();
+
+    const timestamp = Date.now();
+
+    cb(null, `${basename}-${timestamp}${extension.toLowerCase()}`);
+  },
+});
 
 /* =========================================================
    File Filter
 ========================================================= */
 
-const fileFilter = (req, file, callback) => {
-  if (!file) {
-    const error = new Error("File is required.");
-
-    error.code = "FILE_REQUIRED";
-
-    return callback(error, false);
-  }
-
-  if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+const fileFilter = (req, file, cb) => {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.mimetype)) {
     const error = new Error(
-      "Invalid file type. Supported files are JPG, PNG, WEBP, SVG, PDF, DOC and DOCX.",
+      "Invalid file type. Only JPEG, PNG, WebP and SVG images are allowed.",
     );
 
     error.code = "INVALID_FILE_TYPE";
 
-    return callback(error, false);
+    return cb(error, false);
   }
 
-  callback(null, true);
+  cb(null, true);
 };
 
 /* =========================================================
-   Multer
+   Multer Instance
 ========================================================= */
 
 const upload = multer({
   storage,
 
-  fileFilter,
-
   limits: {
-    fileSize: MAX_FILE_SIZE,
-    files: 20,
+    fileSize: 5 * 1024 * 1024,
   },
+
+  fileFilter,
 });
 
 /* =========================================================
-   Single
+   Folder Middleware
 ========================================================= */
 
-export const uploadSingle = (fieldName = "file") => {
-  return upload.single(fieldName);
+export const setUploadFolder = (folder) => {
+  return (req, res, next) => {
+    req.uploadFolder = folder;
+    next();
+  };
 };
 
 /* =========================================================
-   Multiple
+   Single Upload
 ========================================================= */
 
-export const uploadMultiple = (fieldName = "files", maxCount = 20) => {
-  return upload.array(fieldName, maxCount);
+export const uploadSingle = (fieldName, folder = "temp") => {
+  return (req, res, next) => {
+    req.uploadFolder = folder;
+
+    upload.single(fieldName)(req, res, (error) => {
+      if (error) {
+        return next(error);
+      }
+
+      next();
+    });
+  };
 };
 
 /* =========================================================
-   Fields
+   Multiple Upload
 ========================================================= */
 
-export const uploadFields = (fields = []) => {
-  return upload.fields(fields);
+export const uploadMultiple = (fieldName, maxCount = 10, folder = "temp") => {
+  return (req, res, next) => {
+    req.uploadFolder = folder;
+
+    upload.array(fieldName, maxCount)(req, res, (error) => {
+      if (error) {
+        return next(error);
+      }
+
+      next();
+    });
+  };
 };
 
 /* =========================================================
-   Any
+   Fields Upload
 ========================================================= */
 
-export const uploadAny = () => {
-  return upload.any();
+export const uploadFields = (fields, folder = "temp") => {
+  return (req, res, next) => {
+    req.uploadFolder = folder;
+
+    upload.fields(fields)(req, res, (error) => {
+      if (error) {
+        return next(error);
+      }
+
+      next();
+    });
+  };
 };
 
 /* =========================================================
@@ -107,62 +173,63 @@ export const handleUploadError = (error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     switch (error.code) {
       case "LIMIT_FILE_SIZE":
-        error.statusCode = 400;
-        error.message = "File size exceeds the maximum limit of 5MB.";
-        break;
+        return res.status(400).json({
+          success: false,
+          statusCode: 400,
+          message: "File size must not exceed 5MB.",
+          error: {
+            code: error.code,
+          },
+        });
 
       case "LIMIT_FILE_COUNT":
-        error.statusCode = 400;
-        error.message = "Too many files uploaded.";
-        break;
+        return res.status(400).json({
+          success: false,
+          statusCode: 400,
+          message: "Too many files uploaded.",
+          error: {
+            code: error.code,
+          },
+        });
 
       case "LIMIT_UNEXPECTED_FILE":
-        error.statusCode = 400;
-        error.message = "Unexpected file field.";
-        break;
-
-      case "LIMIT_PART_COUNT":
-        error.statusCode = 400;
-        error.message = "Too many multipart form parts.";
-        break;
-
-      case "LIMIT_FIELD_KEY":
-        error.statusCode = 400;
-        error.message = "Field name is too long.";
-        break;
-
-      case "LIMIT_FIELD_VALUE":
-        error.statusCode = 400;
-        error.message = "Field value is too large.";
-        break;
-
-      case "LIMIT_FIELD_COUNT":
-        error.statusCode = 400;
-        error.message = "Too many fields submitted.";
-        break;
+        return res.status(400).json({
+          success: false,
+          statusCode: 400,
+          message: "Unexpected file field.",
+          error: {
+            code: error.code,
+          },
+        });
 
       default:
-        error.statusCode = 400;
-        error.message = "File upload failed.";
-        break;
+        return res.status(400).json({
+          success: false,
+          statusCode: 400,
+          message: error.message || "File upload failed.",
+          error: {
+            code: error.code,
+          },
+        });
     }
-
-    return next(error);
   }
 
   if (error.code === "INVALID_FILE_TYPE") {
-    error.statusCode = 400;
-
-    return next(error);
-  }
-
-  if (error.code === "FILE_REQUIRED") {
-    error.statusCode = 400;
-
-    return next(error);
+    return res.status(400).json({
+      success: false,
+      statusCode: 400,
+      message: error.message,
+      error: {
+        code: error.code,
+      },
+    });
   }
 
   return next(error);
 };
+
+/* =========================================================
+   Export Default
+========================================================= */
 
 export default upload;

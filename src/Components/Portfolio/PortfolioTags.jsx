@@ -16,22 +16,26 @@ const iconMap = {
   PHP: Code1,
   MySQL: Hierarchy,
   "REST API": Cloud,
-  JavaScript: JavaScript,
+  JavaScript,
   HTML5: Html5,
   CSS3: Brush2,
   WooCommerce: Shop,
 };
 
-function PortfolioTags({ technologies }) {
+function PortfolioTags({ technologies = [], className = "" }) {
+  if (!Array.isArray(technologies) || technologies.length === 0) {
+    return null;
+  }
+
   return (
-    <div className='flex flex-wrap gap-2'>
+    <div className={`flex flex-wrap gap-2 ${className}`}>
       {technologies.map((tech) => {
         const Icon = iconMap[tech] || Code1;
 
         return (
           <div
             key={tech}
-            className='
+            className="
               badge
               badge-md
               rounded-full
@@ -44,8 +48,9 @@ function PortfolioTags({ technologies }) {
               hover:border-primary
               hover:bg-primary/60
               hover:text-primary-content
-            '>
-            <Icon variant='Linear' size={16} />
+            "
+          >
+            <Icon variant="Linear" size={16} />
             <span>{tech}</span>
           </div>
         );

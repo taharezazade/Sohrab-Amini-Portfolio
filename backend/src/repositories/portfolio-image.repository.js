@@ -3,146 +3,71 @@
 import prisma from "../config/prisma.js";
 
 class PortfolioImageRepository {
-  /* ============================
-      Create Image
-  ============================ */
-
-  async create(portfolioId, data) {
-    return await prisma.portfolioImage.create({
-      data: {
-        image: data.image,
-
-        alt: data.alt ?? null,
-
-        order: data.order ?? 0,
-
-        portfolioId,
+  async findAll() {
+    return prisma.portfolioImage.findMany({
+      include: {
+        portfolio: {
+          select: { id: true, title: true, slug: true },
+        },
       },
+      orderBy: [{ portfolioId: "asc" }, { order: "asc" }],
     });
   }
 
-  /* ============================
-      Find All Images
-  ============================ */
-
-  async findAll(portfolioId) {
-    return await prisma.portfolioImage.findMany({
-      where: {
-        portfolioId,
-      },
-
-      orderBy: {
-        order: "asc",
-      },
+  async findByPortfolioId(portfolioId) {
+    return prisma.portfolioImage.findMany({
+      where: { portfolioId },
+      orderBy: { order: "asc" },
     });
   }
-
-  /* ============================
-      Find Image By ID
-  ============================ */
 
   async findById(id) {
-    return await prisma.portfolioImage.findUnique({
-      where: {
-        id,
+    return prisma.portfolioImage.findUnique({
+      where: { id },
+      include: {
+        portfolio: {
+          select: { id: true, title: true, slug: true },
+        },
       },
     });
   }
 
-  /* ============================
-      Update Image
-  ============================ */
+  async create(data) {
+    return prisma.portfolioImage.create({ data });
+  }
+
+  async createMany(data) {
+    return prisma.portfolioImage.createMany({ data });
+  }
 
   async update(id, data) {
-    return await prisma.portfolioImage.update({
-      where: {
-        id,
-      },
-
-      data: {
-        ...(data.image !== undefined && {
-          image: data.image,
-        }),
-
-        ...(data.alt !== undefined && {
-          alt: data.alt,
-        }),
-
-        ...(data.order !== undefined && {
-          order: data.order,
-        }),
-      },
+    return prisma.portfolioImage.update({
+      where: { id },
+      data,
     });
   }
-
-  /* ============================
-      Update Image Order
-  ============================ */
-
-  async updateOrder(id, order) {
-    return await prisma.portfolioImage.update({
-      where: {
-        id,
-      },
-
-      data: {
-        order,
-      },
-    });
-  }
-
-  /* ============================
-      Delete Image
-  ============================ */
 
   async delete(id) {
-    return await prisma.portfolioImage.delete({
-      where: {
-        id,
-      },
-    });
+    return prisma.portfolioImage.delete({ where: { id } });
   }
-
-  /* ============================
-      Delete All Portfolio Images
-  ============================ */
 
   async deleteByPortfolioId(portfolioId) {
-    return await prisma.portfolioImage.deleteMany({
-      where: {
-        portfolioId,
-      },
+    return prisma.portfolioImage.deleteMany({
+      where: { portfolioId },
     });
   }
 
-  /* ============================
-      Count Images
-  ============================ */
-
-  async count(portfolioId) {
-    return await prisma.portfolioImage.count({
-      where: {
-        portfolioId,
-      },
+  async countByPortfolioId(portfolioId) {
+    return prisma.portfolioImage.count({
+      where: { portfolioId },
     });
   }
 
-  /* ============================
-      Exists Image
-  ============================ */
-
-  async exists(id) {
-    const image = await prisma.portfolioImage.findUnique({
-      where: {
-        id,
-      },
-
-      select: {
-        id: true,
-      },
+  async updateOrder(id, order) {
+    return prisma.portfolioImage.update({
+      where: { id },
+      data: { order },
     });
-
-    return Boolean(image);
   }
 }
 

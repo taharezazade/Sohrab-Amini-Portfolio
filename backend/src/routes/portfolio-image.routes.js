@@ -3,105 +3,60 @@
 import { Router } from "express";
 
 import portfolioImageController from "../controllers/portfolio-image.controller.js";
-
-import { uploadSingle } from "../middlewares/upload.middleware.js";
+import {
+  uploadSingle,
+  uploadMultiple,
+  handleUploadError,
+} from "../middlewares/upload.middleware.js";
 
 const router = Router();
 
-/* ============================
-   Portfolio Images
-============================ */
+router.get("/", portfolioImageController.getAll.bind(portfolioImageController));
 
-/*
-    Add Portfolio Image
+router.get(
+  "/portfolio/:portfolioId",
+  portfolioImageController.getByPortfolio.bind(portfolioImageController),
+);
 
-    POST
-    /api/portfolio/:portfolioId/images
-
-    Content-Type:
-    multipart/form-data
-
-    Fields:
-
-    file
-    alt
-    order
-*/
+router.get(
+  "/:imageId",
+  portfolioImageController.getById.bind(portfolioImageController),
+);
 
 router.post(
-  "/:portfolioId/images",
-  uploadSingle("file"),
-  portfolioImageController.create,
+  "/portfolio/:portfolioId",
+  uploadSingle("image"),
+  handleUploadError,
+  portfolioImageController.create.bind(portfolioImageController),
 );
 
-/*
-    Get Portfolio Images
+router.post(
+  "/portfolio/:portfolioId/upload",
+  uploadMultiple("files", 20),
+  handleUploadError,
+  portfolioImageController.uploadMany.bind(portfolioImageController),
+);
 
-    GET
-    /api/portfolio/:portfolioId/images
-*/
+router.put(
+  "/:imageId",
+  uploadSingle("image"),
+  handleUploadError,
+  portfolioImageController.update.bind(portfolioImageController),
+);
 
-router.get("/:portfolioId/images", portfolioImageController.getAll);
-
-/*
-    Count Portfolio Images
-
-    GET
-    /api/portfolio/:portfolioId/images/count
-*/
-
-router.get("/:portfolioId/images/count", portfolioImageController.count);
-
-/*
-    Delete All Portfolio Images
-
-    DELETE
-    /api/portfolio/:portfolioId/images
-*/
+router.patch(
+  "/:imageId/order",
+  portfolioImageController.updateOrder.bind(portfolioImageController),
+);
 
 router.delete(
-  "/:portfolioId/images",
-  portfolioImageController.deleteByPortfolio,
+  "/portfolio/:portfolioId",
+  portfolioImageController.deleteByPortfolio.bind(portfolioImageController),
 );
 
-/* ============================
-   Single Image
-============================ */
-
-/*
-    Get Single Image
-
-    GET
-    /api/portfolio/images/:id
-*/
-
-router.get("/images/:id", portfolioImageController.getById);
-
-/*
-    Update Image
-
-    PUT
-    /api/portfolio/images/:id
-*/
-
-router.put("/images/:id", portfolioImageController.update);
-
-/*
-    Update Image Order
-
-    PATCH
-    /api/portfolio/images/:id/order
-*/
-
-router.patch("/images/:id/order", portfolioImageController.updateOrder);
-
-/*
-    Delete Image
-
-    DELETE
-    /api/portfolio/images/:id
-*/
-
-router.delete("/images/:id", portfolioImageController.delete);
+router.delete(
+  "/:imageId",
+  portfolioImageController.delete.bind(portfolioImageController),
+);
 
 export default router;

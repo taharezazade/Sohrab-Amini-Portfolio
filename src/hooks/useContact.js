@@ -1,42 +1,87 @@
 /** @format */
 
 import { useCallback, useEffect, useState } from "react";
+import contactApi from "@/api/contact.api";
 
-import contactService from "@/services/contact.service";
+const DEFAULT_PHONE = "09123884766";
 
-export default function useContact() {
-  const [contact, setContact] = useState(null);
+const initialContact = {
+  id: null,
+  phone: DEFAULT_PHONE,
+  whatsapp: DEFAULT_PHONE,
+  image: null,
+};
 
+const extractContact = (response) => {
+  const apiResponse = response?.data;
+
+  if (!apiResponse) {
+    return null;
+  }
+
+  return apiResponse.data ?? apiResponse.contact ?? null;
+};
+
+const normalizePhone = (value) => {
+  if (!value) return "";
+
+  return String(value)
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/\D/g, "");
+};
+
+const normalizeContact = (data) => {
+  if (!data) {
+    return initialContact;
+  }
+
+  const phone = normalizePhone(data.phone);
+  const whatsapp = normalizePhone(data.whatsapp);
+
+  return {
+    id: data.id ?? null,
+
+    phone: phone || DEFAULT_PHONE,
+
+    whatsapp: whatsapp || phone || DEFAULT_PHONE,
+
+    image: data.image ?? null,
+  };
+};
+
+const useContact = () => {
+  const [contact, setContact] = useState(initialContact);
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState(null);
 
-  const fetchContact = useCallback(async () => {
+  const loadContact = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await contactService.getContact();
+      const response = await contactApi.get();
 
-      setContact(response.data?.data ?? null);
-    } catch (err) {
-      console.error("Failed to fetch contact:", err);
+      const data = extractContact(response);
 
-      setError(err);
-      setContact(null);
+      setContact(normalizeContact(data));
+    } catch (error) {
+      setError(error);
+      setContact(initialContact);
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchContact();
-  }, [fetchContact]);
+    loadContact();
+  }, [loadContact]);
 
   return {
     contact,
     loading,
     error,
-    refresh: fetchContact,
+    reload: loadContact,
   };
-}
+};
+
+export default useContact;

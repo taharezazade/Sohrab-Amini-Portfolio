@@ -2,152 +2,104 @@
 
 import { z } from "zod";
 
-/* =====================================================
-    Constants
-===================================================== */
+const requiredString = (field) =>
+  z
+    .string({
+      required_error: `${field} الزامی است.`,
+      invalid_type_error: `${field} باید متن باشد.`,
+    })
+    .trim()
+    .min(1, `${field} الزامی است.`);
 
-export const PROJECT_STATUS = ["DRAFT", "PUBLISHED", "ARCHIVED"];
-
-/* =====================================================
-    Helpers
-===================================================== */
-
-const urlSchema = z
+const optionalUrl = z
   .string()
   .trim()
-  .url("Invalid URL.")
+  .url("آدرس GitHub معتبر نیست.")
   .optional()
-  .or(z.literal(""))
-  .nullable();
+  .nullable()
+  .or(z.literal(""));
 
-const imageSchema = z.string().trim().min(1, "Image is required.");
+const url = (field) =>
+  z
+    .string({
+      required_error: `${field} الزامی است.`,
+      invalid_type_error: `${field} باید متن باشد.`,
+    })
+    .trim()
+    .url(`${field} باید یک URL معتبر باشد.`);
 
-const slugSchema = z
-  .string()
-  .trim()
-  .min(3, "Slug must contain at least 3 characters.")
-  .max(200)
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug format is invalid.");
+const stringArray = (field) =>
+  z
+    .array(requiredString(field))
+    .min(1, `حداقل یک ${field} وارد کنید.`);
 
-/* =====================================================
-    Params
-===================================================== */
+const booleanFromMultipart = z.preprocess(
+  (value) => value === true || value === "true",
+  z.boolean(),
+);
 
-export const portfolioParamsSchema = z
-  .object({
-    id: z.string().cuid("Invalid portfolio id."),
-  })
-  .strict();
+const numberFromMultipart = z.coerce.number().int().min(0);
 
-/* =====================================================
-    Slug Params
-===================================================== */
+/* =========================================================
+   CREATE
+========================================================= */
 
-export const portfolioSlugSchema = z
-  .object({
-    slug: slugSchema,
-  })
-  .strict();
+export const createPortfolioSchema = z.object({
+  title: requiredString("عنوان پروژه"),
+  slug: requiredString("Slug"),
+  description: requiredString("توضیحات پروژه"),
+  thumbnail: requiredString("تصویر اصلی"),
+  projectUrl: url("لینک پروژه"),
+  githubUrl: optionalUrl,
+  category: requiredString("دسته‌بندی"),
+  technologies: stringArray("تکنولوژی"),
+  featured: booleanFromMultipart.default(false),
+  order: numberFromMultipart.default(0),
+  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
+  challenge: requiredString("چالش پروژه"),
+  client: requiredString("مشتری"),
+  duration: requiredString("مدت زمان پروژه"),
+  features: stringArray("ویژگی پروژه"),
+  role: requiredString("نقش شما در پروژه"),
+  solution: requiredString("راهکار پروژه"),
+});
 
-/* =====================================================
-    Create Portfolio
-===================================================== */
+/* =========================================================
+   UPDATE
+========================================================= */
 
-export const createPortfolioSchema = z
-  .object({
-    title: z.string().trim().min(3).max(150),
+export const updatePortfolioSchema = z.object({
+  title: requiredString("عنوان پروژه"),
+  slug: requiredString("Slug"),
+  description: requiredString("توضیحات پروژه"),
+  thumbnail: requiredString("تصویر اصلی"),
+  projectUrl: url("لینک پروژه"),
+  githubUrl: optionalUrl,
+  category: requiredString("دسته‌بندی"),
+  technologies: stringArray("تکنولوژی"),
+  featured: booleanFromMultipart,
+  order: numberFromMultipart,
+  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
+  challenge: requiredString("چالش پروژه"),
+  client: requiredString("مشتری"),
+  duration: requiredString("مدت زمان پروژه"),
+  features: stringArray("ویژگی پروژه"),
+  role: requiredString("نقش شما در پروژه"),
+  solution: requiredString("راهکار پروژه"),
+});
 
-    slug: slugSchema,
+/* =========================================================
+   STATUS
+========================================================= */
 
-    description: z.string().trim().min(10).max(10000),
+export const updatePortfolioStatusSchema = z.object({
+  status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
+});
 
-    thumbnail: imageSchema.optional().nullable(),
+/* =========================================================
+   ORDER
+========================================================= */
 
-    projectUrl: urlSchema,
-
-    githubUrl: urlSchema,
-
-    category: z.string().trim().min(2).max(100),
-
-    technologies: z
-      .array(z.string().trim().min(1))
-      .max(50)
-      .transform((items) => [...new Set(items)])
-      .default([]),
-
-    featured: z.boolean().default(false),
-
-    order: z.number().int().min(0).default(0),
-
-    status: z.enum(PROJECT_STATUS).default("PUBLISHED"),
-  })
-  .strict();
-
-/* =====================================================
-    Update Portfolio
-===================================================== */
-
-export const updatePortfolioSchema = createPortfolioSchema.partial();
-
-/* =====================================================
-    Status
-===================================================== */
-
-export const portfolioStatusSchema = z
-  .object({
-    status: z.enum(PROJECT_STATUS),
-  })
-  .strict();
-
-/* =====================================================
-    Featured
-===================================================== */
-
-export const portfolioFeaturedSchema = z
-  .object({
-    featured: z.boolean(),
-  })
-  .strict();
-
-/* =====================================================
-    Order
-===================================================== */
-
-export const portfolioOrderSchema = z
-  .object({
-    order: z.number().int().min(0),
-  })
-  .strict();
-
-/* =====================================================
-    Portfolio Image
-===================================================== */
-
-export const portfolioImageSchema = z
-  .object({
-    image: imageSchema,
-
-    alt: z.string().trim().max(255).optional().nullable(),
-
-    order: z.number().int().min(0).default(0),
-  })
-  .strict();
-
-/* =====================================================
-    Portfolio Image Order
-===================================================== */
-
-export const portfolioImageOrderSchema = z
-  .object({
-    order: z.number().int().min(0),
-  })
-  .strict();
-
-/* =====================================================
-    Bulk Images
-===================================================== */
-
-export const portfolioImagesSchema = z
-  .array(portfolioImageSchema)
-  .min(1)
-  .max(100);
+export const updatePortfolioOrderSchema = z.object({
+  order: z.coerce.number().int().min(0),
+});

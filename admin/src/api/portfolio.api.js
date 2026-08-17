@@ -1,24 +1,27 @@
 /** @format */
 
 import api from "@/api/axios";
-
 import { PORTFOLIO_ENDPOINTS } from "@/api/endpoints";
 
 /* =========================================================
-   Portfolio API
+   PORTFOLIO API
 ========================================================= */
 
 const portfolioApi = {
   /* =======================================================
      GET ALL
+     GET /api/portfolio
   ======================================================= */
 
-  getAll() {
-    return api.get(PORTFOLIO_ENDPOINTS.GET_ALL);
+  getAll(params = {}) {
+    return api.get(PORTFOLIO_ENDPOINTS.GET_ALL, {
+      params,
+    });
   },
 
   /* =======================================================
      GET PUBLISHED
+     GET /api/portfolio/published
   ======================================================= */
 
   getPublished() {
@@ -27,6 +30,7 @@ const portfolioApi = {
 
   /* =======================================================
      GET FEATURED
+     GET /api/portfolio/featured
   ======================================================= */
 
   getFeatured() {
@@ -35,6 +39,7 @@ const portfolioApi = {
 
   /* =======================================================
      GET BY ID
+     GET /api/portfolio/:id
   ======================================================= */
 
   getById(id) {
@@ -43,6 +48,7 @@ const portfolioApi = {
 
   /* =======================================================
      GET BY SLUG
+     GET /api/portfolio/slug/:slug
   ======================================================= */
 
   getBySlug(slug) {
@@ -51,6 +57,7 @@ const portfolioApi = {
 
   /* =======================================================
      EXISTS
+     GET /api/portfolio/exists
   ======================================================= */
 
   exists() {
@@ -59,6 +66,7 @@ const portfolioApi = {
 
   /* =======================================================
      COUNT
+     GET /api/portfolio/count
   ======================================================= */
 
   count() {
@@ -67,6 +75,7 @@ const portfolioApi = {
 
   /* =======================================================
      CREATE
+     POST /api/portfolio
   ======================================================= */
 
   create(payload) {
@@ -75,6 +84,7 @@ const portfolioApi = {
 
   /* =======================================================
      UPDATE
+     PUT /api/portfolio/:id
   ======================================================= */
 
   update(id, payload) {
@@ -83,6 +93,7 @@ const portfolioApi = {
 
   /* =======================================================
      DELETE
+     DELETE /api/portfolio/:id
   ======================================================= */
 
   remove(id) {
@@ -91,51 +102,53 @@ const portfolioApi = {
 
   /* =======================================================
      UPDATE STATUS
+     PATCH /api/portfolio/:id/status
   ======================================================= */
 
-  updateStatus(id, payload) {
-    return api.patch(PORTFOLIO_ENDPOINTS.UPDATE_STATUS(id), payload);
-  },
-
-  /* =======================================================
-     UPDATE IMAGE
-  ======================================================= */
-
-  updateImage(id, payload) {
-    return api.put(PORTFOLIO_ENDPOINTS.UPDATE_IMAGE(id), payload);
-  },
-
-  /* =======================================================
-     CLEAR IMAGE
-  ======================================================= */
-
-  clearImage(id) {
-    return api.delete(PORTFOLIO_ENDPOINTS.CLEAR_IMAGE(id));
-  },
-
-  /* =======================================================
-     UPLOAD IMAGES
-  ======================================================= */
-
-  uploadImages(id, formData) {
-    return api.post(PORTFOLIO_ENDPOINTS.UPLOAD_IMAGES(id), formData);
-  },
-
-  /* =======================================================
-     DELETE IMAGE
-  ======================================================= */
-
-  deleteImage(id) {
-    return api.delete(PORTFOLIO_ENDPOINTS.DELETE_IMAGE(id));
+  updateStatus(id, status) {
+    return api.patch(PORTFOLIO_ENDPOINTS.UPDATE_STATUS(id), {
+      status,
+    });
   },
 
   /* =======================================================
      REORDER
+     PATCH /api/portfolio/reorder
   ======================================================= */
 
   reorder(payload) {
     return api.patch(PORTFOLIO_ENDPOINTS.REORDER, payload);
   },
+
+  /* =======================================================
+     PORTFOLIO IMAGES
+  ======================================================= */
+
+  /* -------------------------------------------------------
+     UPLOAD MULTIPLE IMAGES
+     POST /api/portfolio/:portfolioId/images
+  ------------------------------------------------------- */
+
+  uploadImages(portfolioId, formData) {
+    return api.post(PORTFOLIO_ENDPOINTS.UPLOAD_IMAGES(portfolioId), formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+
+  /* -------------------------------------------------------
+     DELETE PORTFOLIO IMAGE
+     DELETE /api/portfolio/images/:imageId
+  ------------------------------------------------------- */
+
+  deleteImage(imageId) {
+    return api.delete(PORTFOLIO_ENDPOINTS.DELETE_IMAGE(imageId));
+  },
 };
+
+/* =========================================================
+   EXPORT
+========================================================= */
 
 export default portfolioApi;

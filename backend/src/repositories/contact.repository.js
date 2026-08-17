@@ -3,36 +3,24 @@
 import prisma from "../config/prisma.js";
 
 class ContactRepository {
-  /* =========================================================
-     Find Contact
-  ========================================================= */
-
   async find() {
-    return await prisma.contact.findFirst({
+    return prisma.contact.findFirst({
       orderBy: {
         createdAt: "asc",
       },
     });
   }
 
-  /* =========================================================
-     Find Contact By ID
-  ========================================================= */
-
   async findById(id) {
-    return await prisma.contact.findUnique({
+    return prisma.contact.findUnique({
       where: {
         id,
       },
     });
   }
 
-  /* =========================================================
-     Create Contact
-  ========================================================= */
-
   async create(data) {
-    return await prisma.contact.create({
+    return prisma.contact.create({
       data: {
         phone: data.phone,
         whatsapp: data.whatsapp,
@@ -41,15 +29,12 @@ class ContactRepository {
     });
   }
 
-  /* =========================================================
-     Update Contact
-  ========================================================= */
-
   async update(id, data) {
-    return await prisma.contact.update({
+    return prisma.contact.update({
       where: {
         id,
       },
+
       data: {
         ...(data.phone !== undefined && {
           phone: data.phone,
@@ -66,35 +51,23 @@ class ContactRepository {
     });
   }
 
-  /* =========================================================
-     Upsert Contact
-  ========================================================= */
-
   async upsert(data) {
-    const contact = await this.find();
+    const existing = await this.find();
 
-    if (contact) {
-      return await this.update(contact.id, data);
+    if (existing) {
+      return this.update(existing.id, data);
     }
 
-    return await this.create(data);
+    return this.create(data);
   }
 
-  /* =========================================================
-     Delete Contact
-  ========================================================= */
-
   async delete(id) {
-    return await prisma.contact.delete({
+    return prisma.contact.delete({
       where: {
         id,
       },
     });
   }
-
-  /* =========================================================
-     Exists
-  ========================================================= */
 
   async exists() {
     const contact = await prisma.contact.findFirst({
@@ -106,68 +79,52 @@ class ContactRepository {
     return Boolean(contact);
   }
 
-  /* =========================================================
-     Count
-  ========================================================= */
-
   async count() {
-    return await prisma.contact.count();
+    return prisma.contact.count();
   }
 
-  /* =========================================================
-     Update Phone
-  ========================================================= */
-
   async updatePhone(id, phone) {
-    return await prisma.contact.update({
+    return prisma.contact.update({
       where: {
         id,
       },
+
       data: {
         phone,
       },
     });
   }
 
-  /* =========================================================
-     Update WhatsApp
-  ========================================================= */
-
   async updateWhatsapp(id, whatsapp) {
-    return await prisma.contact.update({
+    return prisma.contact.update({
       where: {
         id,
       },
+
       data: {
         whatsapp,
       },
     });
   }
 
-  /* =========================================================
-     Update Image
-  ========================================================= */
-
   async updateImage(id, image) {
-    return await prisma.contact.update({
+    return prisma.contact.update({
       where: {
         id,
       },
+
       data: {
         image: image ?? null,
       },
     });
   }
 
-  /* =========================================================
-     Clear Image
-  ========================================================= */
-
   async clearImage(id) {
-    return await prisma.contact.update({
+    return prisma.contact.update({
       where: {
         id,
       },
+
       data: {
         image: null,
       },

@@ -7,9 +7,150 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-////////////////////////////////////////////////////////////
-// ENUMS
-////////////////////////////////////////////////////////////
+model Admin {
+  id          String    @id @default(cuid())
+  firstName   String?
+  lastName    String?
+  displayName String?
+  username    String    @unique
+  email       String    @unique
+  phone       String?
+  bio         String?
+  image       String?
+  password    String
+  role        Role      @default(ADMIN)
+  lastLogin   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Hero {
+  id                  String   @id @default(cuid())
+  title               String
+  subtitle            String
+  description         String
+  image               String
+  resume              String?
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  primaryButtonText   String?
+  primaryButtonLink   String?
+  secondaryButtonText String?
+  secondaryButtonLink String?
+  seoTitle            String?
+  seoDescription      String?
+}
+
+model About {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  birthYear   Int?
+  location    String?
+  experience  Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Service {
+  id               String   @id @default(uuid())
+  title            String
+  shortDescription String?
+  description      String
+  icon             String?
+  features         Json
+  category         String?
+  technologies     Json
+  color            String?
+  order            Int      @default(0)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Portfolio {
+  id           String           @id @default(cuid())
+  title        String
+  slug         String           @unique
+  description  String
+  thumbnail    String?
+  projectUrl   String?
+  githubUrl    String?
+  category     String
+  technologies String[]
+  featured     Boolean          @default(false)
+  order        Int              @default(0)
+  status       ProjectStatus    @default(DRAFT)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  challenge    String?
+  client       String?
+  duration     String?
+  features     String[]
+  role         String?
+  solution     String?
+  images       PortfolioImage[]
+}
+
+model PortfolioImage {
+  id          String    @id @default(cuid())
+  image       String
+  alt         String?
+  order       Int       @default(0)
+  portfolioId String
+  createdAt   DateTime  @default(now())
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  phone     String
+  whatsapp  String
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Setting {
+  id                String   @id @default(cuid())
+  /// ///////////////////////////////////////////////////////
+  /// ///////////////////////////////////////////////////////
+  siteName          String
+  siteTitle         String
+  description       String
+  /// ///////////////////////////////////////////////////////
+  /// ///////////////////////////////////////////////////////
+  phone             String?
+  email             String?
+  /// ///////////////////////////////////////////////////////
+  /// ///////////////////////////////////////////////////////
+  logo              String?
+  favicon           String?
+  /// ///////////////////////////////////////////////////////
+  /// ///////////////////////////////////////////////////////
+  metaTitle         String?
+  metaDescription   String?
+  keywords          String?
+  canonicalUrl      String?
+  /// ///////////////////////////////////////////////////////
+  /// ///////////////////////////////////////////////////////
+  instagram         String?
+  linkedin          String?
+  github            String?
+  telegram          String?
+  twitter           String?
+  whatsapp          String?
+  /// ///////////////////////////////////////////////////////
+  /// ///////////////////////////////////////////////////////
+  maintenanceMode   Boolean  @default(false)
+  twoFactor         Boolean  @default(false)
+  allowRegistration Boolean  @default(false)
+  /// ///////////////////////////////////////////////////////
+  /// ///////////////////////////////////////////////////////
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
 
 enum Role {
   ADMIN
@@ -19,254 +160,4 @@ enum ProjectStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
-}
-
-////////////////////////////////////////////////////////////
-// ADMIN
-////////////////////////////////////////////////////////////
-
-model Admin {
-  id String @id @default(cuid())
-
-  firstName String?
-  lastName  String?
-
-  displayName String?
-
-  username String  @unique
-  email    String  @unique
-  phone    String?
-
-  bio String?
-
-  image String?
-
-  password String
-
-  role Role @default(ADMIN)
-
-  lastLogin DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-////////////////////////////////////////////////////////////
-// HERO
-////////////////////////////////////////////////////////////
-
-model Hero {
-  id String @id @default(cuid())
-
-  title       String
-  subtitle    String
-  description String
-
-  image  String
-  resume String?
-
-  isActive Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  primaryButtonText String?
-  primaryButtonLink String?
-
-  secondaryButtonText String?
-  secondaryButtonLink String?
-
-  seoTitle       String?
-  seoDescription String?
-}
-
-////////////////////////////////////////////////////////////
-// ABOUT
-////////////////////////////////////////////////////////////
-
-model About {
-  id String @id @default(cuid())
-
-  title       String
-  description String
-
-  birthYear  Int?
-  location   String?
-  experience Int?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-////////////////////////////////////////////////////////////
-// SERVICE
-////////////////////////////////////////////////////////////
-
-model Service {
-  id String @id @default(uuid())
-
-  title String
-
-  shortDescription String?
-
-  description String
-
-  icon String?
-
-  features Json
-
-  category String?
-
-  technologies Json
-
-  color String?
-
-  order Int @default(0)
-
-  isActive Boolean @default(true)
-
-  createdAt DateTime @default(now())
-
-  updatedAt DateTime @updatedAt
-}
-
-////////////////////////////////////////////////////////////
-// PORTFOLIO
-////////////////////////////////////////////////////////////
-
-model Portfolio {
-  id String @id @default(cuid())
-
-  title String
-
-  slug String @unique
-
-  description String @db.Text
-
-  thumbnail String?
-
-  projectUrl String?
-
-  githubUrl String?
-
-  category String
-
-  technologies String[]
-
-  featured Boolean @default(false)
-
-  order Int @default(0)
-
-  status ProjectStatus @default(PUBLISHED)
-
-  images PortfolioImage[]
-
-  createdAt DateTime @default(now())
-
-  updatedAt DateTime @updatedAt
-
-  @@index([status])
-  @@index([featured])
-  @@index([order])
-  @@index([slug])
-}
-
-////////////////////////////////////////////////////////////
-// PORTFOLIO IMAGES
-////////////////////////////////////////////////////////////
-
-model PortfolioImage {
-  id String @id @default(cuid())
-
-  image String
-
-  alt String?
-
-  order Int @default(0)
-
-  portfolioId String
-
-  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-}
-
-////////////////////////////////////////////////////////////
-// CONTACT
-////////////////////////////////////////////////////////////
-
-model Contact {
-  id String @id @default(cuid())
-
-  phone    String
-  whatsapp String
-
-  image String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-////////////////////////////////////////////////////////////
-// SETTINGS
-////////////////////////////////////////////////////////////
-
-model Setting {
-  id String @id @default(cuid())
-
-  // General
-
-  siteName String
-
-  siteTitle String
-
-  description String
-
-  // Contact
-
-  phone String?
-
-  email String?
-
-  // Branding
-
-  logo String?
-
-  favicon String?
-
-  // SEO
-
-  metaTitle String?
-
-  metaDescription String?
-
-  keywords String?
-
-  canonicalUrl String?
-
-  // Social
-
-  instagram String?
-
-  linkedin String?
-
-  github String?
-
-  telegram String?
-
-  twitter String?
-
-  whatsapp String?
-
-  // Security
-
-  maintenanceMode Boolean @default(false)
-
-  twoFactor Boolean @default(false)
-
-  allowRegistration Boolean @default(false)
-
-  createdAt DateTime @default(now())
-
-  updatedAt DateTime @updatedAt
 }

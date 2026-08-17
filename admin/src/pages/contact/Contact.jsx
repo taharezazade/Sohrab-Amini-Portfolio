@@ -1,47 +1,89 @@
 /** @format */
 
 import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
-import Background from "../../components/contact/Background";
+import contactApi from "@/api/contact.api";
 
 import ContactHeader from "../../components/contact/ContactHeader";
 import ContactSettings from "../../components/contact/ContactSettings";
 import ContactSkeleton from "../../components/contact/ContactSkeleton";
 
-const initialState = {
-  phone: "09123884766",
-  whatsapp: "09123884766",
+const INITIAL_STATE = {
+  id: null,
+  phone: "",
+  whatsapp: "",
   image: null,
   preview: null,
 };
 
 const Contact = () => {
-  const [contact, setContact] = useState(initialState);
+  const [contact, setContact] = useState(INITIAL_STATE);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const [initialized, setInitialized] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const normalizeContact = (data) => {
+    const contactData = data?.data ?? data;
+
+    return {
+      id: contactData?.id ?? null,
+
+      phone: contactData?.phone ?? "",
+
+      whatsapp: contactData?.whatsapp ?? "",
+
+      image: contactData?.image ?? null,
+
+      preview: contactData?.image ?? null,
+    };
+  };
+
+  const loadContact = async () => {
+    try {
+      setLoading(true);
+
+      const response = await contactApi.get();
+
+      const data = response?.data?.data ?? response?.data;
+
+      if (!data) {
+        setContact(INITIAL_STATE);
+        return;
+      }
+
+      setContact(normalizeContact(data));
+    } catch (error) {
+      console.error("Contact load error:", error);
+
+      toast.error(
+        error?.response?.data?.message ||
+          "دریافت اطلاعات تماس با خطا مواجه شد.",
+      );
+
+      setContact(INITIAL_STATE);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadContact = async () => {
-      try {
-        setLoading(true);
-
-        setContact(initialState);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-
-        setInitialized(true);
-      }
-    };
-
     loadContact();
+
+    return () => {
+      setContact((prev) => {
+        if (prev.preview?.startsWith("blob:")) {
+          URL.revokeObjectURL(prev.preview);
+        }
+
+        return prev;
+      });
+    };
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = (event) => {
+    const { name, value } = event.target;
 
     setContact((prev) => ({
       ...prev,
@@ -52,73 +94,108 @@ const Contact = () => {
   const handleImageChange = (file) => {
     if (!file) return;
 
-    if (file.type !== "image/webp") return;
-
-    const preview = URL.createObjectURL(file);
-
-    setContact((prev) => ({
-      ...prev,
-
-      image: file,
-
-      preview,
-    }));
-  };
-
-  const handleRemoveImage = () => {
-    if (contact.preview) {
-      URL.revokeObjectURL(contact.preview);
+    if (file.type !== "image/webp") {
+      toast.error("فقط تصاویر WEBP مجاز هستند.");
+      return;
     }
 
-    setContact((prev) => ({
-      ...prev,
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("حجم تصویر نباید بیشتر از ۵ مگابایت باشد.");
+      return;
+    }
 
-      image: null,
+    setContact((prev) => {
+      if (prev.preview?.startsWith("blob:")) {
+        URL.revokeObjectURL(prev.preview);
+      }
 
-      preview: null,
-    }));
+      return {
+        ...prev,
+        image: file,
+        preview: URL.createObjectURL(file),
+      };
+    });
+  };
+
+  const handleRemoveImage = async () => {
+    try {
+      if (!contact.id) {
+        setContact((prev) => ({
+          ...prev,
+          image: null,
+          preview: null,
+        }));
+
+        return;
+      }
+
+      setSaving(true);
+
+      await contactApi.clearImage(contact.id);
+
+      if (contact.preview?.startsWith("blob:")) {
+        URL.revokeObjectURL(contact.preview);
+      }
+
+      setContact((prev) => ({
+        ...prev,
+        image: null,
+        preview: null,
+      }));
+
+      toast.success("تصویر با موفقیت حذف شد.");
+    } catch (error) {
+      console.error("Contact image remove error:", error);
+
+      toast.error(
+        error?.response?.data?.message || "حذف تصویر با خطا مواجه شد.",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSave = async () => {
+    console.log("🔥 HANDLE SAVE FIRED");
+    console.log("📦 Contact:", contact);
+
     try {
       setLoading(true);
 
-      const formData = new FormData();
+      const response = await contactApi.update({
+        phone: contact.phone,
+        whatsapp: contact.whatsapp,
+      });
 
-      formData.append("phone", contact.phone);
+      console.log("✅ Contact saved:", response.data);
 
-      formData.append("whatsapp", contact.whatsapp);
+      const updatedContact = response.data?.data || response.data;
 
-      if (contact.image) {
-        formData.append("image", contact.image);
-      }
+      setContact((prev) => ({
+        ...prev,
+        phone: updatedContact.phone,
+        whatsapp: updatedContact.whatsapp,
+      }));
+
+      toast.success("اطلاعات تماس با موفقیت ذخیره شد.");
     } catch (error) {
-      console.error(error);
+      console.error("❌ Contact save error:", error);
+      console.error("❌ Response:", error.response?.data);
+
+      toast.error(
+        error.response?.data?.message || "ذخیره اطلاعات تماس با خطا مواجه شد.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleReset = () => {
-    setContact(initialState);
+    loadContact();
   };
 
-  if (!initialized || loading) {
-    return (
-      <section
-        className='
-          relative
-          h-screen
-          overflow-hidden
-          p-4
-        '>
-        {/* <Background /> */}
-
-        <div className='relative z-10 h-full'>
-          <ContactSkeleton />
-        </div>
-      </section>
-    );
+  if (loading) {
+    return <ContactSkeleton />;
   }
 
   return (
@@ -129,53 +206,36 @@ const Contact = () => {
         overflow-hidden
         p-4
       '>
-      {/* <Background /> */}
-
       <div
         className='
           relative
           z-10
-
           mx-auto
-
           flex
           h-full
-
           max-w-7xl
-
           flex-col
-
           gap-4
-
         '>
         <ContactHeader
           phone={contact.phone}
-
           whatsapp={contact.whatsapp}
-
-          saving={loading}
-
+          saving={saving}
           onSave={handleSave}
         />
 
         <div
           className='
             flex-1
-            overflow-hidden
+            overflow-auto
           '>
           <ContactSettings
             values={contact}
-
-            loading={loading}
-
+            loading={saving}
             onChange={handleChange}
-
             onImageChange={handleImageChange}
-
             onRemoveImage={handleRemoveImage}
-
             onSubmit={handleSave}
-
             onReset={handleReset}
           />
         </div>

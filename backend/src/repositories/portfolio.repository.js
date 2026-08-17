@@ -2,333 +2,123 @@
 
 import prisma from "../config/prisma.js";
 
+const imageInclude = {
+  images: {
+    orderBy: { order: "asc" },
+  },
+};
+
 class PortfolioRepository {
-  /* =========================================
-      Get All Portfolios
-  ========================================= */
-
   async findAll() {
-    return await prisma.portfolio.findMany({
-      include: {
-        images: {
-          orderBy: {
-            order: "asc",
-          },
-        },
-      },
-
-      orderBy: [
-        {
-          order: "asc",
-        },
-        {
-          createdAt: "desc",
-        },
-      ],
+    return prisma.portfolio.findMany({
+      include: imageInclude,
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     });
   }
-
-  /* =========================================
-      Get Published Portfolios
-  ========================================= */
 
   async findPublished() {
-    return await prisma.portfolio.findMany({
-      where: {
-        status: "PUBLISHED",
-      },
-
-      include: {
-        images: {
-          orderBy: {
-            order: "asc",
-          },
-        },
-      },
-
-      orderBy: [
-        {
-          order: "asc",
-        },
-        {
-          createdAt: "desc",
-        },
-      ],
+    return prisma.portfolio.findMany({
+      where: { status: "PUBLISHED" },
+      include: imageInclude,
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     });
   }
-
-  /* =========================================
-      Get Featured Portfolios
-  ========================================= */
 
   async findFeatured() {
-    return await prisma.portfolio.findMany({
-      where: {
-        featured: true,
-
-        status: "PUBLISHED",
-      },
-
-      include: {
-        images: true,
-      },
-
-      orderBy: [
-        {
-          order: "asc",
-        },
-        {
-          createdAt: "desc",
-        },
-      ],
+    return prisma.portfolio.findMany({
+      where: { featured: true },
+      include: imageInclude,
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     });
   }
-
-  /* =========================================
-      Find By ID
-  ========================================= */
 
   async findById(id) {
-    return await prisma.portfolio.findUnique({
-      where: {
-        id,
-      },
-
-      include: {
-        images: {
-          orderBy: {
-            order: "asc",
-          },
-        },
-      },
+    return prisma.portfolio.findUnique({
+      where: { id },
+      include: imageInclude,
     });
   }
-
-  /* =========================================
-      Find By Slug
-  ========================================= */
 
   async findBySlug(slug) {
-    return await prisma.portfolio.findUnique({
-      where: {
-        slug,
-      },
-
-      include: {
-        images: {
-          orderBy: {
-            order: "asc",
-          },
-        },
-      },
+    return prisma.portfolio.findUnique({
+      where: { slug },
+      include: imageInclude,
     });
   }
 
-  /* =========================================
-      Create
-  ========================================= */
+  async findByCategory(category) {
+    return prisma.portfolio.findMany({
+      where: { category },
+      include: imageInclude,
+      orderBy: { order: "asc" },
+    });
+  }
 
   async create(data) {
-    return await prisma.portfolio.create({
+    return prisma.portfolio.create({
       data,
-
-      include: {
-        images: true,
-      },
+      include: imageInclude,
     });
   }
-
-  /* =========================================
-      Update
-  ========================================= */
 
   async update(id, data) {
-    return await prisma.portfolio.update({
-      where: {
-        id,
-      },
-
+    return prisma.portfolio.update({
+      where: { id },
       data,
-
-      include: {
-        images: true,
-      },
+      include: imageInclude,
     });
   }
-
-  /* =========================================
-      Delete
-  ========================================= */
 
   async delete(id) {
-    return await prisma.portfolio.delete({
-      where: {
-        id,
-      },
-    });
+    return prisma.portfolio.delete({ where: { id } });
   }
-
-  /* =========================================
-      Count
-  ========================================= */
-
-  async count() {
-    return await prisma.portfolio.count();
-  }
-
-  /* =========================================
-      Exists By ID
-  ========================================= */
 
   async existsById(id) {
-    const portfolio = await prisma.portfolio.findUnique({
-      where: {
-        id,
-      },
-
-      select: {
-        id: true,
-      },
+    const row = await prisma.portfolio.findUnique({
+      where: { id },
+      select: { id: true },
     });
 
-    return !!portfolio;
+    return Boolean(row);
   }
 
-  /* =========================================
-      Exists By Slug
-  ========================================= */
-
-  async existsBySlug(slug) {
-    const portfolio = await prisma.portfolio.findUnique({
+  async existsBySlug(slug, excludeId = null) {
+    const row = await prisma.portfolio.findFirst({
       where: {
         slug,
+        ...(excludeId ? { NOT: { id: excludeId } } : {}),
       },
-
-      select: {
-        id: true,
-      },
+      select: { id: true },
     });
 
-    return !!portfolio;
+    return Boolean(row);
   }
 
-  /* =========================================
-      Update Status
-  ========================================= */
+  async count(where = {}) {
+    return prisma.portfolio.count({ where });
+  }
 
   async updateStatus(id, status) {
-    return await prisma.portfolio.update({
-      where: {
-        id,
-      },
-
-      data: {
-        status,
-      },
+    return prisma.portfolio.update({
+      where: { id },
+      data: { status },
+      include: imageInclude,
     });
   }
 
-  /* =========================================
-      Toggle Featured
-  ========================================= */
-
-  async toggleFeatured(id, featured) {
-    return await prisma.portfolio.update({
-      where: {
-        id,
-      },
-
-      data: {
-        featured,
-      },
+  async updateFeatured(id, featured) {
+    return prisma.portfolio.update({
+      where: { id },
+      data: { featured },
+      include: imageInclude,
     });
   }
-
-  /* =========================================
-      Update Order
-  ========================================= */
 
   async updateOrder(id, order) {
-    return await prisma.portfolio.update({
-      where: {
-        id,
-      },
-
-      data: {
-        order,
-      },
-    });
-  }
-
-  /* =========================================
-      Get Images
-  ========================================= */
-
-  async findImages(portfolioId) {
-    return await prisma.portfolioImage.findMany({
-      where: {
-        portfolioId,
-      },
-
-      orderBy: {
-        order: "asc",
-      },
-    });
-  }
-
-  /* =========================================
-      Add Image
-  ========================================= */
-
-  async addImage(portfolioId, data) {
-    return await prisma.portfolioImage.create({
-      data: {
-        ...data,
-
-        portfolioId,
-      },
-    });
-  }
-
-  /* =========================================
-      Update Image
-  ========================================= */
-
-  async updateImage(imageId, data) {
-    return await prisma.portfolioImage.update({
-      where: {
-        id: imageId,
-      },
-
-      data,
-    });
-  }
-
-  /* =========================================
-      Delete Image
-  ========================================= */
-
-  async deleteImage(imageId) {
-    return await prisma.portfolioImage.delete({
-      where: {
-        id: imageId,
-      },
-    });
-  }
-
-  /* =========================================
-      Update Image Order
-  ========================================= */
-
-  async updateImageOrder(imageId, order) {
-    return await prisma.portfolioImage.update({
-      where: {
-        id: imageId,
-      },
-
-      data: {
-        order,
-      },
+    return prisma.portfolio.update({
+      where: { id },
+      data: { order },
+      include: imageInclude,
     });
   }
 }

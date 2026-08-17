@@ -1,67 +1,48 @@
 /** @format */
 
 import api from "@/api/axios";
-import API from "@/constants/api";
+
+const BASE = "/portfolio";
 
 const portfolioService = {
-  /**
-   * Get All Portfolio Items
-   */
-  getAll() {
-    return api.get(API.GET_ALL);
+  getAll(params = {}) {
+    return api.get(BASE, { params });
   },
 
-  /**
-   * Get Portfolio By ID
-   */
+  getPublished() {
+    return api.get(`${BASE}/published`);
+  },
+
+  getFeatured() {
+    return api.get(`${BASE}/featured`);
+  },
+
   getById(id) {
-    return api.get(API.GET_BY_ID(id));
+    return api.get(`${BASE}/${id}`);
   },
 
-  /**
-   * Create Portfolio
-   */
-  create(payload) {
-    return api.post(API.CREATE, payload);
+  getBySlug(slug) {
+    return api.get(`${BASE}/slug/${encodeURIComponent(slug)}`);
   },
 
-  /**
-   * Update Portfolio
-   */
-  update(id, payload) {
-    return api.put(API.UPDATE(id), payload);
+  create(formData) {
+    return api.post(BASE, formData, { headers: { "Content-Type": "multipart/form-data" } });
   },
 
-  /**
-   * Delete Portfolio
-   */
+  update(id, formData) {
+    return api.put(`${BASE}/${id}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+  },
+
   remove(id) {
-    return api.delete(API.DELETE(id));
+    return api.delete(`${BASE}/${id}`);
   },
 
-  /**
-   * Upload Portfolio Images
-   */
-  uploadImages(id, formData) {
-    return api.post(API.UPLOAD_IMAGES(id), formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+  updateStatus(id, status) {
+    return api.patch(`${BASE}/${id}/status`, { status });
   },
 
-  /**
-   * Delete Portfolio Image
-   */
-  deleteImage(id) {
-    return api.delete(API.DELETE_IMAGE(id));
-  },
-
-  /**
-   * Reorder Portfolio Items
-   */
-  reorder(payload) {
-    return api.patch(API.REORDER, payload);
+  updateOrder(id, order) {
+    return api.patch(`${BASE}/${id}/order`, { order });
   },
 };
 
