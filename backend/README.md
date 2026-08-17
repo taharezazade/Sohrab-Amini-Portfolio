@@ -1,95 +1,98 @@
-# Sohrab Amini Portfolio
+# Sohrab Amini — Backend API
 
-A modern, scalable, and high-performance personal portfolio built with React, Vite, Tailwind CSS, and a custom Express.js backend. The project is designed with a clean architecture and will include a dedicated admin panel for dynamic content management.
+RESTful backend API for the Sohrab Amini Portfolio and CMS.
 
----
-
-## Overview
-
-This project is more than a personal portfolio. It is a custom portfolio platform with a dedicated content management system (CMS) that allows the website owner to manage all sections without modifying the source code.
-
-The website focuses on performance, responsive design, modern UI/UX, and maintainability.
+The backend is built with Node.js, Express.js, Prisma ORM, and PostgreSQL and provides authentication, content management, validation, file upload infrastructure, search, and standardized API responses for the public website and admin dashboard.
 
 ---
 
-## Tech Stack
+## Architecture
 
-### Frontend
-
-- React
-- Vite
-- Tailwind CSS
-- DaisyUI
-- Framer Motion
-- React Scroll
-- Axios
-- Iconsax React
-
-### Backend
-
-- Node.js
-- Express.js
-- PostgreSQL
-- Prisma ORM
-- JWT Authentication
-- Zod Validation
-- Cloudinary (Image Management)
-
----
-
-## Features
-
-### Public Website
-
-- Modern Hero Section
-- About Section
-- Services
-- Portfolio
-- Contact
-- Responsive Design
-- Dark / Light Theme
-- Smooth Scroll Navigation
-- Optimized Images (WebP)
-
-### Admin Panel (Upcoming)
-
-- Secure Admin Authentication
-- Dashboard
-- Hero Management
-- About Management
-- Services Management
-- Portfolio Management
-- Contact Management
-- Website Settings
-- Image Upload Manager
-
----
-
-## Project Structure
+The backend follows a layered architecture:
 
 ```text
-SohrabAmini/
-
-├── src/
-├── public/
-├── backend/
-│
-├── package.json
-├── vite.config.js
-└── README.md
+Request
+   ↓
+Route
+   ↓
+Middleware
+   ↓
+Controller
+   ↓
+Service
+   ↓
+Repository
+   ↓
+Prisma
+   ↓
+PostgreSQL
 ```
+
+Each layer has a specific responsibility.
+
+### Route
+
+Defines HTTP endpoints and middleware chains.
+
+### Middleware
+
+Handles concerns such as:
+
+* Authentication
+* Authorization
+* Validation
+* File uploads
+* Error handling
+
+### Controller
+
+Responsible for HTTP request/response handling.
+
+### Service
+
+Contains business rules and application logic.
+
+### Repository
+
+Contains database operations.
+
+### Prisma
+
+Provides database access through the Prisma ORM.
 
 ---
 
-## Backend Structure
+# Technology Stack
+
+* Node.js
+* Express.js
+* Prisma ORM
+* PostgreSQL
+* JWT
+* bcrypt
+* Zod
+* Multer
+* Cloudinary
+* Helmet
+* CORS
+* Cookie Parser
+* Morgan
+* Compression
+* Nodemon
+
+---
+
+# Directory Structure
 
 ```text
 backend/
-
+│
 ├── prisma/
+│   ├── schema.prisma
+│   └── seed.js
+│
 ├── src/
 │   ├── config/
-│   ├── constants/
 │   ├── controllers/
 │   ├── middlewares/
 │   ├── repositories/
@@ -97,45 +100,248 @@ backend/
 │   ├── services/
 │   ├── utils/
 │   ├── validations/
-│   ├── app.js
 │   └── server.js
 │
-├── uploads/
-├── tests/
+├── .env
 ├── package.json
-└── .env
+└── README.md
 ```
 
 ---
 
-## Installation
+# API Routes
 
-Clone the repository
+The API is mounted under:
 
-```bash
-git clone https://github.com/taharezazade/Sohrab-Amini-Portfolio.git
+```text
+/api
 ```
 
-Install frontend dependencies
+Available resources:
+
+```text
+/api/auth
+/api/hero
+/api/about
+/api/services
+/api/portfolio
+/api/portfolio-images
+/api/contact
+/api/settings
+/api/upload
+/api/search
+```
+
+---
+
+# Domain Architecture
+
+The main content domains follow the same general pattern:
+
+```text
+Repository
+Validation
+Service
+Controller
+Route
+```
+
+This allows each domain to remain independent and easier to maintain.
+
+---
+
+# Portfolio
+
+Portfolio supports:
+
+```text
+GET    /api/portfolio
+GET    /api/portfolio/published
+GET    /api/portfolio/featured
+GET    /api/portfolio/slug/:slug
+GET    /api/portfolio/:id
+
+POST   /api/portfolio
+PUT    /api/portfolio/:id
+DELETE /api/portfolio/:id
+
+PATCH  /api/portfolio/:id/status
+PATCH  /api/portfolio/:id/featured
+PATCH  /api/portfolio/:id/order
+```
+
+Portfolio images have their own management layer.
+
+---
+
+# Services
+
+The Service domain supports:
+
+* CRUD
+* Active/inactive status
+* Ordering
+* Reordering
+* Statistics
+* Validation
+* Structured features
+* Technologies
+* Categories
+* Icons
+* Colors
+
+---
+
+# Contact
+
+The Contact domain manages:
+
+```text
+phone
+whatsapp
+image
+```
+
+The public website uses the Contact API rather than relying exclusively on hard-coded contact values.
+
+The API supports:
+
+* Fetch contact
+* Fetch contact by ID
+* Create contact
+* Update contact
+* Upsert contact
+* Delete contact
+* Check existence
+* Count records
+* Update phone
+* Update WhatsApp
+* Image operations
+
+---
+
+# Global Search
+
+The search API provides centralized search across content resources.
+
+Supported resources include:
+
+* Hero
+* About
+* Services
+* Portfolio
+* Contact
+* Settings
+
+Search logic is isolated per resource so an unavailable resource does not unnecessarily break the entire search operation.
+
+---
+
+# Database
+
+The application uses PostgreSQL through Prisma.
+
+Primary models include:
+
+```text
+Admin
+Hero
+About
+Service
+Portfolio
+PortfolioImage
+Contact
+Setting
+```
+
+Enums include:
+
+```text
+Role
+ProjectStatus
+```
+
+---
+
+# Prisma Commands
+
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-Start frontend
+Generate Prisma Client:
 
 ```bash
-npm run dev
+npx prisma generate
 ```
 
-Install backend dependencies
+Create and apply a development migration:
+
+```bash
+npx prisma migrate dev
+```
+
+Open Prisma Studio:
+
+```bash
+npx prisma studio
+```
+
+Run database seed when configured:
+
+```bash
+npx prisma db seed
+```
+
+---
+
+# Environment Variables
+
+Create:
+
+```text
+backend/.env
+```
+
+Example:
+
+```env
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
+
+JWT_ACCESS_SECRET=your_access_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+
+PORT=5000
+NODE_ENV=development
+```
+
+Never commit production secrets.
+
+---
+
+# Installation
 
 ```bash
 cd backend
+
 npm install
 ```
 
-Run backend
+Generate Prisma Client:
+
+```bash
+npx prisma generate
+```
+
+Run migrations:
+
+```bash
+npx prisma migrate dev
+```
+
+Start development server:
 
 ```bash
 npm run dev
@@ -143,71 +349,154 @@ npm run dev
 
 ---
 
-## Environment Variables
+# API Response Contract
 
-Create a `.env` file inside the backend directory.
+Successful API responses use a standardized structure:
 
-```env
-PORT=5000
-DATABASE_URL=
-JWT_SECRET=
-CLIENT_URL=http://localhost:5173
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Request completed successfully.",
+  "data": {},
+  "meta": null,
+  "timestamp": "2026-01-01T00:00:00.000Z"
+}
+```
+
+This contract is consumed by the frontend API/service layers.
+
+---
+
+# Validation
+
+Zod schemas validate incoming application data before database operations.
+
+Validation covers:
+
+* Required fields
+* Optional fields
+* IDs
+* Phone numbers
+* WhatsApp numbers
+* Resource-specific constraints
+* Update payloads
+* Ordering payloads
+
+---
+
+# Error Handling
+
+The API uses centralized error handling for:
+
+* Validation errors
+* Authentication errors
+* Authorization errors
+* Resource-not-found errors
+* Conflict errors
+* Database errors
+* Upload errors
+* Unexpected application errors
+
+Controllers delegate failures to the global error middleware through `next(error)`.
+
+---
+
+# Authentication
+
+Authentication uses:
+
+* JWT access tokens
+* Refresh tokens
+* Cookies where configured
+* bcrypt password hashing
+* Role-based authorization
+
+The primary administrative role is:
+
+```text
+ADMIN
 ```
 
 ---
 
-## Roadmap
+# File Uploads
 
-- Backend Infrastructure
-- Database Design
-- Authentication
-- REST API
-- Image Upload System
-- Admin Dashboard
-- Dynamic Website Content
-- SEO Improvements
-- Analytics
-- Performance Optimization
+The upload layer is based on Multer and is isolated from individual domain services.
 
----
+Supported workflows include:
 
-## Performance Goals
-
-- Lighthouse Score 95+
-- Responsive on all devices
-- Optimized WebP assets
-- Lazy Loading
-- Clean Architecture
-- Scalable Backend
+* Image uploads
+* Portfolio images
+* Hero assets
+* Resume uploads
+* Other CMS-managed files
 
 ---
 
-## Security
+# Development
 
-- JWT Authentication
-- Password Hashing
-- Request Validation
-- Rate Limiting
-- Secure HTTP Headers
-- Environment Variable Protection
+Run the backend:
 
----
+```bash
+npm run dev
+```
 
-## License
+The default development API URL is:
 
-All intellectual property, source code, visual assets, UI design, branding, and content belong to **Sohrab Amini**.
-
-Unauthorized copying, redistribution, modification, or commercial use of any part of this project is prohibited without prior written permission.
+```text
+http://localhost:5000/api
+```
 
 ---
 
-## Developer
+# Related Applications
 
-Designed and developed by **Taha Rezazade**
+This backend is consumed by:
 
-GitHub:
-https://github.com/taharezazade
+```text
+../portfolio
+../admin
+```
+
+The public website should use the backend through the configured:
+
+```env
+VITE_API_URL
+```
 
 ---
 
-© Sohrab Amini. All rights reserved.
+# Development Principles
+
+When adding a new domain, follow:
+
+```text
+Prisma Model
+↓
+Repository
+↓
+Validation
+↓
+Service
+↓
+Controller
+↓
+Route
+↓
+Frontend API
+↓
+Frontend Service
+↓
+Hook
+↓
+UI
+```
+
+Avoid putting database queries directly inside controllers or React components.
+
+---
+
+# License
+
+MIT License
